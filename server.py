@@ -499,6 +499,19 @@ def init_database():
             cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS is_ai_verified BOOLEAN DEFAULT FALSE;")
             cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS is_faculty_verified BOOLEAN DEFAULT FALSE;")
             cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS verification_state VARCHAR(50) DEFAULT 'Reviewing';")
+            cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS helpfulness_upvotes INT DEFAULT 0;")
+            cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS rating DECIMAL(3,2) DEFAULT 5.00;")
+            cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS rating_count INT DEFAULT 1;")
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS answer_replies (
+                    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                    answer_id UUID REFERENCES answers(id) ON DELETE CASCADE,
+                    author_name VARCHAR(100) NOT NULL,
+                    author_avatar VARCHAR(200),
+                    content TEXT NOT NULL,
+                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
             cur.execute("ALTER TABLE doubts ADD COLUMN IF NOT EXISTS embedding vector(384);")
             conn.commit()
 
@@ -805,8 +818,22 @@ def get_doubts(subject: str = "All"):
                 'isAiVerified', a.is_ai_verified,
                 'isFacultyVerified', a.is_faculty_verified,
                 'verificationState', a.verification_state,
+                'helpfulnessUpvotes', COALESCE(a.helpfulness_upvotes, 0),
+                'rating', COALESCE(a.rating, 5.00),
+                'ratingCount', COALESCE(a.rating_count, 1),
                 'authorName', au.full_name,
-                'authorAvatar', au.avatar_url
+                'authorAvatar', au.avatar_url,
+                'replies', COALESCE((
+                    SELECT json_agg(json_build_object(
+                        'id', r.id,
+                        'authorName', r.author_name,
+                        'authorAvatar', r.author_avatar,
+                        'content', r.content,
+                        'createdAt', r.created_at
+                    ) ORDER BY r.created_at ASC)
+                    FROM answer_replies r
+                    WHERE r.answer_id = a.id
+                ), '[]'::json)
             ) ORDER BY a.created_at ASC) as answers
             FROM answers a
             JOIN users au ON a.author_id = au.id
@@ -1352,6 +1379,50 @@ def update_user_points(email: str, request: PointsRequest):
     run_query("UPDATE users SET points = %s WHERE id = %s;", [new_points, row['id']], commit=True)
     
     return {"success": True, "points": new_points}
+
+@app.post("/api/answers/{answer_id}/like")
+@app.post("/answers/{answer_id}/like")
+def like_answer(answer_id: str):
+    run_query("UPDATE answers SET helpfulness_upvotes = COALESCE(helpfulness_upvotes, 0) + 1 WHERE id = %s;", [answer_id], commit=True)
+    row = run_query("SELECT helpfulness_upvotes FROM answers WHERE id = %s;", [answer_id], fetch_one=True)
+    return {"success": True, "helpfulnessUpvotes": row['helpfulness_upvotes'] if row else 0}
+
+class RateRequest(BaseModel):
+    rating: float
+
+@app.post("/api/answers/{answer_id}/rate")
+@app.post("/answers/{answer_id}/rate")
+def rate_answer(answer_id: str, request: RateRequest):
+    if request.rating < 1 or request.rating > 5:
+        raise HTTPException(status_code=400, detail="Rating must be between 1 and 5")
+    
+    row = run_query("SELECT rating, rating_count FROM answers WHERE id = %s;", [answer_id], fetch_one=True)
+    if not row:
+        raise HTTPException(status_code=404, detail="Answer not found")
+    
+    curr_rating = float(row['rating']) if row['rating'] is not None else 5.00
+    curr_count = row['rating_count'] if row['rating_count'] is not None else 1
+    
+    new_count = curr_count + 1
+    new_rating = ((curr_rating * curr_count) + request.rating) / new_count
+    
+    run_query("UPDATE answers SET rating = %s, rating_count = %s WHERE id = %s;", [new_rating, new_count, answer_id], commit=True)
+    return {"success": True, "rating": new_rating, "ratingCount": new_count}
+
+class ReplyRequest(BaseModel):
+    authorName: str
+    authorAvatar: str
+    content: str
+
+@app.post("/api/answers/{answer_id}/replies")
+@app.post("/answers/{answer_id}/replies")
+def add_reply(answer_id: str, request: ReplyRequest):
+    run_query("""
+        INSERT INTO answer_replies (answer_id, author_name, author_avatar, content)
+        VALUES (%s, %s, %s, %s);
+    """, [answer_id, request.authorName, request.authorAvatar, request.content], commit=True)
+    return {"success": True, "message": "Reply added successfully."}
+
 
 if __name__ == '__main__':
     import uvicorn

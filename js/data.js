@@ -521,6 +521,56 @@ const DB = {
     return false;
   },
 
+  async likeAnswer(answerId) {
+    try {
+      const response = await fetch(`http://localhost:8000/api/answers/${answerId}/like`, {
+        method: "POST"
+      });
+      if (response.ok) {
+        await this.syncDoubts();
+        return await response.json();
+      }
+    } catch (e) {
+      console.warn("Error liking answer:", e);
+    }
+    return null;
+  },
+
+  async rateAnswer(answerId, rating) {
+    try {
+      const response = await fetch(`http://localhost:8000/api/answers/${answerId}/rate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating })
+      });
+      if (response.ok) {
+        await this.syncDoubts();
+        return await response.json();
+      }
+    } catch (e) {
+      console.warn("Error rating answer:", e);
+    }
+    return null;
+  },
+
+  async addReply(answerId, authorName, authorAvatar, content) {
+    try {
+      const response = await fetch(`http://localhost:8000/api/answers/${answerId}/replies`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ authorName, authorAvatar, content })
+      });
+      if (response.ok) {
+        await this.syncDoubts();
+        return true;
+      }
+    } catch (e) {
+      console.warn("Error adding reply:", e);
+    }
+    return false;
+  },
+
+
   async setAnswerAiVerified(doubtId, answerIdx, isVerified) {
     const doubts = this.getDoubts();
     const doubt = doubts.find(d => d.id === doubtId);

@@ -417,6 +417,79 @@
 
             <!-- Content Area (Editable inline) -->
             <div id="content-container-${a.id}" class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${renderLiteMarkdown(a.content)}</div>
+
+            <!-- Helpful & Rating Actions Row -->
+            <div class="flex flex-wrap items-center justify-between border-t border-slate-100 pt-3 text-xs gap-3 mt-4">
+              <div class="flex items-center gap-4">
+                <!-- Helpful Like Button -->
+                <button onclick="executeLikeAnswer('${a.id}')" class="flex items-center gap-1.5 font-bold text-slate-500 hover:text-indigo-600 transition-colors bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100">
+                  <i data-lucide="thumbs-up" class="w-3.5 h-3.5"></i>
+                  <span>Helpful (${a.helpfulnessUpvotes || 0})</span>
+                </button>
+
+                <!-- Star Rating Selection Widget -->
+                <div class="flex items-center gap-1">
+                  <span class="text-slate-400 font-medium mr-1">Rate:</span>
+                  <div class="flex items-center text-amber-400 gap-0.5">
+                    ${[1,2,3,4,5].map(star => {
+                      const avg = a.rating || 5.0;
+                      const isFilled = star <= Math.round(avg);
+                      return `
+                        <button onclick="executeRateAnswer('${a.id}', ${star})" class="hover:scale-125 transition-transform" title="Rate ${star} Stars">
+                          <i data-lucide="star" class="w-3.5 h-3.5 ${isFilled ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}"></i>
+                        </button>
+                      `;
+                    }).join("")}
+                  </div>
+                  <span class="text-slate-400 font-semibold ml-1">(${parseFloat(a.rating || 5.0).toFixed(1)} / 5)</span>
+                </div>
+              </div>
+
+              <!-- Tag author button -->
+              <button onclick="tagAuthor('${a.authorName.replace(/'/g, "\\'")}', '${a.id}')" class="text-indigo-600 hover:text-indigo-700 font-extrabold flex items-center gap-1">
+                <i data-lucide="at-sign" class="w-3.5 h-3.5"></i> Tag in Reply
+              </button>
+            </div>
+
+            <!-- Replies Container -->
+            <div class="bg-slate-50/50 rounded-xl p-4 border border-slate-100 mt-3 space-y-3">
+              <h5 class="text-xs font-bold text-slate-700 flex items-center gap-1.5 mb-2">
+                <i data-lucide="message-square" class="w-3.5 h-3.5 text-slate-400"></i>
+                Replies (${(a.replies || []).length})
+              </h5>
+              
+              <!-- Replies List -->
+              <div class="space-y-3 max-h-60 overflow-y-auto no-scrollbar">
+                ${(a.replies || []).length === 0 ? `
+                  <p class="text-[11px] text-slate-400 italic">No replies yet. Start the conversation or thank the contributor!</p>
+                ` : (a.replies || []).map(r => {
+                  // Highlight Mentions: @Name tags
+                  const formattedContent = String(r.content).replace(/@([a-zA-Z0-9.\s]+)/g, (match, p1) => {
+                    return `<span class="inline-flex items-center gap-0.5 bg-indigo-50 border border-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[10px] font-bold shadow-sm">@${p1.trim()}</span>`;
+                  });
+                  return `
+                    <div class="flex gap-2.5 items-start bg-white p-2.5 rounded-lg border border-slate-100 shadow-sm text-xs">
+                      <img src="${r.authorAvatar || 'https://via.placeholder.com/150'}" class="w-6 h-6 rounded-full border border-slate-200 object-cover shrink-0">
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                          <span class="font-extrabold text-slate-900">${r.authorName}</span>
+                          <span class="text-[9px] text-slate-400">${r.createdAt ? new Date(r.createdAt).toLocaleDateString() : 'Just now'}</span>
+                        </div>
+                        <p class="text-slate-600 leading-relaxed">${formattedContent}</p>
+                      </div>
+                    </div>
+                  `;
+                }).join("")}
+              </div>
+
+              <!-- Reply Composer Form -->
+              <div class="flex gap-2 mt-3 pt-2 border-t border-slate-100">
+                <input type="text" id="reply-input-${a.id}" placeholder="Type a reply... Use @ to tag users" class="flex-1 text-xs bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-indigo-500 focus:ring-1 ring-indigo-100 transition-all">
+                <button onclick="submitReply('${a.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1 transition-all shrink-0">
+                  <i data-lucide="send" class="w-3 h-3"></i> Send
+                </button>
+              </div>
+            </div>
           </div>
         `;
       }).join("");
@@ -894,6 +967,122 @@
 
       // Redirect now that the database write is committed
       window.location.href = "student-dashboard.html";
+    };
+
+    window.tagAuthor = (name, answerId) => {
+      const input = document.getElementById(`reply-input-${answerId}`);
+      if (input) {
+        input.value = `@${name} ` + input.value;
+        input.focus();
+      }
+    };
+
+    window.submitReply = async (answerId) => {
+      const input = document.getElementById(`reply-input-${answerId}`);
+      if (!input) return;
+
+      const content = input.value.trim();
+      if (!content) {
+        showToast("Reply content cannot be empty.", "error");
+        return;
+      }
+
+      // OPTIMISTIC UPDATE: Add reply locally and render
+      const doubts = DB.getDoubts();
+      let found = false;
+      doubts.forEach(d => {
+        if (d.answers) {
+          const ans = d.answers.find(a => String(a.id) === String(answerId));
+          if (ans) {
+            if (!ans.replies) ans.replies = [];
+            ans.replies.push({
+              id: "temp-reply-" + Date.now(),
+              authorName: state.user.name,
+              authorAvatar: state.user.avatar,
+              content: content,
+              createdAt: new Date().toISOString()
+            });
+            found = true;
+          }
+        }
+      });
+      if (found) {
+        DB.saveDoubts(doubts);
+        loadDoubtData();
+        showToast("Reply posted successfully.", "success");
+      }
+
+      input.value = "";
+
+      // Sync with database in background
+      DB.addReply(answerId, state.user.name, state.user.avatar, content).then(success => {
+        if (!success) {
+          console.error("Failed to sync reply to DB.");
+        }
+      }).catch(err => {
+        console.error("Background sync error:", err);
+      });
+    };
+
+    window.executeLikeAnswer = async (answerId) => {
+      // OPTIMISTIC UPDATE: Increment upvotes locally & render
+      const doubts = DB.getDoubts();
+      let found = false;
+      doubts.forEach(d => {
+        if (d.answers) {
+          const ans = d.answers.find(a => String(a.id) === String(answerId));
+          if (ans) {
+            ans.helpfulnessUpvotes = (ans.helpfulnessUpvotes || 0) + 1;
+            found = true;
+          }
+        }
+      });
+      if (found) {
+        DB.saveDoubts(doubts);
+        loadDoubtData();
+        showToast("Solution marked as helpful!", "success");
+      }
+
+      // Sync with database in background
+      DB.likeAnswer(answerId).then(res => {
+        if (!res || !res.success) {
+          console.error("Failed to sync like to DB.");
+        }
+      }).catch(err => {
+        console.error("Background sync error:", err);
+      });
+    };
+
+    window.executeRateAnswer = async (answerId, rating) => {
+      // OPTIMISTIC UPDATE: Calculate new average locally & render
+      const doubts = DB.getDoubts();
+      let found = false;
+      doubts.forEach(d => {
+        if (d.answers) {
+          const ans = d.answers.find(a => String(a.id) === String(answerId));
+          if (ans) {
+            const currRating = ans.rating || 5.0;
+            const currCount = ans.ratingCount || 1;
+            ans.ratingCount = currCount + 1;
+            ans.rating = ((currRating * currCount) + rating) / ans.ratingCount;
+            found = true;
+          }
+        }
+      });
+      if (found) {
+        DB.saveDoubts(doubts);
+        loadDoubtData();
+        showToast(`Rated ${rating} stars!`, "success");
+      }
+
+      // Sync with database in background
+      DB.rateAnswer(answerId, rating).then(res => {
+        if (!res || !res.success) {
+          console.error("Failed to sync rating to DB.");
+        }
+      }).catch(err => {
+        console.error("Background sync error:", err);
+      });
     };
 
     function showPointsInfo() {
