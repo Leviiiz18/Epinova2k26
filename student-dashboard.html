@@ -3,740 +3,737 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Portal — Study Buddy (PS-01)</title>
-
-  <!-- Tailwind CSS CDN -->
+  <title>Study Buddy — Student Community</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- Custom CSS -->
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .channel-active { background-color: #e0e7ff; color: #4f46e5; font-weight: 700; border-color: #c7d2fe; }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between">
-
-  <!-- Header -->
-  <header class="sticky top-0 z-40 crisp-nav bg-white/95 border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-
-      <!-- Brand Logo -->
+<body class="bg-white text-slate-900 h-screen flex overflow-hidden font-sans">
+  <!-- Left Sidebar (Discord Style) -->
+  <aside class="w-64 bg-slate-50 border-r border-slate-200 flex-shrink-0 hidden md:flex flex-col h-full z-10">
+    <!-- Brand Logo -->
+    <div class="h-16 flex items-center px-4 border-b border-slate-200">
       <a href="index.html" class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-sm">
           <i data-lucide="graduation-cap" class="w-4 h-4"></i>
         </div>
         <div>
-          <span class="text-base font-bold text-slate-900">Study Buddy</span>
-          <span class="badge-clean-neutral text-[10px] font-semibold px-2 py-0.5 rounded ml-2">Student Intelligence</span>
+          <span class="text-base font-extrabold text-slate-900">Study Buddy</span>
         </div>
       </a>
+    </div>
 
-      <!-- Header Right -->
-      <div class="flex items-center gap-3">
-
-        <!-- Ask Doubt CTA -->
-        <button type="button" onclick="scrollToDoubtInput()" class="btn-primary px-3.5 py-1.5 text-xs font-semibold flex items-center gap-1.5">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-          <span class="hidden sm:inline">Ask Doubt</span>
-          <span class="sm:hidden">Ask</span>
+    <!-- Channels Scroll -->
+    <div class="flex-1 overflow-y-auto py-4 space-y-5 no-scrollbar" id="channels-container">
+      <!-- Injected by JS -->
+    </div>
+    
+    <!-- User Profile Footer in Sidebar -->
+    <div class="p-3 border-t border-slate-200 bg-white">
+      <div class="flex items-center gap-2">
+        <img src="" id="sidebar-avatar" class="w-9 h-9 rounded-full object-cover border border-slate-200">
+        <div class="flex-1 min-w-0">
+          <div class="text-sm font-bold text-slate-900 truncate" id="sidebar-name"></div>
+          <div class="text-[10px] text-slate-500 font-medium truncate" id="sidebar-year"></div>
+        </div>
+        <button onclick="logout()" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors" title="Log out">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
         </button>
+      </div>
+    </div>
+  </aside>
 
-        <!-- Points Wallet -->
-        <div id="user-points-wallet" class="flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-bold px-2.5 py-1 rounded-full cursor-pointer hover:bg-amber-100 transition-colors select-none" title="Your BrainPoints Balance" onclick="showPointsInfo()">
+  <!-- Main Content Area -->
+  <div class="flex-1 flex flex-col h-full overflow-hidden bg-white">
+    <!-- Header -->
+    <header class="h-16 flex items-center justify-between px-4 sm:px-6 border-b border-slate-200 bg-white z-10 shrink-0">
+      <div class="flex items-center gap-3">
+        <button class="md:hidden p-2 -ml-2 text-slate-500 hover:bg-slate-100 rounded-md" onclick="toggleMobileMenu()">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+          <i data-lucide="hash" class="w-5 h-5 text-slate-400"></i>
+          <span id="current-channel-title">General</span>
+        </h2>
+        <span class="badge-clean-neutral text-[10px] font-semibold px-2 py-0.5 rounded hidden sm:block bg-slate-100 border border-slate-200 text-slate-600" id="current-year-title">3rd Year</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div id="user-points-wallet" class="flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-bold px-3 py-1.5 rounded-full cursor-pointer hover:bg-amber-100 transition-colors select-none" onclick="showPointsInfo()">
           <span>🪙</span>
           <span id="header-points-balance">100</span>
-          <span class="text-[9px] text-amber-500 font-semibold">pts</span>
+          <span class="text-[9px] text-amber-500 font-semibold uppercase tracking-wide">pts</span>
         </div>
-
-        <!-- Profile -->
-        <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
-          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150" class="w-8 h-8 rounded-full border border-slate-200 object-cover" alt="Student avatar" id="student-header-avatar">
-          <div class="hidden sm:block text-left">
-            <div class="text-xs font-bold text-slate-900 leading-tight" id="student-header-name">Alex Morgan</div>
-            <div class="text-[10px] text-slate-500 font-medium">3rd Year Student</div>
-          </div>
-          <button type="button" onclick="logout()" title="Log out" aria-label="Log out" class="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 transition-colors px-2 py-1.5 rounded-md hover:bg-slate-100 ml-1">
-            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-          </button>
-        </div>
-
       </div>
-    </div>
-  </header>
+    </header>
 
-  <!-- Main Container -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 flex-1 w-full">
+    <!-- Content Split -->
+    <div class="flex flex-1 overflow-hidden relative bg-slate-50/50">
+      <!-- Center Feed (Reddit Style) -->
+      <main class="flex-1 flex flex-col h-full relative">
+        <!-- Scrollable Feed -->
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 no-scrollbar" id="feed-scroll-container">
+          <div class="max-w-3xl mx-auto space-y-6">
+            
+            <!-- Compose Post Box -->
+            <div id="compose-box-container" class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden hidden transition-all">
+              <div class="p-4 border-b border-slate-100 bg-slate-50">
+                <div class="flex items-center gap-2 text-sm font-bold text-slate-700">
+                  <i data-lucide="edit-3" class="w-4 h-4"></i> Post a New Doubt
+                </div>
+              </div>
+              <form onsubmit="handlePostDoubt(event)" class="p-4">
+                <input type="text" id="post-title" required placeholder="Title of your doubt..." class="w-full text-base font-bold text-slate-900 placeholder-slate-400 border-0 focus:ring-0 p-0 mb-3 bg-transparent outline-none">
+                <textarea id="post-desc" required rows="2" placeholder="Explain your doubt in detail. Attachments coming soon..." class="w-full text-sm text-slate-600 placeholder-slate-400 border-0 focus:ring-0 p-0 mb-4 bg-transparent resize-none outline-none"></textarea>
+                <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                  <div class="text-[10px] text-slate-400 flex items-center gap-1 font-semibold">
+                    <i data-lucide="info" class="w-3 h-3"></i> Posts cost 15 pts
+                  </div>
+                  <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm">
+                    Post Doubt
+                  </button>
+                </div>
+              </form>
+            </div>
 
-    <!-- 1. AUTO-SORT AI DOUBT SUBMISSION (PILLAR 1 & 2) -->
-    <div id="doubt-input-section" class="crisp-card p-6 sm:p-8 bg-gradient-to-br from-indigo-50/50 via-white to-slate-50 border border-indigo-100 shadow-sm rounded-xl">
-      <div class="text-center max-w-2xl mx-auto mb-6">
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-[10px] font-bold uppercase tracking-wider mb-3">
-          <i data-lucide="bot" class="w-3.5 h-3.5"></i>
-          <span>Brainly Q&A Peer &amp; AI Engine</span>
-        </div>
-        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">Clear your doubts in seconds</h2>
-        <p class="text-xs text-slate-500 mt-1.5">Ask a question to search the community Q&A library, get instant AI explanations, or receive help from peer mentors.</p>
-      </div>
+            <!-- Permission Warning (If can't post) -->
+            <div id="no-post-warning" class="bg-white border border-slate-200 rounded-xl p-5 text-center hidden shadow-sm">
+              <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-2 text-slate-400">
+                <i data-lucide="lock" class="w-5 h-5"></i>
+              </div>
+              <p class="text-sm text-slate-600 font-bold" id="no-post-warning-text">You can only post doubts in your own academic year's channels.</p>
+            </div>
 
-      <!-- Doubt Input Form -->
-      <form onsubmit="handleLiveAutoSort(event)" class="space-y-4 max-w-3xl mx-auto">
-        <div class="relative bg-white border-2 border-indigo-200 hover:border-indigo-400 focus-within:border-indigo-600 rounded-xl p-1.5 transition-all shadow-md flex items-center gap-2">
-          <i data-lucide="search" class="w-5 h-5 text-indigo-500 ml-2.5 flex-shrink-0"></i>
-          <textarea id="live-doubt-query" rows="2" required placeholder="What is your question? Ask the community and earn points..." class="w-full bg-transparent border-0 focus:ring-0 focus:outline-none p-1.5 text-sm text-slate-900 placeholder-slate-400 resize-none h-12 leading-relaxed"></textarea>
-          <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs font-bold px-5 py-2.5 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm flex-shrink-0">
-            <i data-lucide="sparkles" class="w-4 h-4"></i>
-            <span>Ask community</span>
-          </button>
-        </div>
+            <!-- Filter/Sort Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-slate-200">
+              <div class="flex items-center gap-1 bg-slate-200/50 p-1 rounded-lg border border-slate-200">
+                <button class="px-3 py-1.5 text-[11px] font-bold rounded-md bg-white text-slate-900 shadow-sm border border-slate-200/50">Most Recent</button>
+                <button class="px-3 py-1.5 text-[11px] font-medium rounded-md text-slate-500 hover:text-slate-900">Most Upvoted</button>
+                <button class="px-3 py-1.5 text-[11px] font-medium rounded-md text-slate-500 hover:text-slate-900">Unsolved</button>
+                <button class="px-3 py-1.5 text-[11px] font-medium rounded-md text-slate-500 hover:text-slate-900">Solved</button>
+              </div>
+            </div>
 
-        <div class="text-[10px] text-slate-400 text-center mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
-          <span class="flex items-center gap-0.5">🪙 Deducts 15 pts per doubt</span>
-          <span>&bull;</span>
-          <span class="flex items-center gap-0.5">🎁 Earn 25-35 pts by answering others</span>
-          <span>&bull;</span>
-          <span class="flex items-center gap-0.5">⚡ Auto-sorting to relevant courses</span>
-        </div>
-
-      </form>
-
-      <!-- LIVE AUTO-SORT RESULT PANEL (Injected on Submit) -->
-      <div id="auto-sort-result-box" class="mt-6 pt-5 border-t border-slate-100 hidden">
-        <div class="flex items-center justify-between mb-3">
-          <div class="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
-            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
-            <span>Auto-Sort Engine Output</span>
-          </div>
-          <span class="badge-clean-emerald text-[11px] font-bold px-2 py-0.5 rounded" id="as-confidence">Confidence: 98%</span>
-        </div>
-
-        <!-- 6 Structured Metadata Badges -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs mb-4">
-          <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
-            <span class="text-[10px] text-slate-400 block font-semibold uppercase">Subject</span>
-            <span class="font-bold text-slate-900" id="as-subject">Computer Science</span>
-          </div>
-          <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
-            <span class="text-[10px] text-slate-400 block font-semibold uppercase">Topic</span>
-            <span class="font-bold text-slate-900" id="as-topic">Algorithms</span>
-          </div>
-          <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
-            <span class="text-[10px] text-slate-400 block font-semibold uppercase">Concept</span>
-            <span class="font-bold text-slate-900" id="as-concept">Depth-First Search (DFS)</span>
-          </div>
-          <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
-            <span class="text-[10px] text-slate-400 block font-semibold uppercase">Difficulty &bull; Intent</span>
-            <span class="font-bold text-slate-900" id="as-difficulty">Intermediate &bull; Conceptual</span>
+            <!-- Posts Feed -->
+            <div id="doubts-feed-container" class="space-y-4 pb-12">
+              <!-- Dynamically populated -->
+            </div>
+            
           </div>
         </div>
+      </main>
 
-        <!-- Detected Misconception & Prerequisite Gap Callout -->
-        <div id="misconception-card" class="p-3.5 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900 mb-4 flex items-start gap-2.5">
-          <div id="misconception-icon-container" class="flex-shrink-0 mt-0.5 text-amber-600">
-            <i data-lucide="alert-triangle" class="w-4 h-4"></i>
-          </div>
+      <!-- Right Sidebar (Leaderboard & Faculty) -->
+      <aside class="w-72 bg-white border-l border-slate-200 hidden lg:flex flex-col h-full shrink-0">
+        <div class="flex-1 overflow-y-auto p-5 space-y-8 no-scrollbar">
+          <!-- Top Helpers -->
           <div>
-            <strong id="misconception-title" class="font-bold block">Detected Conceptual Misconception:</strong>
-            <span id="as-misconception" class="text-amber-800">"DFS can only be implemented recursively and fails without recursion"</span>
-            <div class="mt-1.5 text-[11px] text-amber-700">
-              <strong>KAG Identified Prerequisite:</strong> <span id="as-prereq" class="font-semibold underline">Stack (LIFO) &bull; Function Call Frames</span>
+            <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                <i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i> Top Helpers
+              </h3>
+              <span class="text-[9px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">This Week</span>
+            </div>
+            <div class="space-y-2" id="leaderboard-container"></div>
+          </div>
+          
+          <!-- Online Faculty -->
+          <div>
+            <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                <i data-lucide="users" class="w-4 h-4 text-emerald-500"></i> Online Faculty
+              </h3>
+            </div>
+            <div id="online-faculty-container" class="space-y-4">
+              <!-- Dynamically populated from data.js -->
             </div>
           </div>
         </div>
-
-        <!-- KAG Concept Graph Visual Representation -->
-        <div class="p-4 rounded-lg bg-slate-900 text-white text-xs mb-4">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
-            <span>KAG Reasoning Path &bull; Knowledge Graph Neighborhood</span>
-            <span class="text-emerald-400 font-mono">2-Hop Traversal</span>
-          </div>
-          <div class="flex flex-wrap items-center gap-2 font-mono text-[11px]" id="as-graph-path">
-            <span class="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-200">Graph Traversal</span>
-            <span class="text-slate-500">&rarr;</span>
-            <span class="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white font-bold">DFS</span>
-            <span class="text-slate-500">&rarr; requires &rarr;</span>
-            <span class="px-2 py-1 rounded bg-amber-950/80 border border-amber-600 text-amber-300 font-bold">Recursion / Stack</span>
-            <span class="text-slate-500">&rarr; requires &rarr;</span>
-            <span class="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300">Functions</span>
-          </div>
-        </div>
-
-        <!-- AI Targeted Explanation with Style Switcher -->
-        <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 text-xs mb-4">
-          <div class="flex items-center justify-between mb-2">
-            <strong class="font-bold text-slate-900 flex items-center gap-1.5">
-              <i data-lucide="book-open" class="w-3.5 h-3.5 text-slate-700"></i>
-              <span>Targeted AI Explanation:</span>
-            </strong>
-            <div class="flex items-center gap-1 text-[10px]" id="explanation-style-selectors">
-              <button type="button" onclick="switchExplanationStyle('Step-by-step')" class="px-2 py-0.5 rounded bg-slate-900 text-white font-semibold transition-all" id="btn-style-stepbystep">Step-by-step</button>
-              <button type="button" onclick="switchExplanationStyle('Analogy')" class="px-2 py-0.5 rounded text-slate-500 hover:text-slate-900 transition-all" id="btn-style-analogy">Analogy</button>
-              <button type="button" onclick="switchExplanationStyle('Technical')" class="px-2 py-0.5 rounded text-slate-500 hover:text-slate-900 transition-all" id="btn-style-technical">Technical</button>
-            </div>
-          </div>
-          <p class="text-slate-700 leading-relaxed" id="as-ai-explanation">
-            DFS does not strictly require recursion! Recursion simply uses the computer&apos;s internal Call Stack to remember the traversal path. You can implement DFS iteratively using an explicit Stack (LIFO data structure) with <code>while (!stack.isEmpty())</code>.
-          </p>
-        </div>
-
-        <!-- Recommended Senior Peer Mentor (Peer Matching Engine) -->
-        <div class="p-4 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div class="flex items-center gap-3">
-            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150" class="w-10 h-10 rounded-full border border-slate-200 object-cover" alt="Rahul">
-            <div>
-              <div class="flex items-center gap-2">
-                <h4 class="text-xs font-bold text-slate-900">Rahul Sharma (Peer Mentor)</h4>
-                <span class="badge-clean-emerald text-[10px] font-bold px-1.5 py-0.2 rounded">95% Match</span>
-              </div>
-              <p class="text-[11px] text-slate-500">4th Year &bull; 4.92 ★ Helpfulness Rating &bull; Available</p>
-            </div>
-          </div>
-          <button type="button" onclick="requestPeerHelp('Rahul Sharma')" class="btn-secondary px-3.5 py-1.5 text-xs font-semibold text-slate-800">
-            Request Peer Help
-          </button>
-        </div>
-
-        <!-- Recommended Slides & Materials (Auto-Sorted & Identified) -->
-        <div id="recommended-slides-box" class="p-4 rounded-lg bg-white border border-slate-200 shadow-sm mt-3 hidden animate-fade-in">
-          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
-            <span>Recommended Lecture Slides (Auto-Sorted)</span>
-            <span class="text-indigo-600 font-bold" id="slides-concept-badge">DFS</span>
-          </div>
-          <div class="flex items-start gap-3">
-            <div class="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center text-rose-700 flex-shrink-0">
-              <i data-lucide="presentation" class="w-4 h-4"></i>
-            </div>
-            <div class="flex-1 min-w-0">
-              <h4 class="text-xs font-bold text-slate-900 truncate" id="slides-title">Lecture 8: Advanced Graph Traversals & Call Stack Mechanics</h4>
-              <p class="text-[11px] text-slate-500 mt-0.5" id="slides-description">Comprehensive guide on DFS traversal, stack simulation, and complexity analysis.</p>
-              <div class="flex items-center gap-3 mt-2 text-[10px] text-slate-400 font-medium">
-                <span id="slides-count">24 slides</span>
-                <span>&bull;</span>
-                <span id="slides-size">4.2MB</span>
-                <span>&bull;</span>
-                <span id="slides-difficulty" class="badge-clean-neutral px-1.5 py-0.2 rounded">Intermediate</span>
-              </div>
-            </div>
-            <a id="slides-download-link" href="#" target="_blank" class="btn-secondary px-2.5 py-1 text-[11px] font-semibold flex items-center gap-1">
-              <i data-lucide="download" class="w-3 h-3"></i>
-              <span>Download</span>
-            </a>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- 2. MAIN GRID: ACTIVE DOUBTS & UNDERSTANDING VERIFICATION -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-      <!-- Left 2 Cols: Feed of Doubts & Verified Solutions -->
-      <div class="lg:col-span-2 space-y-4">
-        <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-          <h3 class="text-base font-bold text-slate-950 flex items-center gap-2">
-            <i data-lucide="message-square" class="w-4 h-4 text-slate-700"></i>
-            <span>Doubt Board &amp; Peer Q&A Feed</span>
-          </h3>
-          <span class="text-xs text-slate-500 font-medium" id="doubts-count-badge">Seed Cases Active</span>
-        </div>
-
-        <!-- Brainly Category / Subject Filter Pills -->
-        <div class="flex flex-wrap items-center gap-2 py-1 overflow-x-auto no-scrollbar scroll-smooth">
-          <button type="button" onclick="filterDoubtsBySubject('All')" class="subject-filter-pill px-3 py-1.5 rounded-full text-xs font-bold bg-indigo-600 border border-indigo-600 text-white transition-all shadow-sm flex items-center gap-1" data-subject="All">
-            <i data-lucide="layers" class="w-3.5 h-3.5"></i>
-            <span>All Subjects</span>
-          </button>
-          <button type="button" onclick="filterDoubtsBySubject('Computer Science')" class="subject-filter-pill px-3 py-1.5 rounded-full text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center gap-1" data-subject="Computer Science">
-            <span>💻</span>
-            <span>Computer Science</span>
-          </button>
-          <button type="button" onclick="filterDoubtsBySubject('C Programming')" class="subject-filter-pill px-3 py-1.5 rounded-full text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center gap-1" data-subject="C Programming">
-            <span>🔧</span>
-            <span>C Programming</span>
-          </button>
-          <button type="button" onclick="filterDoubtsBySubject('C# Programming')" class="subject-filter-pill px-3 py-1.5 rounded-full text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center gap-1" data-subject="C# Programming">
-            <span>🎯</span>
-            <span>C#</span>
-          </button>
-          <button type="button" onclick="filterDoubtsBySubject('Machine Learning')" class="subject-filter-pill px-3 py-1.5 rounded-full text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center gap-1" data-subject="Machine Learning">
-            <span>🤖</span>
-            <span>Machine Learning</span>
-          </button>
-          <button type="button" onclick="filterDoubtsBySubject('Artificial Intelligence')" class="subject-filter-pill px-3 py-1.5 rounded-full text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center gap-1" data-subject="Artificial Intelligence">
-            <span>🧬</span>
-            <span>AI</span>
-          </button>
-          <button type="button" onclick="filterDoubtsBySubject('Digital Image Processing')" class="subject-filter-pill px-3 py-1.5 rounded-full text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center gap-1" data-subject="Digital Image Processing">
-            <span>📷</span>
-            <span>DIP</span>
-          </button>
-          <button type="button" onclick="filterDoubtsBySubject('Soft Computing')" class="subject-filter-pill px-3 py-1.5 rounded-full text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center gap-1" data-subject="Soft Computing">
-            <span>☁️</span>
-            <span>Soft Computing</span>
-          </button>
-        </div>
-
-        <div id="doubts-feed-container" class="space-y-4 pt-2">
-          <!-- Injected dynamically via JS -->
-        </div>
-      </div>
-
-      <!-- Right 1 Col: Understanding Check & Concept Mastery Model -->
-      <div class="space-y-5">
-
-        <!-- Understanding Verification Check (Section 12 of PDF) -->
-        <div class="crisp-card p-5 bg-white shadow-sm border border-slate-200" id="micro-quiz-widget">
-          <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-100">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
-              <i data-lucide="check-square" class="w-4 h-4 text-emerald-600"></i>
-              <span>Understanding Verification</span>
-            </h4>
-            <span class="text-[10px] text-slate-400">Micro-Check</span>
-          </div>
-
-          <p class="text-xs font-semibold text-slate-800 mb-3" id="quiz-question">
-            Which data structure can be used to convert a recursive DFS into an iterative algorithm?
-          </p>
-
-          <div class="space-y-2 text-xs" id="quiz-options">
-            <button type="button" onclick="verifyQuizAnswer(0)" class="w-full text-left p-2.5 rounded border border-slate-200 hover:bg-slate-50 text-slate-700">
-              A) Queue (FIFO)
-            </button>
-            <button type="button" onclick="verifyQuizAnswer(1)" class="w-full text-left p-2.5 rounded border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium">
-              B) Stack (LIFO)
-            </button>
-            <button type="button" onclick="verifyQuizAnswer(2)" class="w-full text-left p-2.5 rounded border border-slate-200 hover:bg-slate-50 text-slate-700">
-              C) Binary Heap
-            </button>
-            <button type="button" onclick="verifyQuizAnswer(3)" class="w-full text-left p-2.5 rounded border border-slate-200 hover:bg-slate-50 text-slate-700">
-              D) Hash Table
-            </button>
-          </div>
-
-          <!-- Evaluation Feedback -->
-          <div id="quiz-feedback" class="mt-3 p-2.5 rounded bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 hidden">
-            <strong>✓ Correct!</strong> The function call stack in recursion operates as a Last-In First-Out (LIFO) stack.
-            <div class="mt-1 text-[11px] text-emerald-700">Mastery score updated: <strong>+53% &rarr; 88% (Resolved)</strong></div>
-          </div>
-        </div>
-
-        <!-- Peer Mentors Leaderboard (Brainly Style) -->
-        <div class="crisp-card p-5 bg-gradient-to-br from-amber-50/30 to-white shadow-sm border border-slate-200">
-          <div class="text-xs font-bold uppercase tracking-wider text-slate-900 mb-3 pb-2 border-b border-slate-100 flex items-center justify-between">
-            <span class="flex items-center gap-1.5">
-              <i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i>
-              <span>Top Peer Mentors</span>
-            </span>
-            <span class="text-[10px] text-amber-600 font-bold">This Week</span>
-          </div>
-
-          <div class="space-y-3" id="leaderboard-container">
-            <!-- Loaded dynamically from script -->
-          </div>
-        </div>
-
-        <!-- Student Mastery Model (Section 14 of PDF) -->
-        <div class="crisp-card p-5 bg-white shadow-sm border border-slate-200">
-          <div class="text-xs font-bold uppercase tracking-wider text-slate-900 mb-3 pb-2 border-b border-slate-100 flex items-center justify-between">
-            <span>My Concept Mastery</span>
-            <span class="text-[10px] text-slate-400">PostgreSQL State</span>
-          </div>
-
-          <div class="space-y-3 text-xs">
-            <div>
-              <div class="flex justify-between text-slate-700 mb-1">
-                <span class="font-semibold">Depth-First Search (DFS)</span>
-                <span class="font-bold text-emerald-600" id="mastery-dfs">88%</span>
-              </div>
-              <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                <div class="h-full bg-emerald-500 rounded-full" style="width: 88%"></div>
-              </div>
-            </div>
-
-            <div>
-              <div class="flex justify-between text-slate-700 mb-1">
-                <span class="font-semibold">Backpropagation</span>
-                <span class="font-bold text-emerald-600">92%</span>
-              </div>
-              <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                <div class="h-full bg-emerald-500 rounded-full" style="width: 92%"></div>
-              </div>
-            </div>
-
-            <div>
-              <div class="flex justify-between text-slate-700 mb-1">
-                <span class="font-semibold">Binary Search (Unsorted Array Gap)</span>
-                <span class="font-bold text-amber-600">35%</span>
-              </div>
-              <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                <div class="h-full bg-amber-500 rounded-full" style="width: 35%"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-  </main>
-
-  <!-- Peer Answer Modal Overlay (Brainly Style) -->
-  <div id="peer-answer-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden transition-opacity duration-300">
-    <div class="bg-white rounded-xl shadow-xl max-w-lg w-full overflow-hidden border border-slate-200 flex flex-col transform transition-transform scale-95 duration-300">
-      <!-- Header -->
-      <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-indigo-50/50">
-        <h4 class="font-extrabold text-slate-900 text-sm flex items-center gap-1.5">
-          <i data-lucide="edit-3" class="w-4 h-4 text-indigo-600"></i>
-          <span>Write Peer Explanation</span>
-        </h4>
-        <button type="button" onclick="closeAnswerModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <!-- Content Form -->
-      <form onsubmit="submitPeerAnswer(event)" class="p-5 space-y-4">
-        <input type="hidden" id="answer-doubt-id">
-        <div>
-          <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Doubt Question</label>
-          <p id="answer-doubt-question" class="text-xs text-slate-700 font-semibold bg-slate-50 p-3 rounded-lg border border-slate-200 leading-relaxed"></p>
-        </div>
-        <div>
-          <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Write your solution</label>
-          <textarea id="peer-answer-text" rows="5" required placeholder="Write a clear, detailed step-by-step or technical explanation. Helpful answers build reputation and earn points!" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-indigo-500 transition-all"></textarea>
-        </div>
-        
-        <div class="text-[10px] text-amber-600 font-bold bg-amber-50 border border-amber-100 p-2.5 rounded-lg flex items-center gap-2">
-          <span>🎁</span>
-          <span>Answering this doubt claims <strong id="answer-points-badge">25</strong> BrainPoints immediately!</span>
-        </div>
-
-        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-          <button type="button" onclick="closeAnswerModal()" class="btn-secondary px-4 py-2 text-xs font-semibold">
-            Cancel
-          </button>
-          <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 shadow-sm">
-            <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
-            <span>Submit Solution</span>
-          </button>
-        </div>
-      </form>
+      </aside>
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="border-t border-slate-200 bg-white py-4 px-4 text-center text-xs text-slate-400">
-    <span>Study Buddy Platform &bull; AI-Powered Peer Learning Intelligence (PS-01)</span>
-  </footer>
+  <!-- Mobile Menu Overlay -->
+  <div id="mobile-menu" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden md:hidden transition-opacity duration-300 opacity-0">
+    <div class="w-64 bg-slate-50 h-full flex flex-col transform -translate-x-full transition-transform duration-300 shadow-2xl" id="mobile-menu-panel">
+      <!-- Same as Left Sidebar content -->
+      <div class="h-16 flex items-center justify-between px-4 border-b border-slate-200 bg-white">
+        <span class="text-base font-extrabold text-slate-900">Channels</span>
+        <button onclick="toggleMobileMenu()" class="text-slate-400 hover:text-slate-700 bg-slate-100 p-1.5 rounded-md"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="flex-1 overflow-y-auto py-4 space-y-5 no-scrollbar" id="mobile-channels-container"></div>
+    </div>
+  </div>
+
+  <!-- Thread View Modal (Reddit style comments) -->
+  <div id="thread-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex justify-center items-end sm:items-center p-0 sm:p-4 transition-opacity duration-300 opacity-0">
+    <div class="bg-slate-50 w-full max-w-3xl h-[90vh] sm:h-[85vh] sm:rounded-2xl shadow-2xl flex flex-col transform transition-transform translate-y-full sm:translate-y-4 duration-300 relative border border-slate-200/50">
+      <div class="h-14 border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 bg-white sm:rounded-t-2xl shrink-0 z-10 shadow-sm">
+        <div class="flex items-center gap-2 text-sm font-extrabold text-slate-900">
+          <i data-lucide="message-circle" class="w-4 h-4 text-indigo-500"></i> Thread View
+        </div>
+        <button onclick="closeThreadModal()" class="text-slate-400 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-md p-1.5 border border-slate-200 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      
+      <div class="flex-1 overflow-y-auto p-4 sm:p-6 no-scrollbar relative" id="thread-content-area">
+        <!-- Original Post -->
+        <div id="thread-op" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mb-6"></div>
+        
+        <!-- Answers/Comments -->
+        <div class="flex items-center justify-between mb-4 border-b border-slate-200 pb-2">
+          <h4 class="text-sm font-bold text-slate-900">Answers</h4>
+          <span class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider" id="thread-answer-count">0 Answers</span>
+        </div>
+        <div id="thread-answers" class="space-y-4"></div>
+      </div>
+      
+      <!-- Reply Box -->
+      <div class="p-4 bg-white border-t border-slate-200 shrink-0 sm:rounded-b-2xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]" id="thread-reply-container">
+        <!-- Populated via JS based on seniority rules -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
 
   <!-- Scripts -->
   <script src="js/data.js"></script>
-  <script src="js/autosort.js"></script>
   <script src="js/app.js"></script>
   <script>
+    // System State
+    const YEARS = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
+    const SUBJECTS = ["General", ...STUDY_BUDDY_DATA.taxonomy.map(t => t.subjectName)];
+    const YEAR_SUBJECTS = {
+      "1st Year": ["General", "C Programming", "Leadership & Relationship Management Skills"],
+      "2nd Year": ["General", "C# Programming", "Machine Learning"],
+      "3rd Year": ["General", "Artificial Intelligence", "Digital Image Processing"],
+      "4th Year": ["General", "Advanced Web Technologies", "Soft Computing"]
+    };
+    
+    let state = {
+      activeYear: "",
+      activeSubject: "General",
+      user: null,
+      userYearValue: 1, // 1 to 4
+      activeYearValue: 1,
+      currentDoubtId: null
+    };
+
+    function parseYearValue(yearStr) {
+      if (!yearStr) return 1;
+      const str = String(yearStr).toLowerCase();
+      if (str.includes("1st") || str.includes("first") || str.includes("1")) return 1;
+      if (str.includes("2nd") || str.includes("second") || str.includes("2")) return 2;
+      if (str.includes("3rd") || str.includes("third") || str.includes("3")) return 3;
+      if (str.includes("4th") || str.includes("fourth") || str.includes("4")) return 4;
+      return 1;
+    }
+
     document.addEventListener("DOMContentLoaded", async () => {
-      // Force seed upgrade for gamification peer doubts
-      if (localStorage.getItem("studybuddy_db_version") !== "3.2") {
-        localStorage.removeItem("studybuddy_doubts");
-        localStorage.removeItem("studybuddy_current_user");
-        localStorage.setItem("studybuddy_db_version", "3.2");
+      try {
+        state.user = DB.getCurrentUser();
+        if (!state.user) {
+          window.location.href = "login.html";
+          return;
+        }
+        
+        // Setup base year value
+        state.userYearValue = parseYearValue(state.user.year || state.user.yearName);
+        state.activeYearValue = state.userYearValue;
+        state.activeYear = YEARS[state.activeYearValue - 1] || "1st Year";
+      } catch (e) {
+        console.error("Error during init:", e);
+        // Fallback for demo purposes if DB crashes
+        state.user = { name: "Guest", year: "1st Year", points: 100, role: "student" };
+        state.userYearValue = 1;
+        state.activeYearValue = 1;
+        state.activeYear = "1st Year";
+      }
+
+      // Setup UI from user data
+      document.getElementById("sidebar-name").textContent = state.user.name;
+      document.getElementById("sidebar-year").textContent = state.user.year || state.user.yearName || "Unknown Year";
+      
+      const avatarEl = document.getElementById("sidebar-avatar");
+      if (state.user.avatar) {
+        avatarEl.src = state.user.avatar;
+      } else {
+        avatarEl.src = "https://via.placeholder.com/150";
       }
       
-      const user = DB.getCurrentUser();
-      if (user) {
-        document.getElementById("header-points-balance").textContent = user.points || 100;
-        const nameEl = document.getElementById("student-header-name");
-        if (nameEl && user.name) nameEl.textContent = user.name;
-        const avatarEl = document.getElementById("student-header-avatar");
-        if (avatarEl && user.avatar) avatarEl.src = user.avatar;
-      }
+      document.getElementById("header-points-balance").textContent = state.user.points || 100;
 
-      // Show loading state
-      const feedContainer = document.getElementById("doubts-feed-container");
-      if (feedContainer) {
-        feedContainer.innerHTML = `<div class="p-8 text-center text-xs text-slate-400 flex flex-col items-center gap-2">
-          <svg class="animate-spin w-6 h-6 text-indigo-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
-          <span>Loading real doubts from database...</span>
-        </div>`;
-      }
-
-      // Sync real doubts from Neon PostgreSQL via backend API
       await DB.syncDoubts();
-
-      renderDoubtsFeed();
-      renderLeaderboard();
+      renderSidebar();
+      renderFeed();
+      renderLeaderboardUI();
+      renderOnlineFaculty();
       lucide.createIcons();
+      
+      // Auto-trigger switch to user's default channel
+      switchChannel(state.activeYear, state.activeSubject);
     });
 
-    function setDemoQuery(query) {
-      document.getElementById("live-doubt-query").value = query;
-      handleLiveAutoSort(new Event("submit"));
-    }
-
-    function scrollToDoubtInput() {
-      document.getElementById("doubt-input-section").scrollIntoView({ behavior: "smooth" });
-      document.getElementById("live-doubt-query").focus();
-    }
-
-    let currentExplanations = null;
-
-    async function handleLiveAutoSort(e) {
-      if (e) e.preventDefault();
-      const rawQuery = document.getElementById("live-doubt-query").value;
-      if (!rawQuery.trim()) {
-        showToast("Please enter a valid doubt query.", "error");
-        return;
-      }
-      
-      const currentUser = DB.getCurrentUser();
-      if ((currentUser.points || 0) < 15) {
-        showToast("You need at least 15 BrainPoints to ask a doubt. Answer peer doubts to earn points!", "error");
-        return;
-      }
-      
-      const resultBox = document.getElementById("auto-sort-result-box");
-      resultBox.classList.remove("hidden");
-
-      let classification = null;
-      let usingServer = false;
-
-      // Attempt to classification from Python backend
-      try {
-        const response = await fetch("http://localhost:8000/api/doubts", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ 
-            student_id: currentUser.email,
-            title: rawQuery.split('?')[0] + '?',
-            raw_query: rawQuery,
-            query: rawQuery 
-          })
+    function renderSidebar() {
+      const buildSidebarHTML = () => {
+        let html = "";
+        YEARS.forEach((yr, yIdx) => {
+          const yVal = yIdx + 1;
+          // Students only see their year and below. Faculty see all.
+          if (state.user.role !== "faculty" && yVal > state.userYearValue) {
+            return;
+          }
+          
+          html += `
+            <div class="mb-5">
+              <div class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1.5 px-4 flex items-center gap-1.5">
+                <i data-lucide="folder-open" class="w-3.5 h-3.5"></i> ${yr}
+              </div>
+              <div class="space-y-0.5 px-2">
+          `;
+          (YEAR_SUBJECTS[yr] || []).forEach(sub => {
+            const isActive = state.activeYear === yr && state.activeSubject === sub;
+            const activeClass = isActive 
+              ? "channel-active border border-indigo-200/50 shadow-sm" 
+              : "text-slate-600 hover:bg-slate-200/50 hover:text-slate-900 border border-transparent";
+            
+            // Icon logic
+            let icon = "hash";
+            if (sub === "General") icon = "message-square";
+            else if (sub === "AI & ML" || sub === "DSA") icon = "cpu";
+            else if (sub === "Web & Mobile Dev") icon = "smartphone";
+            else if (sub === "Cloud & Systems") icon = "cloud";
+            else if (sub === "Mathematics & Statistics") icon = "bar-chart";
+            else if (sub === "Cyber Security") icon = "shield";
+            
+            html += `
+              <button onclick="switchChannel('${yr}', '${sub}')" class="w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${activeClass}">
+                <i data-lucide="${icon}" class="w-3.5 h-3.5 ${isActive ? 'text-indigo-600' : 'text-slate-400'}"></i>
+                <span class="truncate">${sub}</span>
+              </button>
+            `;
+          });
+          html += `</div></div>`;
         });
-        
-        if (response.ok) {
-          classification = await response.json();
-          usingServer = true;
-        } else {
-          console.warn("Python server classification failed, falling back to local engine.");
-        }
-      } catch (err) {
-        console.warn("Python server is offline or unreachable. Using local client classification engine fallback.");
-      }
+        return html;
+      };
 
-      // Fallback if server call failed
-      if (!classification) {
-        classification = AutoSortEngine.classify(rawQuery);
-      }
+      document.getElementById("channels-container").innerHTML = buildSidebarHTML();
+      document.getElementById("mobile-channels-container").innerHTML = buildSidebarHTML();
+    }
 
-      // 1. Populate metadata fields
-      document.getElementById("as-subject").textContent = classification.subject;
-      document.getElementById("as-topic").textContent = classification.topic;
-      document.getElementById("as-concept").textContent = classification.concept;
-      document.getElementById("as-difficulty").textContent = `${classification.difficulty} • ${classification.intent}`;
-      document.getElementById("as-confidence").textContent = `Confidence: ${Math.round(classification.confidence * 100)}%`;
-      document.getElementById("as-misconception").textContent = classification.misconception;
+    function switchChannel(year, subject) {
+      state.activeYear = year;
+      state.activeSubject = subject;
+      state.activeYearValue = parseYearValue(year);
       
-      // Update misconception card style based on active flags
-      const misconceptionCard = document.getElementById("misconception-card");
-      const iconContainer = document.getElementById("misconception-icon-container");
-      const titleEl = document.getElementById("misconception-title");
-      if (classification.isMisconceptionTriggered) {
-        misconceptionCard.className = "p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-900 mb-4 flex items-start gap-2.5 transition-colors duration-300";
-        iconContainer.className = "flex-shrink-0 mt-0.5 text-rose-600";
-        iconContainer.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4"></i>`;
-        titleEl.textContent = "Triggered Conceptual Misconception:";
+      document.getElementById("current-channel-title").textContent = subject;
+      document.getElementById("current-year-title").textContent = year;
+      
+      // Manage Composer Box Visibility (Seniority Logic for Posting)
+      const composeBox = document.getElementById("compose-box-container");
+      const warningBox = document.getElementById("no-post-warning");
+      const warningText = document.getElementById("no-post-warning-text");
+      
+      // Faculty can post anywhere. Students only in their own year.
+      if (state.user.role === "faculty" || state.activeYearValue === state.userYearValue) {
+        composeBox.classList.remove("hidden");
+        warningBox.classList.add("hidden");
       } else {
-        misconceptionCard.className = "p-3.5 rounded-lg bg-emerald-50/40 border border-emerald-200 text-xs text-slate-700 mb-4 flex items-start gap-2.5 transition-colors duration-300";
-        iconContainer.className = "flex-shrink-0 mt-0.5 text-emerald-600";
-        iconContainer.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4"></i>`;
-        titleEl.textContent = "Canonical Understanding Validated:";
-      }
-
-      // 2. Populate Prerequisites list
-      if (classification.prerequisites.length > 0) {
-        document.getElementById("as-prereq").innerHTML = classification.prerequisites
-          .map(p => `<span class="font-semibold underline">${p}</span>`)
-          .join(" &bull; ");
-      } else {
-        document.getElementById("as-prereq").textContent = "None identified";
-      }
-
-      // 3. Render dynamic KAG Graph Path
-      const graphContainer = document.getElementById("as-graph-path");
-      graphContainer.innerHTML = classification.graphPath.map((node, idx) => {
-        let nodeClass = "bg-slate-800 text-slate-300";
-        if (node.type === "Concept") {
-          nodeClass = "bg-indigo-900 border border-indigo-500 text-indigo-100 font-bold";
-        } else if (node.type === "Prerequisite") {
-          nodeClass = "bg-amber-950 border border-amber-500 text-amber-300 font-bold";
+        composeBox.classList.add("hidden");
+        warningBox.classList.remove("hidden");
+        if (state.activeYearValue < state.userYearValue) {
+          warningText.innerHTML = `You are viewing a junior year channel.<br><span class="text-xs text-slate-500 font-normal mt-1 block">You can view and answer doubts here, but cannot start new discussions.</span>`;
+        } else {
+          warningText.innerHTML = `You do not have access to post in senior channels.<br><span class="text-xs text-slate-500 font-normal mt-1 block">Only ${state.activeYear} students and above can answer or post here.</span>`;
         }
+      }
+
+      renderSidebar();
+      renderFeed();
+      lucide.createIcons();
+      
+      // Close mobile menu if open
+      const mobileMenu = document.getElementById("mobile-menu");
+      if (!mobileMenu.classList.contains("hidden")) toggleMobileMenu();
+    }
+
+    function renderFeed() {
+      const container = document.getElementById("doubts-feed-container");
+      const doubts = DB.getDoubts();
+      
+      // We filter doubts by matching the subject.
+      // In a robust system, doubts should also be tagged with the 'year' they were posted in.
+      // We'll approximate by checking the student's year for now, since they can only post in their own year.
+      const filtered = doubts.filter(d => {
+        const doubtYearVal = parseYearValue(d.studentYear);
+        const matchesYear = doubtYearVal === state.activeYearValue;
         
-        const arrow = idx > 0 ? `<span class="text-slate-500 mx-1">&rarr; ${node.type === 'Prerequisite' ? 'requires &rarr; ' : ''}</span>` : '';
+        // We handle legacy dummy data that might not match perfectly
+        const matchesSubject = (d.subject === state.activeSubject) || 
+                               (state.activeSubject === "General" && !SUBJECTS.includes(d.subject));
+        
+        // Fallback: If doubt has no studentYear or is legacy, just show it based on subject to populate the feed.
+        if (!d.studentYear) return matchesSubject;
+        
+        return matchesYear && matchesSubject;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-16 bg-white rounded-xl border border-slate-200 border-dashed shadow-sm">
+            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 text-slate-300">
+              <i data-lucide="inbox" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-base font-extrabold text-slate-900">No doubts here yet</h3>
+            <p class="text-sm text-slate-500 mt-1 max-w-sm mx-auto">Be the first to start a discussion in ${state.activeYear} - ${state.activeSubject}!</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = filtered.map(d => {
+        const isSolved = d.status === "Resolved";
+        const answerCount = d.answers ? d.answers.length : 0;
+        
+        let yearBadge = "";
+        const authorYearVal = parseYearValue(d.studentYear);
+        if (authorYearVal) yearBadge = `<span class="bg-slate-100 border border-slate-200 text-slate-600 px-1.5 py-0.5 rounded text-[9px] font-bold shadow-sm">${d.studentYear}</span>`;
+
         return `
-          ${arrow}
-          <span class="px-2 py-1 rounded ${nodeClass}">${node.name}</span>
+          <div class="bg-white border border-slate-200 rounded-xl p-5 hover:border-indigo-300 hover:shadow-md transition-all shadow-sm cursor-pointer group relative" onclick="openThread('${d.id}')">
+            <!-- decorative accent line -->
+            ${isSolved ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-l-xl"></div>' : ''}
+            
+            <div class="flex items-start gap-4">
+              <!-- Upvote column -->
+              <div class="flex flex-col items-center gap-1 bg-slate-50/80 px-2.5 py-2 rounded-xl border border-slate-200 group-hover:border-indigo-100 transition-colors shrink-0">
+                <i data-lucide="chevron-up" class="w-5 h-5 text-slate-400 group-hover:text-indigo-500 transition-colors"></i>
+                <span class="text-sm font-extrabold text-slate-700">${Math.floor(Math.random()*25)+2}</span>
+                <i data-lucide="chevron-down" class="w-5 h-5 text-slate-300"></i>
+              </div>
+              
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                  <img src="${d.studentAvatar || 'https://via.placeholder.com/150'}" class="w-5 h-5 rounded-full border border-slate-200">
+                  <span class="text-xs font-bold text-slate-900">${d.studentName}</span>
+                  ${yearBadge}
+                  <span class="text-[10px] text-slate-400 ml-auto whitespace-nowrap">${d.timestamp || '2 hrs ago'}</span>
+                </div>
+                
+                <h4 class="text-base font-extrabold text-slate-900 mb-1.5 leading-snug group-hover:text-indigo-700 transition-colors">${d.title}</h4>
+                <p class="text-sm text-slate-600 line-clamp-2 leading-relaxed mb-4">${d.rawQuery}</p>
+                
+                <div class="flex flex-wrap items-center gap-3 text-[11px] font-bold">
+                  <div class="flex items-center gap-1.5 text-slate-600 bg-slate-100/80 border border-slate-200 px-2.5 py-1 rounded-md shadow-sm">
+                    <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                    <span>${answerCount} ${answerCount === 1 ? 'Answer' : 'Answers'}</span>
+                  </div>
+                  ${isSolved 
+                    ? `<div class="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-md shadow-sm"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Solved</div>` 
+                    : ''
+                  }
+                  <div class="flex items-center gap-1.5 text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 shadow-sm ml-auto sm:ml-0">
+                    <span>🎁 ${d.points || 25} pts bounty</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         `;
       }).join("");
-
-      // 4. Handle explanations & switcher
-      currentExplanations = classification.explanation;
-      switchExplanationStyle('Step-by-step');
-
-      // 5. Render slides/PPT resource
-      if (usingServer && classification.resources && classification.resources.length > 0) {
-        renderRecommendedSlidesFromPayload(classification.resources[0]);
-      } else {
-        renderRecommendedSlides(classification.concept);
-      }
-
-      // Deduct points for asking doubt
-      await DB.updateUserPoints(-15);
-
-      // Create new doubt record in DB
-      if (usingServer) {
-        await DB.syncDoubts();
-      } else {
-        const newDoubtId = "eeeeeeee-" + Math.random().toString(36).substr(2, 9);
-        const newDoubt = {
-          id: newDoubtId,
-          studentName: currentUser.name,
-          studentYear: currentUser.year,
-          studentAvatar: currentUser.avatar,
-          rawQuery: rawQuery,
-          title: rawQuery.includes('?') ? rawQuery.split('?')[0] + '?' : rawQuery + '?',
-          subject: classification.subject,
-          topic: classification.topic || "U1",
-          concept: classification.concept,
-          subConcept: classification.subConcept || "General",
-          difficulty: classification.difficulty || "Beginner",
-          intent: classification.intent,
-          misconception: classification.misconception,
-          prerequisites: classification.prerequisites || [],
-          confidence: { topic: classification.confidence, concept: classification.confidence },
-          status: "Open",
-          timestamp: "Just now",
-          similarCount: Math.floor(Math.random() * 5),
-          points: 25,
-          answers: [],
-          understandingCheck: {
-            id: "gggggggg-" + Math.random().toString(36).substr(2, 9),
-            question: `Regarding ${classification.concept}, which of the following is correct?`,
-            options: ["Option A", "Option B", "Option C", "Option D"],
-            correctIndex: 0,
-            explanation: `Explaining the details of ${classification.concept}.`
-          }
-        };
-        await DB.addDoubt(newDoubt);
-      }
-      renderDoubtsFeed();
-      renderLeaderboard();
-
-      const toastMessage = usingServer 
-        ? "Auto-Sort completed via Python Server! doubt posted (-15 pts)" 
-        : "Auto-Sort completed (Offline Fallback)! doubt posted (-15 pts)";
-      showToast(toastMessage, "warning");
-      
-      // Clear input
-      document.getElementById("live-doubt-query").value = "";
       lucide.createIcons();
     }
 
-    function switchExplanationStyle(style) {
-      if (!currentExplanations) return;
-      document.getElementById("as-ai-explanation").textContent = currentExplanations[style];
+    async function handlePostDoubt(e) {
+      e.preventDefault();
       
-      // Update buttons style
-      const styles = ['Step-by-step', 'Analogy', 'Technical'];
-      styles.forEach(s => {
-        const btnId = `btn-style-${s.toLowerCase().replace('-', '')}`;
-        const btn = document.getElementById(btnId);
-        if (btn) {
-          if (s === style) {
-            btn.className = "px-2 py-0.5 rounded bg-slate-900 text-white font-semibold transition-all";
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      if (submitBtn.disabled) return;
+      
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Posting...';
+      lucide.createIcons();
+      
+      try {
+        const title = document.getElementById("post-title").value;
+        const desc = document.getElementById("post-desc").value;
+        
+        if ((state.user.points || 0) < 15) {
+          showToast("You need 15 pts to post a doubt. Try answering questions first!", "error");
+          return;
+        }
+        
+        await DB.updateUserPoints(-15);
+        
+        const newDoubt = {
+          id: "doubt-" + Date.now(),
+          studentName: state.user.name,
+          studentYear: state.user.year || state.user.yearName,
+          studentAvatar: state.user.avatar,
+          title: title,
+          rawQuery: desc,
+          subject: state.activeSubject,
+          concept: "General",
+          status: "Open",
+          timestamp: "Just now",
+          points: 25,
+          answers: []
+        };
+        
+        await DB.addDoubt(newDoubt);
+        document.getElementById("post-title").value = "";
+        document.getElementById("post-desc").value = "";
+        
+        renderFeed();
+        showToast("Doubt posted successfully! (-15 pts)", "success");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    }
+
+    function openThread(doubtId) {
+      state.currentDoubtId = doubtId;
+      const doubts = DB.getDoubts();
+      const d = doubts.find(x => x.id === doubtId);
+      if (!d) return;
+
+      document.getElementById("thread-answer-count").textContent = `${d.answers ? d.answers.length : 0} Answers`;
+
+      // Render Original Post
+      const opHtml = `
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <img src="${d.studentAvatar || 'https://via.placeholder.com/150'}" class="w-10 h-10 rounded-full border border-slate-200 shadow-sm">
+            <div>
+              <div class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                ${d.studentName} 
+                <span class="bg-slate-100 border border-slate-200 text-slate-600 px-1.5 py-0.5 rounded text-[10px] shadow-sm">${d.studentYear}</span>
+              </div>
+              <div class="text-[11px] text-slate-500 font-medium">${d.timestamp || '2 hrs ago'} in ${d.subject}</div>
+            </div>
+          </div>
+          <div class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 shadow-sm flex items-center gap-1.5">
+             <span>🎁</span> ${d.points || 25} pts bounty
+          </div>
+        </div>
+        <h3 class="text-xl font-extrabold text-slate-900 mb-3">${d.title}</h3>
+        <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${d.rawQuery}</p>
+        <div class="mt-5 pt-4 border-t border-slate-100 flex items-center gap-4 text-xs font-bold text-slate-500">
+          <button class="flex items-center gap-1.5 hover:text-indigo-600 transition-colors"><i data-lucide="chevron-up" class="w-4 h-4"></i> Upvote</button>
+          <button class="flex items-center gap-1.5 hover:text-indigo-600 transition-colors"><i data-lucide="share-2" class="w-4 h-4"></i> Share</button>
+        </div>
+      `;
+      document.getElementById("thread-op").innerHTML = opHtml;
+
+      // Render Answers
+      const ansContainer = document.getElementById("thread-answers");
+      if (!d.answers || d.answers.length === 0) {
+        ansContainer.innerHTML = `
+          <div class="text-center py-8 bg-slate-50 rounded-xl border border-slate-200 border-dashed">
+            <p class="text-sm text-slate-500 font-medium italic">No answers yet. Be the first to help out!</p>
+          </div>
+        `;
+      } else {
+        ansContainer.innerHTML = d.answers.map(a => {
+          let badgeHtml = "";
+          let bgClass = "bg-white";
+          
+          if (a.authorName.includes("Faculty") || a.isFacultyVerified) {
+            bgClass = "bg-emerald-50/30 border-emerald-200";
+            badgeHtml = `<span class="bg-emerald-100 border border-emerald-300 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-extrabold flex items-center gap-1 shadow-sm"><i data-lucide="award" class="w-3 h-3"></i> Faculty Verified ✓</span>`;
           } else {
-            btn.className = "px-2 py-0.5 rounded text-slate-500 hover:text-slate-900 transition-all";
+            // Student Senior badge
+            badgeHtml = `<span class="bg-indigo-100 border border-indigo-200 text-indigo-800 px-2 py-0.5 rounded text-[10px] font-extrabold flex items-center gap-1 shadow-sm"><i data-lucide="check-circle" class="w-3 h-3"></i> Answered by Peer ✓</span>`;
           }
+
+          return `
+            <div class="p-5 rounded-xl border border-slate-200 shadow-sm relative pl-12 ${bgClass}">
+              <!-- Thread connector line -->
+              <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-100 -z-10"></div>
+              
+              <div class="flex items-center gap-3 mb-3">
+                <img src="${a.authorAvatar || 'https://via.placeholder.com/150'}" class="w-8 h-8 rounded-full border-2 border-white shadow-sm absolute left-2 top-4 bg-white">
+                <span class="text-sm font-extrabold text-slate-900">${a.authorName}</span>
+                ${badgeHtml}
+                <span class="text-[10px] text-slate-400 ml-auto font-medium">Just now</span>
+              </div>
+              <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${a.content}</p>
+              
+              <div class="mt-4 flex items-center gap-4 text-xs font-bold text-slate-500">
+                <button class="hover:text-indigo-600 flex items-center gap-1 transition-colors"><i data-lucide="thumbs-up" class="w-4 h-4"></i> Helpful (0)</button>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      // Seniority Logic for Reply Box
+      const replyContainer = document.getElementById("thread-reply-container");
+      
+      // Target channel year logic (the channel they are currently viewing)
+      // A student can answer if state.userYearValue >= state.activeYearValue
+      
+      if (state.user.role === "faculty" || state.userYearValue >= state.activeYearValue) {
+        replyContainer.innerHTML = `
+          <div class="text-[10px] text-slate-500 font-bold mb-2 flex items-center gap-1.5 uppercase tracking-wider">
+             <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Submit an Answer
+          </div>
+          <form onsubmit="submitReply(event)" class="flex flex-col gap-3">
+            <textarea id="reply-text" rows="3" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl p-3 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 ring-indigo-100 transition-all resize-none" placeholder="Write a helpful explanation..."></textarea>
+            <div class="flex justify-between items-center">
+              <span class="text-[11px] text-amber-600 font-bold bg-amber-50 px-2 py-1 rounded border border-amber-200">🎁 Earn 25 pts for helping</span>
+              <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white px-5 py-2 rounded-lg text-xs font-bold flex items-center justify-center shadow-sm transition-colors">
+                Post Answer
+              </button>
+            </div>
+          </form>
+        `;
+      } else {
+        replyContainer.innerHTML = `
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
+            <div class="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-2 text-slate-500">
+              <i data-lucide="lock" class="w-4 h-4"></i>
+            </div>
+            <p class="text-sm text-slate-600 font-bold">Answering Disabled</p>
+            <p class="text-xs text-slate-500 font-medium mt-1">Only students in ${state.activeYear} or above can answer questions here.</p>
+          </div>
+        `;
+      }
+
+      // Show modal with animation
+      const modal = document.getElementById("thread-modal");
+      modal.classList.remove("hidden");
+      
+      // Trigger reflow
+      void modal.offsetWidth;
+      
+      modal.classList.remove("opacity-0");
+      modal.children[0].classList.remove("translate-y-full", "sm:translate-y-4");
+      
+      lucide.createIcons();
+    }
+
+    function closeThreadModal() {
+      const modal = document.getElementById("thread-modal");
+      modal.classList.add("opacity-0");
+      modal.children[0].classList.add("translate-y-full", "sm:translate-y-4");
+      
+      setTimeout(() => {
+        modal.classList.add("hidden");
+      }, 300);
+    }
+
+    async function submitReply(e) {
+      e.preventDefault();
+      const txt = document.getElementById("reply-text").value;
+      if (!txt.trim() || !state.currentDoubtId) return;
+      
+      const ansData = {
+        authorName: state.user.name,
+        authorAvatar: state.user.avatar,
+        content: txt,
+        isFacultyVerified: state.user.role === "faculty",
+        isAiVerified: false
+      };
+
+      await DB.resolveDoubt(state.currentDoubtId, ansData);
+      await DB.updateUserPoints(25);
+      
+      showToast("Answer posted successfully! Earned 25 pts.", "success");
+      openThread(state.currentDoubtId); // refresh thread
+      renderFeed(); // refresh feed
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById("mobile-menu");
+      const panel = document.getElementById("mobile-menu-panel");
+      
+      if (menu.classList.contains("hidden")) {
+        menu.classList.remove("hidden");
+        void menu.offsetWidth; // reflow
+        menu.classList.remove("opacity-0");
+        panel.classList.remove("-translate-x-full");
+      } else {
+        menu.classList.add("opacity-0");
+        panel.classList.add("-translate-x-full");
+        setTimeout(() => menu.classList.add("hidden"), 300);
+      }
+    }
+
+    function renderLeaderboardUI() {
+      let list = STUDY_BUDDY_DATA.peers.map(p => ({
+        name: p.name,
+        pts: p.sessionsCompleted * 25, 
+        avatar: p.avatar
+      }));
+      
+      if (!list.find(p => p.name === state.user.name)) {
+        list.push({ 
+          name: state.user.name, 
+          pts: state.user.points || 100, 
+          avatar: state.user.avatar || 'https://via.placeholder.com/150' 
+        });
+      }
+
+      list = list.sort((a,b) => b.pts - a.pts);
+
+      document.getElementById("leaderboard-container").innerHTML = list.map((l, i) => `
+        <div class="flex items-center justify-between p-2.5 rounded-xl transition-all ${l.name === state.user.name ? 'bg-indigo-50 border border-indigo-100 shadow-sm' : 'bg-slate-50 border border-slate-100'}">
+          <div class="flex items-center gap-3">
+            <span class="text-[10px] font-extrabold ${i===0 ? 'text-amber-500' : 'text-slate-400'} w-3 text-center">${i+1}</span>
+            <img src="${l.avatar}" class="w-7 h-7 rounded-full object-cover border border-slate-200">
+            <span class="text-xs font-bold text-slate-800">${l.name} ${l.name === state.user.name ? '<span class="text-[9px] text-indigo-500 font-bold ml-1">(You)</span>' : ''}</span>
+          </div>
+          <span class="text-xs font-extrabold text-indigo-600">${l.pts}</span>
+        </div>
+      `).join("");
+    }
+
+    function renderOnlineFaculty() {
+      // Mocking faculty from the resources metadata in data.js
+      const uniqueFaculty = {};
+      STUDY_BUDDY_DATA.resources.forEach(r => {
+        if(!uniqueFaculty[r.facultyId]) {
+          uniqueFaculty[r.facultyId] = {
+            name: r.facultyId === "33333333-0000-0000-0000-000000000001" ? "Dr. Sarah Jenkins" : "Prof. David Kumar",
+            dept: r.metadata.subject,
+            avatar: r.facultyId === "33333333-0000-0000-0000-000000000001" ? "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150" : "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150"
+          };
         }
       });
-      showToast(`Switched explanation style to ${style}`, "info");
-    }
+      const faculty = Object.values(uniqueFaculty);
 
-    function renderRecommendedSlides(conceptName) {
-      const slidesBox = document.getElementById("recommended-slides-box");
-      if (!slidesBox) return;
-
-      const matchingResources = DB.getResourcesByConcept(conceptName);
-      if (matchingResources && matchingResources.length > 0) {
-        const resource = matchingResources[0];
-        document.getElementById("slides-concept-badge").textContent = resource.metadata.concept;
-        document.getElementById("slides-title").textContent = resource.title;
-        document.getElementById("slides-description").textContent = resource.metadata.description;
-        document.getElementById("slides-count").textContent = `${resource.metadata.slideCount} slides`;
-        document.getElementById("slides-size").textContent = resource.metadata.fileSize;
-        
-        const diffBadge = document.getElementById("slides-difficulty");
-        diffBadge.textContent = resource.metadata.difficulty;
-        diffBadge.className = `badge-clean-neutral px-1.5 py-0.2 rounded`;
-        if (resource.metadata.difficulty === "Advanced") {
-          diffBadge.className = "badge-clean-rose px-1.5 py-0.2 rounded font-bold";
-        } else if (resource.metadata.difficulty === "Intermediate") {
-          diffBadge.className = "badge-clean-amber px-1.5 py-0.2 rounded font-bold";
-        } else {
-          diffBadge.className = "badge-clean-neutral px-1.5 py-0.2 rounded";
-        }
-
-        const downloadLink = document.getElementById("slides-download-link");
-        if (downloadLink) {
-          downloadLink.href = resource.url;
-        }
-
-        slidesBox.classList.remove("hidden");
-      } else {
-        slidesBox.classList.add("hidden");
+      const container = document.getElementById("online-faculty-container");
+      if(container) {
+        container.innerHTML = faculty.map(f => `
+          <div class="flex items-center gap-3">
+            <div class="relative shrink-0">
+              <img src="${f.avatar}" class="w-9 h-9 rounded-full object-cover border border-slate-200">
+              <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></div>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-slate-900">${f.name}</div>
+              <div class="text-[10px] text-slate-500 font-medium">${f.dept}</div>
+            </div>
+          </div>
+        `).join('');
       }
     }
 
-    function renderRecommendedSlidesFromPayload(resource) {
-      const slidesBox = document.getElementById("recommended-slides-box");
-      if (!slidesBox) return;
-
-      document.getElementById("slides-concept-badge").textContent = resource.metadata.concept;
-      document.getElementById("slides-title").textContent = resource.title;
-      document.getElementById("slides-description").textContent = resource.metadata.description;
-      document.getElementById("slides-count").textContent = `${resource.metadata.slideCount} slides`;
-      document.getElementById("slides-size").textContent = resource.metadata.fileSize;
-      
-      const diffBadge = document.getElementById("slides-difficulty");
-      diffBadge.textContent = resource.metadata.difficulty;
-      diffBadge.className = `badge-clean-neutral px-1.5 py-0.2 rounded`;
-      if (resource.metadata.difficulty === "Advanced") {
-        diffBadge.className = "badge-clean-rose px-1.5 py-0.2 rounded font-bold";
-      } else if (resource.metadata.difficulty === "Intermediate") {
-        diffBadge.className = "badge-clean-amber px-1.5 py-0.2 rounded font-bold";
-      } else {
-        diffBadge.className = "badge-clean-neutral px-1.5 py-0.2 rounded";
-      }
-
-      const downloadLink = document.getElementById("slides-download-link");
-      if (downloadLink) {
-        downloadLink.href = resource.url;
-      }
-
-      slidesBox.classList.remove("hidden");
-    }
-
-    let currentSubjectFilter = 'All';
-
-    // Points wallet update listener
     window.onPointsUpdate = (newPoints, diff) => {
       const balanceEl = document.getElementById("header-points-balance");
       if (balanceEl) {
         balanceEl.textContent = newPoints;
-        
-        // CSS Bounce / Pulse Animation
         const wallet = document.getElementById("user-points-wallet");
         wallet.classList.remove("scale-100");
         wallet.classList.add("scale-110", "bg-amber-100", "border-amber-400");
@@ -748,333 +745,7 @@
     };
 
     function showPointsInfo() {
-      const user = DB.getCurrentUser();
-      showToast(`Points balance: ${user.points} pts. Solve quizzes (+15) or answer peer doubts (+25) to earn!`, "info");
-    }
-
-    function verifyQuizAnswer(optionIndex) {
-      const feedback = document.getElementById("quiz-feedback");
-      if (optionIndex === 1) {
-        feedback.classList.remove("hidden");
-        document.getElementById("mastery-dfs").textContent = "88%";
-        DB.updateUserPoints(15);
-        showToast("Correct! +15 BrainPoints claimed!", "success");
-      } else {
-        showToast("Incorrect option. Remember that call frames use LIFO order.", "error");
-      }
-    }
-
-    function requestPeerHelp(peerName) {
-      showToast(`Peer help request sent to ${peerName}! Session invite generated.`, "success");
-    }
-
-    // Filter doubts by subject pill
-    function filterDoubtsBySubject(subjectName) {
-      currentSubjectFilter = subjectName;
-      
-      // Update active style of pills
-      const pills = document.querySelectorAll(".subject-filter-pill");
-      pills.forEach(pill => {
-        const sub = pill.getAttribute("data-subject");
-        if (sub === subjectName) {
-          pill.className = "subject-filter-pill px-3 py-1.5 rounded-full text-xs font-bold bg-indigo-600 border border-indigo-600 text-white transition-all shadow-sm flex items-center gap-1";
-        } else {
-          pill.className = "subject-filter-pill px-3 py-1.5 rounded-full text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center gap-1";
-        }
-      });
-
-      renderDoubtsFeed();
-      showToast(`Viewing doubts for: ${subjectName}`, "info");
-    }
-
-    // Modal Operations
-    function openAnswerModal(doubtId) {
-      const doubts = DB.getDoubts();
-      const doubt = doubts.find(d => d.id === doubtId);
-      if (!doubt) return;
-
-      document.getElementById("answer-doubt-id").value = doubtId;
-      document.getElementById("answer-doubt-question").textContent = doubt.rawQuery;
-      document.getElementById("answer-points-badge").textContent = doubt.points || 25;
-      document.getElementById("peer-answer-text").value = "";
-
-      const modal = document.getElementById("peer-answer-modal");
-      modal.classList.remove("hidden");
-      setTimeout(() => {
-        modal.querySelector(".transform").classList.remove("scale-95");
-        modal.querySelector(".transform").classList.add("scale-100");
-      }, 50);
-    }
-
-    function closeAnswerModal() {
-      const modal = document.getElementById("peer-answer-modal");
-      modal.querySelector(".transform").classList.remove("scale-100");
-      modal.querySelector(".transform").classList.add("scale-95");
-      setTimeout(() => {
-        modal.classList.add("hidden");
-      }, 150);
-    }
-
-    function submitPeerAnswer(e) {
-      e.preventDefault();
-      const doubtId = document.getElementById("answer-doubt-id").value;
-      const content = document.getElementById("peer-answer-text").value;
-      if (!content.trim()) return;
-
-      const doubts = DB.getDoubts();
-      const doubt = doubts.find(d => d.id === doubtId);
-      if (!doubt) return;
-
-      const currentUser = DB.getCurrentUser();
-      const answerData = {
-        authorName: `${currentUser.name} (Peer Mentor)`,
-        authorAvatar: currentUser.avatar,
-        style: "Technical",
-        isAiVerified: false,
-        isFacultyVerified: false,
-        content: content
-      };
-
-      DB.resolveDoubt(doubtId, answerData);
-      
-      // Award base points immediately
-      const pointsWon = doubt.points || 25;
-      DB.updateUserPoints(pointsWon);
-
-      closeAnswerModal();
-      renderDoubtsFeed();
-      renderLeaderboard();
-      showToast(`Answer posted! Claimed +${pointsWon} base BrainPoints. Evaluating...`, "warning");
-
-      // 1. AI Agent Verification (1.5s delay)
-      setTimeout(async () => {
-        let isAiVerified = false;
-        let aiReason = "";
-        
-        try {
-          const valResponse = await fetch("http://localhost:8000/api/validate_answer", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              query: doubt.rawQuery,
-              answer: content,
-              concept: doubt.concept
-            })
-          });
-          
-          if (valResponse.ok) {
-            const valResult = await valResponse.json();
-            isAiVerified = valResult.verified;
-            aiReason = valResult.reason;
-          }
-        } catch (err) {
-          console.warn("Python server is offline for answer validation. Using local keyword check fallback.");
-          const matchKeywords = ["recursion", "stack", "search", "array", "sorted", "binary", "tree", "graph", "node", "interface", "class", "fuzzy", "logic", "membership", "sugeno", "mamdani", "gradient", "derivation", "chain", "rule"];
-          const lowerContent = content.toLowerCase();
-          const overlap = matchKeywords.filter(k => lowerContent.includes(k));
-          isAiVerified = overlap.length >= 2;
-          aiReason = isAiVerified 
-            ? "Offline AI verified matching terms: " + overlap.join(", ") 
-            : "Offline validation failed: Answer lacks technical keywords.";
-        }
-
-        const activeDoubts = DB.getDoubts();
-        const curDoubt = activeDoubts.find(d => d.id === doubtId);
-        if (curDoubt && curDoubt.answers) {
-          const ansIdx = curDoubt.answers.findIndex(a => a.authorName.includes(currentUser.name));
-          if (ansIdx !== -1) {
-            if (isAiVerified) {
-              DB.setAnswerAiVerified(doubtId, ansIdx, true);
-              DB.updateUserPoints(10); // +10 points for AI verify
-              renderDoubtsFeed();
-              renderLeaderboard();
-              showToast(`🤖 AI Agent verified answer! +10 pts: ${aiReason}`, "success");
-            } else {
-              showToast(`⚠️ AI Agent validation failed: ${aiReason}`, "error");
-            }
-          }
-        }
-      }, 1500);
-    }
-
-    function renderLeaderboard() {
-      const container = document.getElementById("leaderboard-container");
-      if (!container) return;
-
-      const currentUser = DB.getCurrentUser();
-      
-      // List of peers
-      const list = [
-        { name: "Rahul Sharma", year: "4th Year", points: 350, rank: "Expert", avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150" },
-        { name: "Elena Vance", year: "4th Year", points: 280, rank: "Brainiac", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150" },
-        { name: `${currentUser.name} (You)`, year: currentUser.year, points: currentUser.points || 100, rank: "Contributor", avatar: currentUser.avatar, isSelf: true },
-        { name: "Priya Patel", year: "3rd Year", points: 210, rank: "Helper", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150" },
-        { name: "Jordan Hayes", year: "2nd Year", points: 110, rank: "Novice", avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=150" }
-      ];
-
-      // Sort descending
-      list.sort((a, b) => b.points - a.points);
-
-      container.innerHTML = list.map((item, idx) => {
-        let rankColor = "bg-slate-100 text-slate-600";
-        if (idx === 0) rankColor = "bg-amber-100 text-amber-700 font-bold border border-amber-200";
-        else if (idx === 1) rankColor = "bg-slate-200 text-slate-700 font-semibold";
-        else if (idx === 2) rankColor = "bg-orange-100 text-orange-700 font-semibold";
-
-        const selfBorder = item.isSelf ? "border-l-4 border-indigo-500 bg-indigo-50/20 pl-2 rounded-r" : "";
-
-        return `
-          <div class="flex items-center justify-between text-xs py-1.5 ${selfBorder}">
-            <div class="flex items-center gap-2">
-              <span class="w-5 h-5 flex items-center justify-center rounded-full text-[10px] ${rankColor}">${idx + 1}</span>
-              <img src="${item.avatar}" class="w-6 h-6 rounded-full border border-slate-200 object-cover" alt="">
-              <div class="text-left">
-                <span class="font-bold text-slate-800">${item.name}</span>
-                <span class="text-[9px] text-slate-400 block">${item.year} &bull; ${item.rank}</span>
-              </div>
-            </div>
-            <div class="text-right">
-              <span class="font-extrabold text-indigo-700">${item.points}</span>
-              <span class="text-[8px] text-slate-400 block">pts</span>
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    function renderDoubtsFeed() {
-      const doubts = DB.getDoubts();
-      const container = document.getElementById("doubts-feed-container");
-      
-      // Filter doubts based on CategoryFilter
-      const filteredDoubts = currentSubjectFilter === 'All' 
-        ? doubts 
-        : doubts.filter(d => d.subject.toLowerCase() === currentSubjectFilter.toLowerCase());
-
-      // Update badge count
-      document.getElementById("doubts-count-badge").textContent = `${filteredDoubts.length} Doubts Listed`;
-
-      if (filteredDoubts.length === 0) {
-        container.innerHTML = `
-          <div class="p-8 text-center bg-slate-50 border border-slate-200 rounded-lg text-slate-400 text-xs">
-            <i data-lucide="info" class="w-8 h-8 mx-auto mb-2 text-slate-300"></i>
-            <span>No doubts found under ${currentSubjectFilter} subject yet. Be the first to ask!</span>
-          </div>
-        `;
-        lucide.createIcons();
-        return;
-      }
-
-      container.innerHTML = filteredDoubts.map(d => {
-        const isResolved = d.status === "Resolved";
-        let answerBlock = "";
-        if (d.answers && d.answers.length > 0) {
-          answerBlock = d.answers.map(a => {
-            const aiBadge = a.isAiVerified ? `
-              <span class="badge-clean-purple text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 shadow-sm" title="Verified by AI Agent for technical accuracy">
-                <i data-lucide="bot" class="w-3 h-3 text-purple-600"></i>
-                <span>AI Verified</span>
-              </span>
-            ` : '';
-            
-            const facultyBadge = a.isFacultyVerified ? `
-              <span class="badge-clean-emerald text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 shadow-sm" title="Verified by Course Faculty Lead">
-                <i data-lucide="award" class="w-3 h-3 text-emerald-600"></i>
-                <span>Faculty Verified</span>
-              </span>
-            ` : '';
-
-            let pendingIndicator = (!a.isAiVerified && !a.isFacultyVerified) ? `
-              <span class="bg-slate-100 text-slate-400 text-[9px] font-semibold px-1.5 py-0.5 rounded flex items-center gap-0.5" title="Review in progress">
-                <i data-lucide="clock" class="w-3 h-3"></i>
-                <span>Reviewing...</span>
-              </span>
-            ` : '';
-
-            return `
-              <div class="mt-3 p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs transition-all duration-300">
-                <div class="flex items-center justify-between mb-1.5">
-                  <div class="flex items-center gap-1.5">
-                    <img src="${a.authorAvatar}" class="w-5 h-5 rounded-full border border-slate-200 object-cover">
-                    <span class="font-bold text-slate-900">${a.authorName}</span>
-                  </div>
-                  <div class="flex items-center gap-1">
-                    ${aiBadge}
-                    ${facultyBadge}
-                    ${pendingIndicator}
-                  </div>
-                </div>
-                <p class="text-slate-700 leading-relaxed pl-6">${a.content}</p>
-              </div>
-            `;
-          }).join("");
-        }
-
-        // Brainly-Style Action bar: Answering rewards
-        let claimActionBar = "";
-        if (!isResolved) {
-          claimActionBar = `
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-              <span class="text-[10px] text-slate-400 flex items-center gap-1">
-                <span>By: <strong>${d.studentName}</strong></span>
-                <span>&bull;</span>
-                <span>${d.studentYear}</span>
-              </span>
-              <button type="button" onclick="openAnswerModal('${d.id}')" class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 shadow-sm">
-                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-                <span>Answer &amp; claim ${d.points || 25} pts</span>
-              </button>
-            </div>
-          `;
-        } else {
-          claimActionBar = `
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-              <span class="text-[10px] text-slate-400">Asked by: <strong>${d.studentName}</strong></span>
-              <span class="text-[10px] text-emerald-600 font-bold flex items-center gap-0.5">
-                <span>✓ Solved</span>
-                <span>&bull;</span>
-                <span>${d.points || 25} pts awarded</span>
-              </span>
-            </div>
-          `;
-        }
-
-        return `
-          <div class="crisp-card p-5 bg-white border border-slate-200 hover:border-slate-300 transition-colors shadow-sm">
-            <div class="flex items-center justify-between gap-2 mb-3">
-              <div class="flex flex-wrap items-center gap-1.5">
-                <span class="badge-clean-neutral px-2.5 py-0.5 rounded text-[10px] font-bold">${d.subject} &bull; ${d.concept}</span>
-                <span class="badge-clean-neutral px-2 py-0.5 rounded text-[10px] text-slate-500">${d.difficulty}</span>
-              </div>
-              <div class="flex items-center gap-2">
-                ${!isResolved ? `
-                  <span class="bg-amber-50 border border-amber-200 text-amber-700 px-2 py-0.5 rounded text-[10px] font-extrabold flex items-center gap-0.5">
-                    <span>🎁</span>
-                    <span>${d.points || 25} pts</span>
-                  </span>
-                ` : ''}
-                <span class="${isResolved ? 'badge-clean-emerald' : 'badge-clean-amber'} px-2 py-0.5 rounded text-[10px] font-bold">
-                  ${d.status}
-                </span>
-                <span class="text-[10px] text-slate-400">${d.timestamp}</span>
-              </div>
-            </div>
- 
-            <h4 class="text-sm font-extrabold text-slate-950 mb-1 leading-snug">${d.title}</h4>
-            <p class="text-xs text-slate-600 mb-3 leading-relaxed">${d.rawQuery}</p>
- 
-            <div class="p-2 rounded bg-slate-50 text-[10px] text-slate-400 flex items-center justify-between">
-              <span>Auto-Route Intent: <strong>${d.intent}</strong></span>
-              <span>Matched Cases: <strong>${d.similarCount || 4}</strong></span>
-            </div>
- 
-            ${answerBlock}
-            ${claimActionBar}
-          </div>
-        `;
-      }).join("");
-
-      lucide.createIcons();
+      showToast(`You have ${state.user.points} pts! Answer doubts to earn more.`, "info");
     }
   </script>
 </body>

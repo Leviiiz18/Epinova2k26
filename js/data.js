@@ -6,68 +6,6 @@ const STUDY_BUDDY_DATA = {
   // Taxonomy Hierarchy (Subject -> Topic -> Concept -> Sub-concept)
   taxonomy: [
     {
-      subjectId: "aaaaaaaa-0000-0000-0000-000000000001",
-      subjectName: "Computer Science",
-      topics: [
-        {
-          topicId: "bbbbbbbb-0000-0000-0000-000000000001",
-          topicName: "Algorithms",
-          concepts: [
-            {
-              conceptId: "cccccccc-0000-0000-0000-000000000001",
-              conceptName: "Binary Search",
-              subConcept: "Sorted Array Requirement",
-              difficulty: "Beginner",
-              intent: "Conceptual",
-              canonicalSummary: "Divide-and-conquer search requiring monotonic ordering.",
-              misconception: "Binary search works on unsorted data",
-              prerequisites: ["Arrays", "Monotonic Ordering"],
-              confidence: { topic: 0.98, concept: 0.99 }
-            },
-            {
-              conceptId: "cccccccc-0000-0000-0000-000000000002",
-              conceptName: "Recursion",
-              subConcept: "Base Case & Call Stack",
-              difficulty: "Beginner",
-              intent: "Conceptual",
-              canonicalSummary: "Self-referencing function execution requiring terminal state.",
-              misconception: "Recursion has no stopping condition and executes forever",
-              prerequisites: ["Functions", "Conditionals"],
-              confidence: { topic: 0.95, concept: 0.98 }
-            },
-            {
-              conceptId: "cccccccc-0000-0000-0000-000000000003",
-              conceptName: "Depth-First Search (DFS)",
-              subConcept: "Graph Traversal with Call Stack",
-              difficulty: "Intermediate",
-              intent: "Conceptual",
-              canonicalSummary: "Graph search exploring deepest branch before backtracking.",
-              misconception: "DFS can only be implemented recursively and fails on cyclic graphs",
-              prerequisites: ["Recursion", "Stack Data Structure", "Graph Adjacency"],
-              confidence: { topic: 0.96, concept: 0.98 }
-            }
-          ]
-        },
-        {
-          topicId: "bbbbbbbb-0000-0000-0000-000000000003",
-          topicName: "Neural Networks & Optimization",
-          concepts: [
-            {
-              conceptId: "cccccccc-0000-0000-0000-000000000004",
-              conceptName: "Backpropagation",
-              subConcept: "Softmax & Cross-Entropy Gradient",
-              difficulty: "Advanced",
-              intent: "Problem Solving",
-              canonicalSummary: "Chain-rule gradient computation across network layers.",
-              misconception: "Softmax derivatives require individual Jacobian matrix inversion",
-              prerequisites: ["Multivariate Calculus", "Chain Rule", "Log-Likelihood Loss"],
-              confidence: { topic: 0.94, concept: 0.97 }
-            }
-          ]
-        }
-      ]
-    },
-    {
       subjectId: "aaaaaaaa-0000-0000-0000-000000000002",
       subjectName: "C Programming",
       topics: [
