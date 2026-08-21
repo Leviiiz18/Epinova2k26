@@ -368,8 +368,21 @@
 
     async function submitFacultyAnswer(e) {
       e.preventDefault();
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      // Guard: a second click/submit while one is already in flight is ignored.
+      if (submitBtn && submitBtn.disabled) return;
+
       const doubtId = document.getElementById("fac-hidden-doubt-id").value;
       const text = document.getElementById("fac-solution-text").value;
+
+      const originalBtnHtml = submitBtn ? submitBtn.innerHTML : "";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add("opacity-60", "cursor-not-allowed");
+        submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Saving...';
+        lucide.createIcons();
+      }
 
       const answerData = {
         authorName: "Dr. Sarah Jenkins (Faculty Lead)",
@@ -380,10 +393,21 @@
         content: text
       };
 
-      await DB.resolveDoubt(doubtId, answerData);
-      closeModal("faculty-answer-modal");
-      showToast("Solution saved & knowledge validated in NeonDB!", "success");
-      renderFacultyQueue();
+      try {
+        await DB.resolveDoubt(doubtId, answerData);
+        closeModal("faculty-answer-modal");
+        showToast("Solution saved & knowledge validated in NeonDB!", "success");
+        renderFacultyQueue();
+      } catch (err) {
+        showToast("Failed to save solution. Please try again.", "error");
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.classList.remove("opacity-60", "cursor-not-allowed");
+          submitBtn.innerHTML = originalBtnHtml;
+          lucide.createIcons();
+        }
+      }
     }
   </script>
 </body>

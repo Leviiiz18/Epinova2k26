@@ -621,6 +621,56 @@ def read_index():
 def read_knowledge_graph():
     return FileResponse(os.path.join(BASE_DIR, "knowledge_graph.html"))
 
+class KgRagRequest(BaseModel):
+    concept: str
+    question: str = ""
+    exam_mode: str = "none"  # "none" | "5m" | "10m"
+
+@app.post("/api/kg_rag")
+@app.post("/kg_rag")
+def kg_rag(request: KgRagRequest):
+    """RAG endpoint called by the Knowledge Graph when 'Ask Doubt in Portal'
+    is clicked. Returns a grounded answer from the syllabus vector store."""
+    concept = request.concept.strip()
+    question = request.question.strip() or f"Explain {concept} in detail."
+    mode = request.exam_mode
+
+    # Try the active RAG chain first
+    if rag_chains_by_mode:
+        chain = rag_chains_by_mode.get(mode) or rag_chains_by_mode.get("none")
+        if chain:
+            try:
+                answer = chain.invoke(question + " " + concept)
+                return {"success": True, "answer": answer, "source": "rag", "concept": concept}
+            except Exception as e:
+                print(f"kg_rag chain error: {e}")
+
+    # Fallback: pull the concept record from the taxonomy table
+    concept_row = run_query("""
+        SELECT c.name, c.canonical_summary, c.misconception, c.prerequisites,
+               t.name as topic, s.name as subject
+        FROM concepts c
+        JOIN topics t ON c.topic_id = t.id
+        JOIN subjects s ON t.subject_id = s.id
+        WHERE c.name ILIKE %s
+        LIMIT 1;
+    """, [f"%{concept}%"], fetch_one=True)
+
+    if concept_row:
+        ans = f"**{concept_row['name']}** ({concept_row['subject']} / {concept_row['topic']})\n\n"
+        if concept_row.get('canonical_summary'):
+            ans += concept_row['canonical_summary'] + "\n\n"
+        if concept_row.get('misconception'):
+            ans += f"⚠️ Common misconception: {concept_row['misconception']}"
+        return {"success": True, "answer": ans, "source": "taxonomy", "concept": concept}
+
+    return {
+        "success": False,
+        "answer": f"No syllabus content found for '{concept}'. Try searching the Student Portal.",
+        "source": "none",
+        "concept": concept
+    }
+
 # NLP Helpers
 def tokenize(text):
     return re.findall(r'\b\w+\b', text.lower())
@@ -1028,27 +1078,49 @@ def add_answer(doubt_id: str, request: AnswerRequest):
     content = request.content
     if not content.strip():
         raise HTTPException(status_code=400, detail="Empty answer content")
-        
-    user_row = run_query("SELECT id FROM users WHERE email = %s;", [request.authorEmail], fetch_one=True)
-    if not user_row:
-        raise HTTPException(status_code=404, detail="User not found")
-    author_id = user_row['id']
-    
-    doubt_row = run_query("SELECT points FROM doubts WHERE id = %s;", [doubt_id], fetch_one=True)
-    bounty = doubt_row['points'] if doubt_row else 25
-    
-    ans_query = """
-        INSERT INTO answers (doubt_id, author_id, content, explanation_style, is_ai_verified, is_faculty_verified, verification_state)
-        VALUES (%s, %s, %s, 'Technical', FALSE, FALSE, 'Reviewing')
-        RETURNING id;
-    """
-    inserted = run_query(ans_query, [doubt_id, author_id, content], commit=True, fetch_one=True)
-    run_query("UPDATE doubts SET status = 'Resolved' WHERE id = %s;", [doubt_id], commit=True)
-    run_query("UPDATE users SET points = points + %s WHERE id = %s;", [bounty, author_id], commit=True)
-    
+
+    # Use a SINGLE connection for all 4 operations to avoid multiple
+    # Neon TCP round-trips which were causing the visible 'Post Answer' lag.
+    try:
+        conn = get_db_connection()
+        with conn.cursor() as cur:
+            # 1. Resolve author
+            cur.execute("SELECT id FROM users WHERE email = %s;", [request.authorEmail])
+            user_row = cur.fetchone()
+            if not user_row:
+                raise HTTPException(status_code=404, detail="User not found")
+            author_id = user_row[0]
+
+            # 2. Get doubt bounty
+            cur.execute("SELECT points FROM doubts WHERE id = %s;", [doubt_id])
+            doubt_row = cur.fetchone()
+            bounty = doubt_row[0] if doubt_row else 25
+
+            # 3. Insert answer
+            cur.execute("""
+                INSERT INTO answers (doubt_id, author_id, content, explanation_style,
+                                     is_ai_verified, is_faculty_verified, verification_state)
+                VALUES (%s, %s, %s, 'Technical', FALSE, FALSE, 'Reviewing')
+                RETURNING id;
+            """, [doubt_id, author_id, content])
+            inserted = cur.fetchone()
+            answer_id = str(inserted[0]) if inserted else ""
+
+            # 4. Update doubt status + user points in the same transaction
+            cur.execute("UPDATE doubts SET status = 'Resolved' WHERE id = %s;", [doubt_id])
+            cur.execute("UPDATE users SET points = points + %s WHERE id = %s;", [bounty, author_id])
+
+            conn.commit()
+        conn.close()
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"add_answer error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to post answer")
+
     return {
         "success": True,
-        "answerId": str(inserted['id']) if inserted else "",
+        "answerId": answer_id,
         "bountyAwarded": bounty
     }
 

@@ -29,7 +29,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6, .font-heading {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-heading {
   font-family: var(--font-heading);
   letter-spacing: -0.02em;
 }
@@ -164,8 +170,161 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     opacity: 0;
     transform: translateY(12px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+}
+
+/* Knowledge Graph Styling & Smooth Morphing Animations */
+.kg-canvas-container {
+  background: radial-gradient(circle at 50% 50%, #ffffff 0%, #f1f5f9 100%);
+  background-image:
+    radial-gradient(#cbd5e1 1px, transparent 1px),
+    radial-gradient(#e2e8f0 1px, #f8fafc 1px);
+  background-size: 24px 24px;
+  background-position: 0 0, 12px 12px;
+}
+
+/* Center Node Morphing Container */
+.kg-center-morph {
+  position: absolute;
+  transform: translate(-50%, -50%) !important;
+  will-change: width, height, border-radius, transform, opacity;
+  box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  /* Prevent text spilling outside during morph */
+}
+
+.kg-center-morph.kg-circle-mode:hover {
+  transform: translate(-50%, -50%) scale(1.06) !important;
+  box-shadow: 0 25px 50px -12px rgba(79, 70, 229, 0.4), 0 0 0 4px rgba(199, 210, 254, 0.8) !important;
+}
+
+/* Expanding: 0.25s smooth transition to rectangle */
+.kg-morph-expanding {
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    border-radius 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+/* Minimizing: 0.25s smooth transition to circle */
+.kg-morph-minimizing {
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    border-radius 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+/* Instant priority fade-out for text before minimizing */
+.kg-text-exit {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: scale(0.92) !important;
+  transition: opacity 0.08s ease-out, transform 0.08s ease-out !important;
+}
+
+/* Fade animations for inner content */
+.kg-content-fade-in {
+  animation: kgFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.kg-content-fade-out {
+  animation: kgFadeOut 0.08s ease-out forwards;
+}
+
+@keyframes kgFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.97);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes kgFadeOut {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+/* Orbiting Satellite Nodes */
+.kg-satellite-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+    left 0.25s cubic-bezier(0.2, 0, 0, 1),
+    top 0.25s cubic-bezier(0.2, 0, 0, 1),
+    opacity 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+  will-change: transform, left, top, opacity;
+}
+
+.kg-satellite-node:hover {
+  transform: translate(-50%, -50%) scale(1.16);
+  box-shadow: 0 12px 28px -4px rgba(37, 99, 235, 0.28), 0 0 0 2px #4f46e5;
+  z-index: 30 !important;
+}
+
+.kg-satellite-node.node-gliding {
+  z-index: 40 !important;
+  transition: left 0.25s cubic-bezier(0.2, 0, 0, 1),
+    top 0.25s cubic-bezier(0.2, 0, 0, 1),
+    transform 0.25s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.kg-satellite-node.node-exiting {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.3);
+  pointer-events: none;
+  transition: opacity 0.18s ease-out, transform 0.18s ease-out;
+}
+
+.kg-satellite-node.node-entering {
+  animation: satPopIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes satPopIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.kg-edge-line {
+  stroke-dasharray: 6;
+  animation: edgeFlow 25s linear infinite;
+  transition: opacity 0.2s ease;
+}
+
+@keyframes edgeFlow {
+  from {
+    stroke-dashoffset: 200;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.rag-pill-glow {
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
 }
