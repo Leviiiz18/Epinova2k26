@@ -146,7 +146,7 @@
       </div>
       <div class="flex gap-2 justify-center pt-2">
         <button onclick="closeConfirmModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
-        <button id="confirm-delete-btn" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition-colors shadow-md shadow-rose-100">Yes, Delete</button>
+        <button onclick="executeDeleteAnswer()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition-colors shadow-md shadow-rose-100">Yes, Delete</button>
       </div>
     </div>
   </div>
@@ -643,41 +643,35 @@
       pendingDeleteAnswerId = null;
     };
 
-    // Attach listeners on load (we can do it directly on page initialization)
-    document.addEventListener("DOMContentLoaded", () => {
-      const confirmBtn = document.getElementById("confirm-delete-btn");
-      if (confirmBtn) {
-        confirmBtn.addEventListener("click", async () => {
-          if (!pendingDeleteAnswerId) return;
-          const answerId = pendingDeleteAnswerId;
-          closeConfirmModal();
+    window.executeDeleteAnswer = async () => {
+      if (!pendingDeleteAnswerId) return;
+      const answerId = pendingDeleteAnswerId;
+      closeConfirmModal();
+      
+      try {
+        const success = await DB.deleteAnswer(answerId);
+        if (success) {
+          showToast("Solution deleted successfully.", "success");
           
-          try {
-            const success = await DB.deleteAnswer(answerId);
-            if (success) {
-              showToast("Solution deleted successfully.", "success");
-              
-              // Re-fetch current user profile to update points balance in UI
-              const email = state.user.email;
-              const userResp = await fetch(`http://localhost:8000/api/user/${email}`);
-              if (userResp.ok) {
-                const freshUser = await userResp.json();
-                DB.setCurrentUser(freshUser);
-                state.user = freshUser;
-                document.getElementById("points-balance").textContent = freshUser.points || 0;
-              }
-              
-              // Reload doubt data
-              loadDoubtData();
-            } else {
-              showToast("Failed to delete solution.", "error");
-            }
-          } catch (err) {
-            showToast("Error deleting solution.", "error");
+          // Re-fetch current user profile to update points balance in UI
+          const email = state.user.email;
+          const userResp = await fetch(`http://localhost:8000/api/user/${email}`);
+          if (userResp.ok) {
+            const freshUser = await userResp.json();
+            DB.setCurrentUser(freshUser);
+            state.user = freshUser;
+            document.getElementById("points-balance").textContent = freshUser.points || 0;
           }
-        });
+          
+          // Reload doubt data
+          loadDoubtData();
+        } else {
+          showToast("Failed to delete solution.", "error");
+        }
+      } catch (err) {
+        showToast("Error deleting solution.", "error");
       }
-    });
+    };
 
     function showPointsInfo() {
       showToast(`Wallet: ${state.user.points || 0} pts. Complete peer reviews to gain more!`, "info");
