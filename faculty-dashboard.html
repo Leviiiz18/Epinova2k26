@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty Learning Intelligence Dashboard — Study Buddy (PS-01)</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 crisp-nav bg-white/95 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+
+      <!-- Brand Logo -->
+      <a href="index.html" class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white">
+          <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <span class="text-base font-bold text-slate-900">Study Buddy</span>
+          <span class="badge-clean-neutral text-[10px] font-semibold px-2 py-0.5 rounded ml-2">Faculty Intelligence</span>
+        </div>
+      </a>
+
+      <!-- Quick Actions & Faculty Profile -->
+      <div class="flex items-center gap-3">
+        <!-- Switch to Student View -->
+        <a href="student-dashboard.html" title="Switch to Student View" class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors">
+          <i data-lucide="repeat" class="w-3.5 h-3.5"></i>
+          <span>Student View</span>
+        </a>
+
+        <!-- Faculty Profile Pill -->
+        <div class="flex items-center gap-2.5 pl-2 border-l border-slate-200">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250" class="w-8 h-8 rounded-full border border-slate-200 object-cover" alt="Faculty Avatar">
+          <div class="hidden sm:block text-left">
+            <div class="text-xs font-bold text-slate-900 leading-tight">Dr. Sarah Jenkins</div>
+            <div class="text-[10px] text-slate-500 font-medium">Computer Science Lead</div>
+          </div>
+          <button type="button" onclick="logout()" title="Logout" aria-label="Log out" class="p-1.5 text-slate-400 hover:text-slate-700 transition-colors">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 flex-1 w-full">
+
+    <!-- 1. TOP STATS BAR (Section 15: Faculty Intelligence) -->
+    <div class="crisp-card p-6 bg-white shadow-sm border border-slate-200">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+        <div>
+          <div class="badge-clean-neutral inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider mb-1">
+            Section 15 &bull; Campus Learning Intelligence
+          </div>
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-950">
+            Campus Concept Analytics &amp; Learning Gaps
+          </h1>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Real-time doubt clustering, prerequisite failure patterns, and recommended classroom interventions.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="badge-clean-emerald text-xs font-semibold px-3 py-1 rounded">
+            NeonDB Sync Active
+          </span>
+        </div>
+      </div>
+
+      <!-- 4 Intelligence Metrics -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-1">
+        <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+          <div class="text-[10px] font-bold text-slate-500 uppercase">Active Doubt Volume</div>
+          <div class="text-xl font-bold text-slate-900 mt-0.5">42 Queries</div>
+        </div>
+        <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+          <div class="text-[10px] font-bold text-slate-500 uppercase">Top Unresolved Gap</div>
+          <div class="text-xl font-bold text-amber-600 mt-0.5">Unsorted Binary Search</div>
+        </div>
+        <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+          <div class="text-[10px] font-bold text-slate-500 uppercase">Peer Resolution Rate</div>
+          <div class="text-xl font-bold text-emerald-600 mt-0.5">78.4%</div>
+        </div>
+        <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+          <div class="text-[10px] font-bold text-slate-500 uppercase">Prerequisite Warning</div>
+          <div class="text-xl font-bold text-slate-900 mt-0.5">Stack &bull; Recursion</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. CAMPUS LEARNING GAPS & RECOMMENDED INTERVENTIONS (Section 15 of PDF) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+      <!-- Learning Gap Heatmap -->
+      <div class="crisp-card p-5 bg-white shadow-sm border border-slate-200">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900 mb-3 pb-2 border-b border-slate-100 flex items-center justify-between">
+          <span>Campus Concept Gap Clusters</span>
+          <span class="text-[10px] text-slate-400">Aggregated Signal</span>
+        </h3>
+
+        <div class="space-y-3 text-xs">
+          <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+            <div class="flex justify-between items-center mb-1">
+              <span class="font-bold text-slate-900">Binary Search &rarr; Sorted Array Requirement</span>
+              <span class="badge-clean-rose text-[10px] font-bold px-1.5 py-0.2 rounded">32% Failure Rate</span>
+            </div>
+            <p class="text-[11px] text-slate-500 mb-2">Common misconception: Assuming binary search operates on arbitrary unsorted data.</p>
+            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <div class="h-full bg-rose-500 rounded-full" style="width: 32%"></div>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+            <div class="flex justify-between items-center mb-1">
+              <span class="font-bold text-slate-900">Depth-First Search &rarr; Call Stack Mechanism</span>
+              <span class="badge-clean-amber text-[10px] font-bold px-1.5 py-0.2 rounded">24% Gap</span>
+            </div>
+            <p class="text-[11px] text-slate-500 mb-2">Prerequisite gap: Students not understanding how function call frames behave as LIFO stack.</p>
+            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+              <div class="h-full bg-amber-500 rounded-full" style="width: 24%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommended Classroom Interventions (Section 15 of PDF) -->
+      <div class="crisp-card p-5 bg-white shadow-sm border border-slate-200">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900 mb-3 pb-2 border-b border-slate-100 flex items-center justify-between">
+          <span>AI-Recommended Classroom Interventions</span>
+          <span class="text-[10px] text-emerald-600 font-bold">Actionable</span>
+        </h3>
+
+        <div class="space-y-3 text-xs">
+          <div class="p-3 rounded-lg bg-emerald-50/50 border border-emerald-200 text-slate-800">
+            <div class="font-bold text-emerald-950 mb-1 flex items-center gap-1.5">
+              <i data-lucide="zap" class="w-3.5 h-3.5 text-emerald-600"></i>
+              <span>Next Lecture Topic: Explicit Stack Simulation</span>
+            </div>
+            <p class="text-[11px] text-slate-600 leading-relaxed">
+              Spend 10 minutes in CS101 demonstrating how iterative DFS uses a <code>Stack</code> object vs function call stack to resolve 24 student inquiries.
+            </p>
+          </div>
+
+          <div class="p-3 rounded-lg bg-blue-50/50 border border-blue-200 text-slate-800">
+            <div class="font-bold text-blue-950 mb-1 flex items-center gap-1.5">
+              <i data-lucide="book-marked" class="w-3.5 h-3.5 text-blue-600"></i>
+              <span>Resource Validation</span>
+            </div>
+            <p class="text-[11px] text-slate-600 leading-relaxed">
+              Validate Rahul Sharma&apos;s peer explanation for DFS with 1 click to promote it into campus canonical knowledge.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 3. INCOMING DOUBT RESOLUTION QUEUE -->
+    <div class="space-y-3">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+        <h3 class="text-base font-bold text-slate-950 flex items-center gap-2">
+          <i data-lucide="inbox" class="w-4 h-4 text-slate-700"></i>
+          <span>Faculty Doubt Queue &amp; Auto-Sort Verification</span>
+        </h3>
+        <span class="text-xs text-slate-500 font-medium">Domain: Computer Science</span>
+      </div>
+
+      <div id="faculty-queue-list" class="space-y-3.5">
+        <!-- Injected dynamically via JS -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ANSWER / VALIDATE MODAL -->
+  <div id="faculty-answer-modal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="crisp-card max-w-xl w-full p-6 bg-white shadow-xl border border-slate-300 relative max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-4">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Faculty Knowledge Validation</h3>
+          <p class="text-xs text-slate-500">Provide official faculty explanation or validate peer response</p>
+        </div>
+        <button type="button" onclick="closeModal('faculty-answer-modal')" aria-label="Close modal" class="text-slate-400 hover:text-slate-700 p-1">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form onsubmit="submitFacultyAnswer(event)" class="space-y-3.5">
+        <input type="hidden" id="fac-hidden-doubt-id">
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Official Solution (Markdown / Code / Formulas)</label>
+          <textarea id="fac-solution-text" rows="5" required placeholder="Write the authoritative explanation to be saved in NeonDB..." class="w-full bg-white border border-slate-300 rounded-md p-3 text-xs text-slate-900 focus:outline-none focus:border-slate-900"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
+          <button type="button" onclick="closeModal('faculty-answer-modal')" class="px-3.5 py-2 text-xs font-medium text-slate-600 hover:text-slate-900">
+            Cancel
+          </button>
+          <button type="submit" class="btn-primary px-4 py-2 text-xs font-semibold">
+            Save &bull; Validate Knowledge
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200 bg-white py-4 px-4 text-center text-xs text-slate-400">
+    <span>Study Buddy Platform &bull; AI-Powered Peer Learning Intelligence (PS-01)</span>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      renderFacultyQueue();
+      lucide.createIcons();
+    });
+
+    function renderFacultyQueue() {
+      const doubts = DB.getDoubts();
+      const container = document.getElementById("faculty-queue-list");
+
+      container.innerHTML = doubts.map(d => {
+        const isResolved = d.status === "Resolved";
+        return `
+          <div class="crisp-card p-5 bg-white border border-slate-200">
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <div class="flex items-center gap-1.5">
+                <span class="badge-clean-neutral px-2 py-0.5 rounded text-[10px] font-bold">${d.concept}</span>
+                <span class="badge-clean-neutral px-2 py-0.5 rounded text-[10px] text-slate-500">${d.difficulty}</span>
+                <span class="badge-clean-purple px-2 py-0.5 rounded text-[10px] font-bold">Auto-Sort: ${d.intent}</span>
+              </div>
+              <span class="${isResolved ? 'badge-clean-emerald' : 'badge-clean-amber'} px-2 py-0.5 rounded text-[10px] font-bold">
+                ${d.status}
+              </span>
+            </div>
+
+            <h4 class="text-sm font-bold text-slate-950 mb-1">${d.title}</h4>
+            <p class="text-xs text-slate-600 mb-3">${d.rawQuery}</p>
+
+            <div class="p-2.5 rounded bg-slate-50 border border-slate-100 text-[11px] mb-3 text-slate-600">
+              <strong>Detected Misconception:</strong> ${d.misconception}
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+              <span class="text-slate-500">Student: <strong>${d.studentName}</strong> (${d.studentYear})</span>
+              <button type="button" onclick="openFacultyAnswer('${d.id}')" class="btn-primary px-3 py-1.5 text-xs font-semibold">
+                ${isResolved ? 'Update / Validate Solution' : 'Answer Doubt'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    function openFacultyAnswer(doubtId) {
+      document.getElementById("fac-hidden-doubt-id").value = doubtId;
+      openModal("faculty-answer-modal");
+    }
+
+    function submitFacultyAnswer(e) {
+      e.preventDefault();
+      const doubtId = document.getElementById("fac-hidden-doubt-id").value;
+      const text = document.getElementById("fac-solution-text").value;
+
+      const answerData = {
+        authorName: "Dr. Sarah Jenkins (Faculty Lead)",
+        authorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250",
+        style: "Technical",
+        isFacultyValidated: true,
+        content: text
+      };
+
+      DB.resolveDoubt(doubtId, answerData);
+      closeModal("faculty-answer-modal");
+      showToast("Solution saved & knowledge validated in NeonDB!", "success");
+      renderFacultyQueue();
+    }
+  </script>
+</body>
+</html>

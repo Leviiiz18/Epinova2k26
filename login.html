@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In &amp; Authentication — Study Buddy</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between">
+
+  <!-- Header -->
+  <header class="w-full px-6 py-4 flex items-center justify-between border-b border-slate-200 bg-white">
+    <a href="index.html" class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white">
+        <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+      </div>
+      <span class="text-base font-bold text-slate-900">Study Buddy</span>
+    </a>
+
+    <a href="index.html" class="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition-colors">
+      <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+      <span>Back to Overview</span>
+    </a>
+  </header>
+
+  <!-- Main Login Card -->
+  <main class="flex-1 flex items-center justify-center p-4 sm:p-6 my-6">
+    <div class="w-full max-w-md crisp-card p-6 sm:p-8 bg-white shadow-sm border border-slate-200">
+
+      <!-- Header Title -->
+      <div class="text-center mb-6">
+        <h1 class="text-2xl font-bold text-slate-950 tracking-tight" id="auth-title">Welcome to Study Buddy</h1>
+        <p class="text-slate-500 text-xs mt-1" id="auth-subtitle">Select your role to access your academic dashboard</p>
+      </div>
+
+      <!-- ROLE SELECTOR TABS: Student vs Faculty -->
+      <div class="p-1 rounded-lg bg-slate-100 border border-slate-200 flex mb-5">
+        <button type="button" id="role-btn-student" onclick="setRole('student')" class="flex-1 py-2 px-3 rounded-md text-xs font-semibold flex items-center justify-center gap-2 transition-all bg-white text-slate-900 shadow-sm border border-slate-200">
+          <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+          <span>Student Portal</span>
+        </button>
+
+        <button type="button" id="role-btn-faculty" onclick="setRole('faculty')" class="flex-1 py-2 px-3 rounded-md text-xs font-semibold flex items-center justify-center gap-2 transition-all text-slate-600 hover:text-slate-900">
+          <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+          <span>Faculty Portal</span>
+        </button>
+      </div>
+
+      <!-- Quick Demo Access Container -->
+      <div class="mb-5 p-3 rounded-lg bg-slate-50 border border-slate-200">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center justify-between">
+          <span>Quick Demo Access</span>
+          <span class="text-[10px] text-slate-400">1-Click</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2" id="demo-buttons-container">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <div class="relative flex py-2 items-center mb-4">
+        <div class="flex-grow border-t border-slate-200"></div>
+        <span class="flex-shrink mx-3 text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Or enter account</span>
+        <div class="flex-grow border-t border-slate-200"></div>
+      </div>
+
+      <!-- AUTH FORM -->
+      <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-3.5">
+
+        <!-- Name Field (for signup mode) -->
+        <div id="field-name" class="hidden">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
+          <input type="text" id="input-name" placeholder="e.g. Alex Morgan" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition-colors">
+        </div>
+
+        <!-- Student Year Selector (if student + signup) -->
+        <div id="field-student-year" class="hidden">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Academic Year</label>
+          <select id="input-year" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-slate-900 transition-colors">
+            <option value="year-1">1st Year (Freshman)</option>
+            <option value="year-2">2nd Year (Sophomore)</option>
+            <option value="year-3" selected>3rd Year (Junior)</option>
+            <option value="year-4">4th Year (Senior)</option>
+          </select>
+        </div>
+
+        <!-- Faculty Domain Selector (if faculty + signup) -->
+        <div id="field-faculty-domain" class="hidden">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Subject Specialization</label>
+          <select id="input-domain" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-slate-900 transition-colors">
+            <option value="Artificial Intelligence &amp; ML">Artificial Intelligence &amp; Machine Learning</option>
+            <option value="Data Structures &amp; Algorithms">Data Structures &amp; Algorithms</option>
+            <option value="Web &amp; Mobile Development">Web &amp; Mobile Development</option>
+            <option value="Cloud &amp; Systems">Cloud &amp; Systems Architecture</option>
+            <option value="Mathematics &amp; Statistics">Mathematics &amp; Statistics</option>
+            <option value="Cyber Security">Cyber Security &amp; Cryptography</option>
+          </select>
+        </div>
+
+        <!-- Email Field -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1" id="label-email">Email Address</label>
+          <input type="email" id="input-email" required placeholder="alex.morgan@studybuddy.edu" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition-colors">
+        </div>
+
+        <!-- Password Field -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-xs font-semibold text-slate-700">Password</label>
+            <a href="#" onclick="showToast('Password reset link sent to demo email!', 'info'); return false;" class="text-[11px] text-slate-500 hover:text-slate-800">Forgot?</a>
+          </div>
+          <input type="password" id="input-password" autocomplete="current-password" required value="password123" placeholder="••••••••" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-900 transition-colors">
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="submit-auth-btn" class="w-full btn-primary py-2.5 px-4 text-xs font-semibold flex items-center justify-center gap-2 mt-4">
+          <span id="btn-text">Sign In to Student Dashboard</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </button>
+
+      </form>
+
+      <!-- Toggle Sign In / Sign Up Mode -->
+      <div class="mt-5 text-center text-xs text-slate-500">
+        <span id="auth-switch-text">Don't have an account?</span>
+        <button type="button" onclick="toggleAuthMode()" id="auth-switch-btn" class="font-semibold text-slate-900 hover:underline ml-1">
+          Sign up now
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-4 text-center text-xs text-slate-400 border-t border-slate-200 bg-white">
+    <span>Study Buddy Platform • Academic Doubt Resolution Engine</span>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    let currentRole = "student";
+    let isSignUp = false;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("role") === "faculty") {
+      currentRole = "faculty";
+    }
+    if (urlParams.get("tab") === "signup") {
+      isSignUp = true;
+    }
+
+    function setRole(role) {
+      currentRole = role;
+      const studentBtn = document.getElementById("role-btn-student");
+      const facultyBtn = document.getElementById("role-btn-faculty");
+      const labelEmail = document.getElementById("label-email");
+      const emailInput = document.getElementById("input-email");
+      const submitBtn = document.getElementById("submit-auth-btn");
+
+      if (role === "student") {
+        studentBtn.className = "flex-1 py-2 px-3 rounded-md text-xs font-semibold flex items-center justify-center gap-2 transition-all bg-white text-slate-900 shadow-sm border border-slate-200";
+        facultyBtn.className = "flex-1 py-2 px-3 rounded-md text-xs font-semibold flex items-center justify-center gap-2 transition-all text-slate-600 hover:text-slate-900";
+
+        labelEmail.textContent = "Student Email Address";
+        emailInput.placeholder = "alex.morgan@studybuddy.edu";
+        emailInput.value = "alex.morgan@studybuddy.edu";
+
+        document.getElementById("btn-text").textContent = isSignUp ? "Create Student Account" : "Sign In to Student Dashboard";
+      } else {
+        facultyBtn.className = "flex-1 py-2 px-3 rounded-md text-xs font-semibold flex items-center justify-center gap-2 transition-all bg-white text-slate-900 shadow-sm border border-slate-200";
+        studentBtn.className = "flex-1 py-2 px-3 rounded-md text-xs font-semibold flex items-center justify-center gap-2 transition-all text-slate-600 hover:text-slate-900";
+
+        labelEmail.textContent = "Faculty Official Email";
+        emailInput.placeholder = "s.jenkins@studybuddy.edu";
+        emailInput.value = "s.jenkins@studybuddy.edu";
+
+        document.getElementById("btn-text").textContent = isSignUp ? "Register as Faculty" : "Sign In to Faculty Dashboard";
+      }
+
+      renderDemoButtons();
+      updateVisibility();
+      lucide.createIcons();
+    }
+
+    function renderDemoButtons() {
+      const container = document.getElementById("demo-buttons-container");
+      if (currentRole === "student") {
+        container.innerHTML = `
+          <button type="button" onclick="loginAsDemo('student')" class="p-2 rounded-md bg-white hover:bg-slate-50 border border-slate-200 text-left transition-colors flex items-center gap-2">
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150" class="w-6 h-6 rounded-full" alt="Alex">
+            <div class="overflow-hidden">
+              <div class="text-[11px] font-bold text-slate-900 truncate">Alex Morgan</div>
+              <div class="text-[10px] text-slate-500">3rd Year Student</div>
+            </div>
+          </button>
+          <button type="button" onclick="loginAsDemoStudentYear2()" class="p-2 rounded-md bg-white hover:bg-slate-50 border border-slate-200 text-left transition-colors flex items-center gap-2">
+            <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=150" class="w-6 h-6 rounded-full" alt="Jordan">
+            <div class="overflow-hidden">
+              <div class="text-[11px] font-bold text-slate-900 truncate">Jordan Hayes</div>
+              <div class="text-[10px] text-slate-500">2nd Year Student</div>
+            </div>
+          </button>
+        `;
+      } else {
+        container.innerHTML = `
+          <button type="button" onclick="loginAsDemo('faculty', 'fac-ai-01')" class="p-2 rounded-md bg-white hover:bg-slate-50 border border-slate-200 text-left transition-colors flex items-center gap-2">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250" class="w-6 h-6 rounded-full" alt="Dr Sarah">
+            <div class="overflow-hidden">
+              <div class="text-[11px] font-bold text-slate-900 truncate">Dr. Sarah Jenkins</div>
+              <div class="text-[10px] text-slate-500 truncate">AI &amp; ML Faculty</div>
+            </div>
+          </button>
+          <button type="button" onclick="loginAsDemo('faculty', 'fac-dsa-01')" class="p-2 rounded-md bg-white hover:bg-slate-50 border border-slate-200 text-left transition-colors flex items-center gap-2">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250" class="w-6 h-6 rounded-full" alt="Prof David">
+            <div class="overflow-hidden">
+              <div class="text-[11px] font-bold text-slate-900 truncate">Prof. David Kumar</div>
+              <div class="text-[10px] text-slate-500 truncate">DSA &amp; Alg Faculty</div>
+            </div>
+          </button>
+        `;
+      }
+    }
+
+    function loginAsDemoStudentYear2() {
+      const studentUser = {
+        role: "student",
+        id: "student-jordan",
+        name: "Jordan Hayes",
+        yearId: "year-2",
+        yearName: "2nd Year (Sophomore)",
+        email: "jordan.hayes@student.studybuddy.edu",
+        avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=150"
+      };
+      DB.setCurrentUser(studentUser);
+      showToast("Signed in as Jordan Hayes (2nd Year Student)");
+      setTimeout(() => { window.location.href = "student-dashboard.html"; }, 300);
+    }
+
+    function toggleAuthMode() {
+      isSignUp = !isSignUp;
+      updateVisibility();
+    }
+
+    function updateVisibility() {
+      const fieldName = document.getElementById("field-name");
+      const fieldYear = document.getElementById("field-student-year");
+      const fieldDomain = document.getElementById("field-faculty-domain");
+      const switchText = document.getElementById("auth-switch-text");
+      const switchBtn = document.getElementById("auth-switch-btn");
+      const authTitle = document.getElementById("auth-title");
+      const authSubtitle = document.getElementById("auth-subtitle");
+
+      if (isSignUp) {
+        fieldName.classList.remove("hidden");
+        if (currentRole === "student") {
+          fieldYear.classList.remove("hidden");
+          fieldDomain.classList.add("hidden");
+          authTitle.textContent = "Create Student Account";
+          authSubtitle.textContent = "Access year-wise subjects and get faculty help";
+          document.getElementById("btn-text").textContent = "Create Student Account";
+        } else {
+          fieldYear.classList.add("hidden");
+          fieldDomain.classList.remove("hidden");
+          authTitle.textContent = "Faculty Registration";
+          authSubtitle.textContent = "Join the domain teaching board & solve student inquiries";
+          document.getElementById("btn-text").textContent = "Register as Faculty";
+        }
+        switchText.textContent = "Already have an account?";
+        switchBtn.textContent = "Sign in here";
+      } else {
+        fieldName.classList.add("hidden");
+        fieldYear.classList.add("hidden");
+        fieldDomain.classList.add("hidden");
+        authTitle.textContent = "Welcome to Study Buddy";
+        authSubtitle.textContent = "Select your role to access your academic dashboard";
+        document.getElementById("btn-text").textContent = currentRole === "student" ? "Sign In to Student Dashboard" : "Sign In to Faculty Dashboard";
+        switchText.textContent = "Don't have an account?";
+        switchBtn.textContent = "Sign up now";
+      }
+    }
+
+    function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById("input-email").value;
+      const name = document.getElementById("input-name").value || (currentRole === "student" ? "Alex Morgan" : "Dr. Sarah Jenkins");
+
+      if (currentRole === "student") {
+        const yearSelect = document.getElementById("input-year");
+        const yearId = yearSelect ? yearSelect.value : "year-3";
+        const yearObj = STUDY_BUDDY_DATA.years.find(y => y.id === yearId) || STUDY_BUDDY_DATA.years[2];
+
+        const user = {
+          role: "student",
+          id: "student-" + Date.now(),
+          name: name,
+          yearId: yearObj.id,
+          yearName: yearObj.name,
+          email: email,
+          avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150"
+        };
+        DB.setCurrentUser(user);
+        showToast(`Signed in as ${user.name}`);
+        setTimeout(() => { window.location.href = "student-dashboard.html"; }, 300);
+      } else {
+        const domainSelect = document.getElementById("input-domain");
+        const domain = domainSelect ? domainSelect.value : "Artificial Intelligence & ML";
+        const facultyMatch = DB.getFacultyForDomain(domain);
+
+        const user = {
+          role: "faculty",
+          id: facultyMatch.id,
+          name: name || facultyMatch.name,
+          title: facultyMatch.title,
+          domain: domain,
+          email: email,
+          avatar: facultyMatch.avatar,
+          status: "online"
+        };
+        DB.setCurrentUser(user);
+        showToast(`Signed in as ${user.name}`);
+        setTimeout(() => { window.location.href = "faculty-dashboard.html"; }, 300);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      setRole(currentRole);
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

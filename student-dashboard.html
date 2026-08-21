@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Portal — Study Buddy (PS-01)</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 crisp-nav bg-white/95 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+
+      <!-- Brand Logo -->
+      <a href="index.html" class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white">
+          <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+        </div>
+        <div>
+          <span class="text-base font-bold text-slate-900">Study Buddy</span>
+          <span class="badge-clean-neutral text-[10px] font-semibold px-2 py-0.5 rounded ml-2">Student Intelligence</span>
+        </div>
+      </a>
+
+      <!-- Quick Action Buttons & Profile -->
+      <div class="flex items-center gap-3">
+
+        <!-- Post Doubt Action -->
+        <button type="button" onclick="scrollToDoubtInput()" class="btn-primary px-3.5 py-1.5 text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <span>Ask Doubt (Auto-Sort)</span>
+        </button>
+
+        <!-- Knowledge Graph Nav -->
+        <a href="knowledge_graph.html" title="Explore Concept Knowledge Graph" class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-indigo-700 hover:text-indigo-900 border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100 transition-colors">
+          <i data-lucide="git-branch" class="w-3.5 h-3.5 text-indigo-600"></i>
+          <span>Knowledge Graph</span>
+        </a>
+
+        <!-- Switch to Faculty Demo Pill -->
+        <a href="faculty-dashboard.html" title="Switch to Faculty View" class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors">
+          <i data-lucide="repeat" class="w-3.5 h-3.5"></i>
+          <span>Faculty View</span>
+        </a>
+
+        <!-- User Profile Pill -->
+        <div class="flex items-center gap-2.5 pl-2 border-l border-slate-200">
+          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150" class="w-8 h-8 rounded-full border border-slate-200 object-cover" alt="Alex">
+          <div class="hidden sm:block text-left">
+            <div class="text-xs font-bold text-slate-900 leading-tight">Alex Morgan</div>
+            <div class="text-[10px] text-slate-500 font-medium">3rd Year Student</div>
+          </div>
+          <button type="button" onclick="logout()" title="Logout" aria-label="Log out" class="p-1.5 text-slate-400 hover:text-slate-700 transition-colors">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 flex-1 w-full">
+
+    <!-- 1. AUTO-SORT AI DOUBT SUBMISSION (PILLAR 1 & 2) -->
+    <div id="doubt-input-section" class="crisp-card p-6 sm:p-7 bg-white shadow-sm border border-slate-200">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+        <div>
+          <div class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+            <i data-lucide="bot" class="w-3.5 h-3.5 text-slate-700"></i>
+            <span>Pillars: Auto-Sort AI &bull; Semantic Search &bull; KAG Reasoning</span>
+          </div>
+          <h2 class="text-xl font-bold text-slate-950">Ask Any Academic Doubt in Natural Language</h2>
+        </div>
+        <span class="badge-clean-emerald text-[11px] font-semibold px-2.5 py-1 rounded">
+          NeonDB Ready
+        </span>
+      </div>
+
+      <!-- Doubt Input Form -->
+      <form onsubmit="handleLiveAutoSort(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">Enter your question or where you are stuck:</label>
+          <div class="relative">
+            <textarea id="live-doubt-query" rows="3" required placeholder="e.g. Why does DFS need recursion? What happens if we don't use it?" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-slate-900 transition-colors"></textarea>
+          </div>
+        </div>
+
+        <!-- Quick Demo Question Pills for Judge / Evaluation -->
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <span class="text-slate-500 text-[11px] font-semibold">⚡ Try Seed Scenarios:</span>
+          <button type="button" onclick="setDemoQuery('Why does DFS need recursion?')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-[11px]">
+            &ldquo;Why does DFS need recursion?&rdquo;
+          </button>
+          <button type="button" onclick="setDemoQuery('Why doesn\'t binary search work on my unsorted array [5, 2, 8, 1, 9]?')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-[11px]">
+            &ldquo;Why doesn&apos;t binary search work on unsorted array?&rdquo;
+          </button>
+          <button type="button" onclick="setDemoQuery('How does Softmax derivative cancel out with Cross-Entropy Loss?')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-[11px]">
+            &ldquo;Softmax with Cross-Entropy derivation&rdquo;
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+          <span class="text-[11px] text-slate-400">Auto-Sort structures raw text into canonical metadata</span>
+          <button type="submit" class="btn-primary px-5 py-2 text-xs font-semibold flex items-center gap-1.5">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            <span>Process &bull; Auto-Sort &amp; KAG</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- LIVE AUTO-SORT RESULT PANEL (Injected on Submit) -->
+      <div id="auto-sort-result-box" class="mt-6 pt-5 border-t border-slate-100 hidden">
+        <div class="flex items-center justify-between mb-3">
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600"></i>
+            <span>Auto-Sort Engine Output</span>
+          </div>
+          <span class="badge-clean-emerald text-[11px] font-bold px-2 py-0.5 rounded" id="as-confidence">Confidence: 98%</span>
+        </div>
+
+        <!-- 6 Structured Metadata Badges -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs mb-4">
+          <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+            <span class="text-[10px] text-slate-400 block font-semibold uppercase">Subject</span>
+            <span class="font-bold text-slate-900" id="as-subject">Computer Science</span>
+          </div>
+          <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+            <span class="text-[10px] text-slate-400 block font-semibold uppercase">Topic</span>
+            <span class="font-bold text-slate-900" id="as-topic">Algorithms</span>
+          </div>
+          <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+            <span class="text-[10px] text-slate-400 block font-semibold uppercase">Concept</span>
+            <span class="font-bold text-slate-900" id="as-concept">Depth-First Search (DFS)</span>
+          </div>
+          <div class="p-2.5 rounded bg-slate-50 border border-slate-200">
+            <span class="text-[10px] text-slate-400 block font-semibold uppercase">Difficulty &bull; Intent</span>
+            <span class="font-bold text-slate-900" id="as-difficulty">Intermediate &bull; Conceptual</span>
+          </div>
+        </div>
+
+        <!-- Detected Misconception & Prerequisite Gap Callout -->
+        <div class="p-3.5 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900 mb-4 flex items-start gap-2.5">
+          <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5"></i>
+          <div>
+            <strong class="font-bold block">Detected Conceptual Misconception:</strong>
+            <span id="as-misconception" class="text-amber-800">"DFS can only be implemented recursively and fails without recursion"</span>
+            <div class="mt-1.5 text-[11px] text-amber-700">
+              <strong>KAG Identified Prerequisite:</strong> <span id="as-prereq" class="font-semibold underline">Stack (LIFO) &bull; Function Call Frames</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- KAG Concept Graph Visual Representation -->
+        <div class="p-4 rounded-lg bg-slate-900 text-white text-xs mb-4">
+          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
+            <span>KAG Reasoning Path &bull; Knowledge Graph Neighborhood</span>
+            <span class="text-emerald-400 font-mono">2-Hop Traversal</span>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 font-mono text-[11px]" id="as-graph-path">
+            <span class="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-200">Graph Traversal</span>
+            <span class="text-slate-500">&rarr;</span>
+            <span class="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-white font-bold">DFS</span>
+            <span class="text-slate-500">&rarr; requires &rarr;</span>
+            <span class="px-2 py-1 rounded bg-amber-950/80 border border-amber-600 text-amber-300 font-bold">Recursion / Stack</span>
+            <span class="text-slate-500">&rarr; requires &rarr;</span>
+            <span class="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-slate-300">Functions</span>
+          </div>
+        </div>
+
+        <!-- AI Targeted Explanation with Style Switcher -->
+        <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 text-xs mb-4">
+          <div class="flex items-center justify-between mb-2">
+            <strong class="font-bold text-slate-900 flex items-center gap-1.5">
+              <i data-lucide="book-open" class="w-3.5 h-3.5 text-slate-700"></i>
+              <span>Targeted AI Explanation:</span>
+            </strong>
+            <div class="flex items-center gap-1 text-[10px]">
+              <span class="px-2 py-0.5 rounded bg-white border border-slate-200 font-semibold text-slate-800">Step-by-step</span>
+              <span class="px-2 py-0.5 rounded text-slate-500">Analogy</span>
+              <span class="px-2 py-0.5 rounded text-slate-500">Technical</span>
+            </div>
+          </div>
+          <p class="text-slate-700 leading-relaxed" id="as-ai-explanation">
+            DFS does not strictly require recursion! Recursion simply uses the computer&apos;s internal Call Stack to remember the traversal path. You can implement DFS iteratively using an explicit Stack (LIFO data structure) with <code>while (!stack.isEmpty())</code>.
+          </p>
+        </div>
+
+        <!-- Recommended Senior Peer Mentor (Peer Matching Engine) -->
+        <div class="p-4 rounded-lg bg-white border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150" class="w-10 h-10 rounded-full border border-slate-200 object-cover" alt="Rahul">
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="text-xs font-bold text-slate-900">Rahul Sharma (Peer Mentor)</h4>
+                <span class="badge-clean-emerald text-[10px] font-bold px-1.5 py-0.2 rounded">95% Match</span>
+              </div>
+              <p class="text-[11px] text-slate-500">4th Year &bull; 4.92 ★ Helpfulness Rating &bull; Available</p>
+            </div>
+          </div>
+          <button type="button" onclick="requestPeerHelp('Rahul Sharma')" class="btn-secondary px-3.5 py-1.5 text-xs font-semibold text-slate-800">
+            Request Peer Help
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- 2. MAIN GRID: ACTIVE DOUBTS & UNDERSTANDING VERIFICATION -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- Left 2 Cols: Feed of Doubts & Verified Solutions -->
+      <div class="lg:col-span-2 space-y-4">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+          <h3 class="text-base font-bold text-slate-950 flex items-center gap-2">
+            <i data-lucide="message-square" class="w-4 h-4 text-slate-700"></i>
+            <span>Doubt Resolution Feed &amp; Peer Explanations</span>
+          </h3>
+          <span class="text-xs text-slate-500 font-medium">3 Seed Cases Active</span>
+        </div>
+
+        <div id="doubts-feed-container" class="space-y-4">
+          <!-- Injected dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Right 1 Col: Understanding Check & Concept Mastery Model -->
+      <div class="space-y-5">
+
+        <!-- Understanding Verification Check (Section 12 of PDF) -->
+        <div class="crisp-card p-5 bg-white shadow-sm border border-slate-200" id="micro-quiz-widget">
+          <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-100">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+              <i data-lucide="check-square" class="w-4 h-4 text-emerald-600"></i>
+              <span>Understanding Verification</span>
+            </h4>
+            <span class="text-[10px] text-slate-400">Micro-Check</span>
+          </div>
+
+          <p class="text-xs font-semibold text-slate-800 mb-3" id="quiz-question">
+            Which data structure can be used to convert a recursive DFS into an iterative algorithm?
+          </p>
+
+          <div class="space-y-2 text-xs" id="quiz-options">
+            <button type="button" onclick="verifyQuizAnswer(0)" class="w-full text-left p-2.5 rounded border border-slate-200 hover:bg-slate-50 text-slate-700">
+              A) Queue (FIFO)
+            </button>
+            <button type="button" onclick="verifyQuizAnswer(1)" class="w-full text-left p-2.5 rounded border border-slate-200 hover:bg-slate-50 text-slate-700 font-medium">
+              B) Stack (LIFO)
+            </button>
+            <button type="button" onclick="verifyQuizAnswer(2)" class="w-full text-left p-2.5 rounded border border-slate-200 hover:bg-slate-50 text-slate-700">
+              C) Binary Heap
+            </button>
+            <button type="button" onclick="verifyQuizAnswer(3)" class="w-full text-left p-2.5 rounded border border-slate-200 hover:bg-slate-50 text-slate-700">
+              D) Hash Table
+            </button>
+          </div>
+
+          <!-- Evaluation Feedback -->
+          <div id="quiz-feedback" class="mt-3 p-2.5 rounded bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 hidden">
+            <strong>✓ Correct!</strong> The function call stack in recursion operates as a Last-In First-Out (LIFO) stack.
+            <div class="mt-1 text-[11px] text-emerald-700">Mastery score updated: <strong>+53% &rarr; 88% (Resolved)</strong></div>
+          </div>
+        </div>
+
+        <!-- Student Mastery Model (Section 14 of PDF) -->
+        <div class="crisp-card p-5 bg-white shadow-sm border border-slate-200">
+          <div class="text-xs font-bold uppercase tracking-wider text-slate-900 mb-3 pb-2 border-b border-slate-100 flex items-center justify-between">
+            <span>My Concept Mastery</span>
+            <span class="text-[10px] text-slate-400">PostgreSQL State</span>
+          </div>
+
+          <div class="space-y-3 text-xs">
+            <div>
+              <div class="flex justify-between text-slate-700 mb-1">
+                <span class="font-semibold">Depth-First Search (DFS)</span>
+                <span class="font-bold text-emerald-600" id="mastery-dfs">88%</span>
+              </div>
+              <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full bg-emerald-500 rounded-full" style="width: 88%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-slate-700 mb-1">
+                <span class="font-semibold">Backpropagation</span>
+                <span class="font-bold text-emerald-600">92%</span>
+              </div>
+              <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full bg-emerald-500 rounded-full" style="width: 92%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-slate-700 mb-1">
+                <span class="font-semibold">Binary Search (Unsorted Array Gap)</span>
+                <span class="font-bold text-amber-600">35%</span>
+              </div>
+              <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full bg-amber-500 rounded-full" style="width: 35%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200 bg-white py-4 px-4 text-center text-xs text-slate-400">
+    <span>Study Buddy Platform &bull; AI-Powered Peer Learning Intelligence (PS-01)</span>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      renderDoubtsFeed();
+      lucide.createIcons();
+    });
+
+    function setDemoQuery(query) {
+      document.getElementById("live-doubt-query").value = query;
+      handleLiveAutoSort(new Event("submit"));
+    }
+
+    function scrollToDoubtInput() {
+      document.getElementById("doubt-input-section").scrollIntoView({ behavior: "smooth" });
+      document.getElementById("live-doubt-query").focus();
+    }
+
+    function handleLiveAutoSort(e) {
+      if (e) e.preventDefault();
+      const query = document.getElementById("live-doubt-query").value.toLowerCase();
+      const resultBox = document.getElementById("auto-sort-result-box");
+      resultBox.classList.remove("hidden");
+
+      if (query.includes("dfs") || query.includes("recursion")) {
+        document.getElementById("as-subject").textContent = "Computer Science";
+        document.getElementById("as-topic").textContent = "Algorithms";
+        document.getElementById("as-concept").textContent = "Depth-First Search (DFS)";
+        document.getElementById("as-difficulty").textContent = "Intermediate • Conceptual";
+        document.getElementById("as-confidence").textContent = "Confidence: 98%";
+        document.getElementById("as-misconception").textContent = '"DFS can only be implemented recursively and fails without recursion"';
+        document.getElementById("as-prereq").textContent = "Stack (LIFO) • Function Call Frames";
+        document.getElementById("as-graph-path").innerHTML = `
+          <span class="px-2 py-1 rounded bg-slate-800 text-slate-200">Graph Traversal</span>
+          <span class="text-slate-500">&rarr;</span>
+          <span class="px-2 py-1 rounded bg-slate-800 text-white font-bold">DFS</span>
+          <span class="text-slate-500">&rarr; requires &rarr;</span>
+          <span class="px-2 py-1 rounded bg-amber-950 border border-amber-500 text-amber-300 font-bold">Recursion / Stack</span>
+        `;
+        document.getElementById("as-ai-explanation").textContent = "DFS does not strictly require recursion! Recursion simply uses the computer's internal Call Stack to remember the traversal path. You can implement DFS iteratively using an explicit Stack (LIFO data structure) with while (!stack.isEmpty()).";
+      } else if (query.includes("binary") || query.includes("array")) {
+        document.getElementById("as-subject").textContent = "Computer Science";
+        document.getElementById("as-topic").textContent = "Algorithms";
+        document.getElementById("as-concept").textContent = "Binary Search";
+        document.getElementById("as-difficulty").textContent = "Beginner • Debugging";
+        document.getElementById("as-confidence").textContent = "Confidence: 99%";
+        document.getElementById("as-misconception").textContent = '"Binary search works on unsorted data"';
+        document.getElementById("as-prereq").textContent = "Monotonic Ordering • Array Indexing";
+        document.getElementById("as-graph-path").innerHTML = `
+          <span class="px-2 py-1 rounded bg-slate-800 text-slate-200">Array Indexing</span>
+          <span class="text-slate-500">&rarr; requires &rarr;</span>
+          <span class="px-2 py-1 rounded bg-amber-950 border border-amber-500 text-amber-300 font-bold">Sorted Ordering</span>
+          <span class="text-slate-500">&rarr; requires &rarr;</span>
+          <span class="px-2 py-1 rounded bg-slate-800 text-white font-bold">Binary Search</span>
+        `;
+        document.getElementById("as-ai-explanation").textContent = "Binary search requires an array to be monotonically sorted before searching. On [5, 2, 8, 1, 9], comparing against the midpoint element fails because elements are not partitioned into smaller/larger halves.";
+      } else {
+        document.getElementById("as-subject").textContent = "Computer Science";
+        document.getElementById("as-topic").textContent = "Neural Networks";
+        document.getElementById("as-concept").textContent = "Backpropagation";
+        document.getElementById("as-difficulty").textContent = "Advanced • Problem Solving";
+        document.getElementById("as-confidence").textContent = "Confidence: 97%";
+        document.getElementById("as-misconception").textContent = '"Requires explicit Jacobian matrix computation"';
+        document.getElementById("as-prereq").textContent = "Chain Rule • Log-Likelihood Loss";
+        document.getElementById("as-ai-explanation").textContent = "The derivative simplifies directly to (y_hat_i - y_i) because the Kronecker delta isolates the target logit index during summation.";
+      }
+
+      showToast("Auto-Sort completed & KAG graph reasoned!");
+      lucide.createIcons();
+    }
+
+    function verifyQuizAnswer(optionIndex) {
+      const feedback = document.getElementById("quiz-feedback");
+      if (optionIndex === 1) {
+        feedback.classList.remove("hidden");
+        document.getElementById("mastery-dfs").textContent = "88%";
+        showToast("Concept Mastery Verified: +53%!", "success");
+      } else {
+        showToast("Incorrect option. Remember that call frames use LIFO order.", "error");
+      }
+    }
+
+    function requestPeerHelp(peerName) {
+      showToast(`Peer help request sent to ${peerName}! Session invite generated.`, "success");
+    }
+
+    function renderDoubtsFeed() {
+      const doubts = DB.getDoubts();
+      const container = document.getElementById("doubts-feed-container");
+
+      container.innerHTML = doubts.map(d => {
+        const isResolved = d.status === "Resolved";
+        let answerBlock = "";
+        if (d.answers && d.answers.length > 0) {
+          answerBlock = d.answers.map(a => `
+            <div class="mt-3 p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-bold text-slate-900">${a.authorName}</span>
+                <span class="badge-clean-emerald text-[10px] font-semibold px-1.5 py-0.5 rounded">✓ Verified Solution</span>
+              </div>
+              <p class="text-slate-700 leading-relaxed pl-2">${a.content}</p>
+            </div>
+          `).join("");
+        }
+
+        return `
+          <div class="crisp-card p-5 bg-white border border-slate-200">
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <div class="flex items-center gap-1.5">
+                <span class="badge-clean-neutral px-2 py-0.5 rounded text-[10px] font-bold">${d.concept}</span>
+                <span class="badge-clean-neutral px-2 py-0.5 rounded text-[10px] text-slate-500">${d.difficulty}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="${isResolved ? 'badge-clean-emerald' : 'badge-clean-amber'} px-2 py-0.5 rounded text-[10px] font-bold">
+                  ${d.status}
+                </span>
+                <span class="text-[10px] text-slate-400">${d.timestamp}</span>
+              </div>
+            </div>
+
+            <h4 class="text-sm font-bold text-slate-950 mb-1">${d.title}</h4>
+            <p class="text-xs text-slate-600 mb-2">${d.rawQuery}</p>
+
+            <div class="p-2 rounded bg-slate-50 text-[11px] text-slate-500 flex items-center justify-between">
+              <span>Auto-Sort: <strong>${d.intent}</strong> intent</span>
+              <span>Semantic Search: <strong>${d.similarCount || 4} similar cases</strong></span>
+            </div>
+
+            ${answerBlock}
+          </div>
+        `;
+      }).join("");
+
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>
