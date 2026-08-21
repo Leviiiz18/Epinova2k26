@@ -256,8 +256,8 @@
         let peerAnswersBlock = "";
         if (d.answers && d.answers.length > 0) {
           peerAnswersBlock = d.answers.map((a, idx) => {
-            const isPeer = a.authorName.includes("Peer Mentor");
-            const verifyBtn = (isPeer && !a.isFacultyVerified) ? `
+            const isPeer = a.authorName.includes("Peer Mentor") || a.authorName.includes("AI") || a.authorName.includes("StudyBuddy");
+            const verifyBtn = (!a.isFacultyVerified) ? `
               <button type="button" onclick="facultyVerifyPeerAnswer('${d.id}', ${idx})" class="mt-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded font-bold transition-all text-[10px] flex items-center gap-1 shadow-sm">
                 <i data-lucide="check" class="w-3.5 h-3.5"></i>
                 <span>Approve & Verify Answer (Award Tag)</span>
