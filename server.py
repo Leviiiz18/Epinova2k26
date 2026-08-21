@@ -37,7 +37,9 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_private_network=True,
 )
+
 
 # Mount Static Directories for Frontend Assets
 if os.path.exists(os.path.join(BASE_DIR, "css")):
