@@ -472,6 +472,23 @@ const DB = {
     return false;
   },
 
+  async updateAnswer(answerId, content) {
+    try {
+      const response = await fetch(`http://localhost:8000/api/answers/${answerId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content })
+      });
+      if (response.ok) {
+        await this.syncDoubts();
+        return true;
+      }
+    } catch (e) {
+      console.warn("Error updating answer:", e);
+    }
+    return false;
+  },
+
   async setAnswerAiVerified(doubtId, answerIdx, isVerified) {
     const doubts = this.getDoubts();
     const doubt = doubts.find(d => d.id === doubtId);

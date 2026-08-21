@@ -1120,6 +1120,23 @@ def delete_answer(answer_id: str):
         
     return {"success": True, "message": "Answer deleted successfully.", "deductedPoints": deduction}
 
+class UpdateAnswerRequest(BaseModel):
+    content: str
+
+@app.put("/api/answers/{answer_id}")
+@app.put("/answers/{answer_id}")
+def update_answer(answer_id: str, request: UpdateAnswerRequest):
+    content = request.content
+    if not content.strip():
+        raise HTTPException(status_code=400, detail="Empty answer content")
+        
+    ans = run_query("SELECT id FROM answers WHERE id = %s;", [answer_id], fetch_one=True)
+    if not ans:
+        raise HTTPException(status_code=404, detail="Answer not found")
+        
+    run_query("UPDATE answers SET content = %s WHERE id = %s;", [content, answer_id], commit=True)
+    return {"success": True, "message": "Answer updated successfully."}
+
 class ValidateRequest(BaseModel):
     query: str
     answer: str

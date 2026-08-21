@@ -304,9 +304,17 @@
         }
 
         const isAuthor = String(a.authorName).trim().toLowerCase() === String(state.user.name).trim().toLowerCase();
+        
+        // Escape content for safe JS string passing
+        const escapedContent = String(a.content)
+          .replace(/\\/g, '\\\\')
+          .replace(/`/g, '\\`')
+          .replace(/\$/g, '\\$')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
 
         return `
-          <div class="p-5 bg-white rounded-2xl border ${borderClass} shadow-sm space-y-3">
+          <div class="p-5 bg-white rounded-2xl border ${borderClass} shadow-sm space-y-3 relative">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2.5">
                 <img src="${a.authorAvatar || 'https://via.placeholder.com/150'}" class="w-8 h-8 rounded-full border border-slate-200 object-cover">
@@ -318,14 +326,39 @@
                   <div class="text-[10px] text-slate-400 font-medium">Answered recently</div>
                 </div>
               </div>
-              ${isAuthor ? `
-                <button onclick="handleDeleteAnswer('${a.id}')" class="text-slate-400 hover:text-rose-600 transition-colors p-1.5 rounded-lg hover:bg-rose-50" title="Delete Answer">
-                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+              
+              <!-- Three-dot Dropdown Options -->
+              <div class="relative inline-block text-left">
+                <button onclick="toggleAnswerMenu(event, '${a.id}')" class="text-slate-400 hover:text-slate-700 transition-colors p-1.5 rounded-lg hover:bg-slate-100" title="Options">
+                  <i data-lucide="more-vertical" class="w-4 h-4"></i>
                 </button>
-              ` : ''}
+                <div id="menu-${a.id}" class="origin-top-right absolute right-0 mt-1 w-40 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-slate-100 focus:outline-none hidden z-50 border border-slate-200">
+                  <div class="py-1">
+                    ${isAuthor ? `
+                      <button onclick="startEditAnswer('${a.id}', \`${escapedContent}\`)" class="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium">
+                        <i data-lucide="edit-2" class="w-3.5 h-3.5 text-slate-400"></i>
+                        <span>Edit Answer</span>
+                      </button>
+                    ` : ''}
+                    <button onclick="handleCopyAnswer(event, '${a.id}')" class="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium">
+                      <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-400"></i>
+                      <span>Copy Content</span>
+                    </button>
+                  </div>
+                  ${isAuthor ? `
+                    <div class="py-1">
+                      <button onclick="handleDeleteAnswer('${a.id}')" class="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 flex items-center gap-2 font-semibold">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-400"></i>
+                        <span>Delete Answer</span>
+                      </button>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
             </div>
 
-            <div class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${renderLiteMarkdown(a.content)}</div>
+            <!-- Content Area (Editable inline) -->
+            <div id="content-container-${a.id}" class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${renderLiteMarkdown(a.content)}</div>
           </div>
         `;
       }).join("");
@@ -489,6 +522,85 @@
         lucide.createIcons();
       }
     }
+
+    window.toggleAnswerMenu = (e, answerId) => {
+      e.stopPropagation();
+      const menu = document.getElementById(`menu-${answerId}`);
+      
+      // Close all other open dropdowns first
+      document.querySelectorAll('[id^="menu-"]').forEach(m => {
+        if (m.id !== `menu-${answerId}`) m.classList.add("hidden");
+      });
+      
+      if (menu) {
+        menu.classList.toggle("hidden");
+      }
+    };
+
+    // Close menus when clicking outside
+    document.addEventListener("click", () => {
+      document.querySelectorAll('[id^="menu-"]').forEach(m => m.classList.add("hidden"));
+    });
+
+    window.handleCopyAnswer = (e, answerId) => {
+      e.stopPropagation();
+      const a = state.activeDoubt.answers.find(x => String(x.id) === String(answerId));
+      if (a) {
+        navigator.clipboard.writeText(a.content).then(() => {
+          showToast("Answer content copied to clipboard!", "info");
+        });
+      }
+    };
+
+    window.startEditAnswer = (answerId, originalContent) => {
+      const container = document.getElementById(`content-container-${answerId}`);
+      if (!container) return;
+
+      const menu = document.getElementById(`menu-${answerId}`);
+      if (menu) menu.classList.add("hidden");
+
+      // Replace backticks to prevent JS interpolation issues
+      const escapedContentForReset = originalContent.replace(/`/g, '\\`').replace(/\$/g, '\\$');
+      
+      container.innerHTML = `
+        <textarea id="edit-textarea-${answerId}" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 ring-indigo-100 transition-all resize-none mb-2" rows="3">${originalContent}</textarea>
+        <div class="flex gap-2 justify-end">
+          <button onclick="cancelEditAnswer('${answerId}', \`${escapedContentForReset}\`)" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button onclick="saveEditAnswer('${answerId}')" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm">Save</button>
+        </div>
+      `;
+      lucide.createIcons();
+    };
+
+    window.cancelEditAnswer = (answerId, originalContent) => {
+      const container = document.getElementById(`content-container-${answerId}`);
+      if (container) {
+        container.innerHTML = renderLiteMarkdown(originalContent);
+      }
+    };
+
+    window.saveEditAnswer = async (answerId) => {
+      const textarea = document.getElementById(`edit-textarea-${answerId}`);
+      if (!textarea) return;
+
+      const newContent = textarea.value.trim();
+      if (!newContent) {
+        showToast("Content cannot be empty.", "error");
+        return;
+      }
+
+      try {
+        const success = await DB.updateAnswer(answerId, newContent);
+        if (success) {
+          showToast("Answer updated successfully.", "success");
+          loadDoubtData();
+        } else {
+          showToast("Failed to update answer.", "error");
+        }
+      } catch (err) {
+        showToast("Error updating answer.", "error");
+      }
+    };
 
     window.handleDeleteAnswer = async (answerId) => {
       if (!confirm("Are you sure you want to delete your solution? This will also revert the points awarded for this answer.")) return;
