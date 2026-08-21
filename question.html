@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Question Details — Study Buddy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+    .ai-gradient-border {
+      position: relative;
+      border-radius: 1rem;
+      background: linear-gradient(to right, #818cf8, #a78bfa, #c084fc);
+      padding: 1px;
+    }
+    .ai-gradient-content {
+      background: white;
+      border-radius: calc(1rem - 1px);
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col font-sans">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-white/95 border-b border-slate-200 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand & Back Button -->
+      <div class="flex items-center gap-4">
+        <a href="student-dashboard.html" class="flex items-center gap-1.5 text-slate-500 hover:text-slate-900 transition-colors text-xs font-bold bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-200">
+          <i data-lucide="chevron-left" class="w-4 h-4"></i>
+          <span>Back to Feed</span>
+        </a>
+        <div class="h-4 w-px bg-slate-200"></div>
+        <a href="index.html" class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-sm">
+            <i data-lucide="graduation-cap" class="w-4 h-4"></i>
+          </div>
+          <span class="text-base font-extrabold text-slate-900 hidden sm:inline">Study Buddy</span>
+        </a>
+      </div>
+
+      <!-- User Info & Points -->
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 bg-amber-50 border border-amber-200/80 rounded-xl px-3.5 py-1.5 shadow-sm shadow-amber-100/50 cursor-pointer" onclick="showPointsInfo()">
+          <span class="text-sm">🎁</span>
+          <span class="text-xs font-extrabold text-amber-800" id="points-balance">100</span>
+          <span class="text-[10px] font-bold text-amber-600/80 uppercase tracking-wider">pts</span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <img src="" id="user-avatar" class="w-8 h-8 rounded-full object-cover border border-slate-200">
+          <div class="hidden md:block text-left">
+            <div class="text-xs font-bold text-slate-900 leading-tight" id="user-name">Guest</div>
+            <div class="text-[10px] text-slate-500 font-medium" id="user-year">1st Year</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
+    
+    <!-- Question & Answers (Left 2 Columns) -->
+    <div class="lg:col-span-2 space-y-6">
+      
+      <!-- Question Detail Card -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6" id="question-card">
+        <!-- Rendered via JS -->
+        <div class="animate-pulse space-y-4">
+          <div class="h-4 bg-slate-200 rounded w-1/4"></div>
+          <div class="h-6 bg-slate-200 rounded w-3/4"></div>
+          <div class="h-24 bg-slate-200 rounded"></div>
+        </div>
+      </div>
+
+      <!-- Answers List -->
+      <div class="space-y-4">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-2">
+          <i data-lucide="message-square" class="w-4 h-4"></i>
+          <span id="answers-header-count">Answers</span>
+        </h2>
+        <div class="space-y-4" id="answers-container">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Answer Composer -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6" id="reply-composer-container">
+        <!-- Rendered via JS -->
+      </div>
+
+    </div>
+
+    <!-- Sidebar (Right Column) -->
+    <div class="space-y-6">
+      
+      <!-- Prerequisite Knowledge Graph / Concept info -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
+          <i data-lucide="network" class="w-4 h-4 text-indigo-500"></i>
+          <span>Knowledge Graph Node</span>
+        </h3>
+        <div id="concept-info-container" class="text-xs space-y-3">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Course references / Slides -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
+          <i data-lucide="book-open" class="w-4 h-4 text-emerald-500"></i>
+          <span>Course Slide References</span>
+        </h3>
+        <div id="resources-container" class="space-y-2.5">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200 bg-white py-6 px-4 text-center text-xs text-slate-400 mt-12">
+    <span>Study Buddy Platform &bull; AI-Powered Peer Learning Intelligence (PS-01)</span>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    let state = {
+      user: null,
+      currentDoubtId: null,
+      userYearValue: 1,
+      activeDoubt: null
+    };
+
+    function parseYearValue(yearStr) {
+      if (!yearStr) return 1;
+      const str = String(yearStr).toLowerCase();
+      if (str.includes("1st") || str.includes("first") || str.includes("1")) return 1;
+      if (str.includes("2nd") || str.includes("second") || str.includes("2")) return 2;
+      if (str.includes("3rd") || str.includes("third") || str.includes("3")) return 3;
+      if (str.includes("4th") || str.includes("fourth") || str.includes("4")) return 4;
+      return 1;
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      // 1. Auth check
+      state.user = DB.getCurrentUser();
+      if (!state.user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      state.userYearValue = parseYearValue(state.user.year || state.user.yearName);
+
+      // Render Header User Info
+      document.getElementById("user-name").textContent = state.user.name;
+      document.getElementById("user-year").textContent = state.user.year || state.user.yearName || "1st Year";
+      document.getElementById("points-balance").textContent = state.user.points || 0;
+      if (state.user.avatar) {
+        document.getElementById("user-avatar").src = state.user.avatar;
+      } else {
+        document.getElementById("user-avatar").src = "https://via.placeholder.com/150";
+      }
+
+      // 2. Parse Question ID from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      state.currentDoubtId = urlParams.get("id");
+      if (!state.currentDoubtId) {
+        showToast("No question ID specified.", "error");
+        setTimeout(() => { window.location.href = "student-dashboard.html"; }, 2000);
+        return;
+      }
+
+      // 3. Sync doubts from backend
+      await DB.syncDoubts();
+      loadDoubtData();
+    });
+
+    function loadDoubtData() {
+      const doubts = DB.getDoubts();
+      state.activeDoubt = doubts.find(d => String(d.id) === String(state.currentDoubtId));
+
+      if (!state.activeDoubt) {
+        document.getElementById("question-card").innerHTML = `
+          <div class="text-center py-8 text-slate-500 text-sm">
+            <i data-lucide="alert-circle" class="w-8 h-8 mx-auto mb-2 text-rose-500"></i>
+            <span>Doubt not found in database.</span>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      renderQuestionCard();
+      renderAnswers();
+      renderReplyComposer();
+      renderSidebarInfo();
+    }
+
+    function renderQuestionCard() {
+      const d = state.activeDoubt;
+      const card = document.getElementById("question-card");
+
+      card.innerHTML = `
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2.5">
+            <img src="${d.studentAvatar || 'https://via.placeholder.com/150'}" class="w-10 h-10 rounded-full border border-slate-200 object-cover">
+            <div>
+              <div class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                ${d.studentName}
+                <span class="bg-slate-100 border border-slate-200 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-bold shadow-sm">${d.studentYear}</span>
+              </div>
+              <div class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">${d.subject} &bull; ${d.timestamp || 'Just now'}</div>
+            </div>
+          </div>
+          <div class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 shadow-sm flex items-center gap-1.5">
+            <span>🎁</span> ${d.points || 25} pts bounty
+          </div>
+        </div>
+
+        <h1 class="text-2xl font-extrabold text-slate-900 mb-3 leading-snug">${d.title}</h1>
+        <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${d.rawQuery}</p>
+
+        ${d.detected_misconception ? `
+          <div class="mt-4 p-3 bg-amber-50/50 border border-amber-100 rounded-xl text-xs flex gap-2">
+            <span class="text-sm">💡</span>
+            <div>
+              <span class="font-bold text-amber-800">Detected Misconception:</span>
+              <p class="text-slate-600 mt-0.5">${d.detected_misconception}</p>
+            </div>
+          </div>
+        ` : ''}
+
+        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center gap-4 text-xs font-bold text-slate-500">
+          <button class="flex items-center gap-1.5 hover:text-indigo-600 transition-colors" onclick="handleUpvote(event)">
+            <i data-lucide="chevron-up" class="w-4 h-4"></i>
+            <span>Upvotes (${d.upvotes || 0})</span>
+          </button>
+          <button class="flex items-center gap-1.5 hover:text-indigo-600 transition-colors" onclick="handleShareLink(event)">
+            <i data-lucide="share-2" class="w-4 h-4"></i>
+            <span>Share Link</span>
+          </button>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function renderAnswers() {
+      const d = state.activeDoubt;
+      const container = document.getElementById("answers-container");
+      const countEl = document.getElementById("answers-header-count");
+
+      const answers = d.answers || [];
+      countEl.textContent = `${answers.length} ${answers.length === 1 ? 'Answer' : 'Answers'}`;
+
+      if (answers.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 bg-white rounded-2xl border border-slate-200 border-dashed">
+            <p class="text-sm text-slate-400 font-medium italic">No answers submitted yet. Be the first to help!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = answers.map(a => {
+        let isFaculty = a.isFacultyVerified || a.authorName.includes("Faculty") || a.authorName.includes("Sarah Jenkins");
+        let badgeHtml = "";
+        let borderClass = "border-slate-200";
+
+        if (isFaculty) {
+          borderClass = "border-emerald-200 bg-emerald-50/10";
+          badgeHtml = `
+            <span class="bg-emerald-100 border border-emerald-300 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-extrabold flex items-center gap-1 shadow-sm">
+              <i data-lucide="award" class="w-3 h-3"></i> Faculty Verified ✓
+            </span>
+          `;
+        } else if (a.isAiVerified) {
+          borderClass = "border-violet-200 bg-violet-50/10";
+          badgeHtml = `
+            <span class="bg-violet-100 border border-violet-300 text-violet-800 px-2 py-0.5 rounded text-[10px] font-extrabold flex items-center gap-1 shadow-sm">
+              <i data-lucide="sparkles" class="w-3 h-3"></i> AI Verified ✓
+            </span>
+          `;
+        } else {
+          badgeHtml = `
+            <span class="bg-indigo-100 border border-indigo-200 text-indigo-800 px-2 py-0.5 rounded text-[10px] font-extrabold flex items-center gap-1 shadow-sm">
+              <i data-lucide="check-circle" class="w-3 h-3"></i> Peer Answer
+            </span>
+          `;
+        }
+
+        return `
+          <div class="p-5 bg-white rounded-2xl border ${borderClass} shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <img src="${a.authorAvatar || 'https://via.placeholder.com/150'}" class="w-8 h-8 rounded-full border border-slate-200 object-cover">
+                <div>
+                  <div class="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                    <span>${a.authorName}</span>
+                    ${badgeHtml}
+                  </div>
+                  <div class="text-[10px] text-slate-400 font-medium">Answered recently</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${renderLiteMarkdown(a.content)}</div>
+          </div>
+        `;
+      }).join("");
+      lucide.createIcons();
+    }
+
+    function renderReplyComposer() {
+      const d = state.activeDoubt;
+      const container = document.getElementById("reply-composer-container");
+
+      const activeYearVal = parseYearValue(d.studentYear);
+      // Seniority Check: Only allow replies if user is senior/peer mentor or faculty
+      const isSenior = state.user.role === "faculty" || state.userYearValue >= activeYearVal;
+
+      if (!isSenior) {
+        container.innerHTML = `
+          <div class="text-center py-4">
+            <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-2 border border-slate-200 text-slate-400">
+              <i data-lucide="lock" class="w-5 h-5"></i>
+            </div>
+            <h4 class="text-sm font-bold text-slate-900">Answering Locked</h4>
+            <p class="text-xs text-slate-500 mt-1">To ensure answer quality, only students in ${d.studentYear} or above can submit solutions to this channel.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = `
+        <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-1.5 uppercase tracking-wider">
+          <i data-lucide="edit-3" class="w-4 h-4 text-indigo-500"></i> Submit Your Solution
+        </h3>
+        <form onsubmit="handlePostReply(event)" class="space-y-4">
+          <textarea id="reply-text" rows="4" required class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 ring-indigo-100 transition-all resize-none placeholder-slate-400 leading-relaxed" placeholder="Type a step-by-step clear explanation..."></textarea>
+          
+          <div class="flex justify-between items-center pt-2">
+            <span class="text-xs text-amber-700 font-extrabold bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm">
+              <span>🎁</span> Earn ${d.points || 25} pts for helping
+            </span>
+            <button type="submit" id="reply-submit-btn" class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white px-5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md shadow-indigo-100 transition-all">
+              <i data-lucide="send" class="w-3.5 h-3.5"></i>
+              <span>Post Solution</span>
+            </button>
+          </div>
+        </form>
+      `;
+      lucide.createIcons();
+    }
+
+    function renderSidebarInfo() {
+      const d = state.activeDoubt;
+      
+      // Render Concept details
+      const infoContainer = document.getElementById("concept-info-container");
+      infoContainer.innerHTML = `
+        <div>
+          <span class="text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Active Concept</span>
+          <span class="text-slate-900 font-extrabold text-sm block">${d.concept || 'General Concept'}</span>
+        </div>
+        ${d.difficulty ? `
+          <div>
+            <span class="text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Complexity Level</span>
+            <span class="badge-clean-neutral px-2 py-0.5 rounded text-[10px] font-bold inline-block">${d.difficulty}</span>
+          </div>
+        ` : ''}
+        ${d.intent ? `
+          <div>
+            <span class="text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Identified Query Intent</span>
+            <span class="badge-clean-purple px-2 py-0.5 rounded text-[10px] font-bold inline-block">Intent: ${d.intent}</span>
+          </div>
+        ` : ''}
+      `;
+
+      // Render Dynamic DB Slide References
+      const resContainer = document.getElementById("resources-container");
+      
+      // Try to find matching resources in DB metadata
+      const resources = DB.getResourcesByConcept(d.concept || "");
+      if (resources.length === 0) {
+        resContainer.innerHTML = `
+          <div class="text-[11px] text-slate-400 italic">No slide materials linked to this concept.</div>
+        `;
+        return;
+      }
+
+      resContainer.innerHTML = resources.slice(0, 3).map(r => `
+        <a href="${r.url}" target="_blank" class="block p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-200 transition-all text-xs group">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="badge-clean-emerald text-[9px] font-bold px-1.5 py-0.5 rounded">${r.resource_type || 'Slides'}</span>
+            <span class="text-[10px] text-slate-400 font-semibold ml-auto">Unit 1</span>
+          </div>
+          <p class="font-bold text-slate-800 leading-snug group-hover:text-emerald-700 transition-colors">${r.title}</p>
+          <div class="flex items-center gap-1 text-[10px] text-slate-400 mt-1 font-semibold">
+            <i data-lucide="external-link" class="w-3 h-3"></i>
+            <span>Open Slides</span>
+          </div>
+        </a>
+      `).join("");
+      lucide.createIcons();
+    }
+
+    function renderLiteMarkdown(text) {
+      if (!text) return "";
+      const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return escaped.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    }
+
+    window.handleUpvote = (e) => {
+      e.stopPropagation();
+      const doubts = DB.getDoubts();
+      const doubtIndex = doubts.findIndex(x => String(x.id) === String(state.currentDoubtId));
+      if (doubtIndex === -1) return;
+
+      doubts[doubtIndex].upvotes = (doubts[doubtIndex].upvotes || 0) + 1;
+      DB.saveDoubts(doubts);
+      loadDoubtData();
+      showToast("Upvoted doubt!", "success");
+    };
+
+    window.handleShareLink = (e) => {
+      e.stopPropagation();
+      const shareUrl = window.location.href;
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        showToast("Direct question link copied!", "info");
+      });
+    };
+
+    async function handlePostReply(e) {
+      e.preventDefault();
+      const text = document.getElementById("reply-text").value;
+      if (!text.trim() || !state.currentDoubtId) return;
+
+      const submitBtn = document.getElementById("reply-submit-btn");
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Posting...';
+      lucide.createIcons();
+
+      try {
+        const ansData = {
+          authorName: state.user.name,
+          authorAvatar: state.user.avatar,
+          content: text,
+          isFacultyVerified: state.user.role === "faculty",
+          isAiVerified: false
+        };
+
+        const bounty = state.activeDoubt.points || 25;
+        await DB.resolveDoubt(state.currentDoubtId, ansData);
+        await DB.updateUserPoints(bounty);
+
+        showToast(`Answer posted successfully! Earned ${bounty} pts.`, "success");
+        
+        // Refresh local data & UI
+        await DB.syncDoubts();
+        loadDoubtData();
+      } catch (err) {
+        showToast("Error posting answer.", "error");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i data-lucide="send" class="w-3.5 h-3.5"></i> <span>Post Solution</span>';
+        lucide.createIcons();
+      }
+    }
+
+    function showPointsInfo() {
+      showToast(`Wallet: ${state.user.points || 0} pts. Complete peer reviews to gain more!`, "info");
+    }
+  </script>
+</body>
+
+</html>

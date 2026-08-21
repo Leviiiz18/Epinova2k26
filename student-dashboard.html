@@ -305,42 +305,6 @@
     </div>
   </div>
 
-  <!-- Thread View Modal (Reddit style comments) -->
-  <div id="thread-modal"
-    class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex justify-center items-end sm:items-center p-0 sm:p-4 transition-opacity duration-300 opacity-0">
-    <div
-      class="bg-slate-50 w-full max-w-3xl h-[90vh] sm:h-[85vh] sm:rounded-2xl shadow-2xl flex flex-col transform transition-transform translate-y-full sm:translate-y-4 duration-300 relative border border-slate-200/50">
-      <div
-        class="h-14 border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 bg-white sm:rounded-t-2xl shrink-0 z-10 shadow-sm">
-        <div class="flex items-center gap-2 text-sm font-extrabold text-slate-900">
-          <i data-lucide="message-circle" class="w-4 h-4 text-indigo-500"></i> Thread View
-        </div>
-        <button onclick="closeThreadModal()"
-          class="text-slate-400 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 rounded-md p-1.5 border border-slate-200 transition-colors"><i
-            data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-
-      <div class="flex-1 overflow-y-auto p-4 sm:p-6 no-scrollbar relative" id="thread-content-area">
-        <!-- Original Post -->
-        <div id="thread-op" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm mb-6"></div>
-
-        <!-- Answers/Comments -->
-        <div class="flex items-center justify-between mb-4 border-b border-slate-200 pb-2">
-          <h4 class="text-sm font-bold text-slate-900">Answers</h4>
-          <span class="text-[10px] text-slate-500 font-semibold uppercase tracking-wider" id="thread-answer-count">0
-            Answers</span>
-        </div>
-        <div id="thread-answers" class="space-y-4"></div>
-      </div>
-
-      <!-- Reply Box -->
-      <div
-        class="p-4 bg-white border-t border-slate-200 shrink-0 sm:rounded-b-2xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]"
-        id="thread-reply-container">
-        <!-- Populated via JS based on seniority rules -->
-      </div>
-    </div>
-  </div>
 
   <!-- Toast Container -->
   <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
@@ -433,19 +397,7 @@
     });
 
     window.addEventListener("popstate", () => {
-      const hash = window.location.hash;
-      if (hash && hash.includes("/question/")) {
-        checkUrlForDoubt();
-      } else {
-        const modal = document.getElementById("thread-modal");
-        if (modal && !modal.classList.contains("hidden")) {
-          modal.classList.add("opacity-0");
-          modal.children[0].classList.add("translate-y-full", "sm:translate-y-4");
-          setTimeout(() => {
-            modal.classList.add("hidden");
-          }, 300);
-        }
-      }
+      checkUrlForDoubt();
     });
 
     function checkUrlForDoubt() {
@@ -461,7 +413,7 @@
       }
       
       if (doubtId) {
-        openThread(doubtId);
+        window.location.href = `question.html?id=${doubtId}`;
       }
     }
 
@@ -773,168 +725,9 @@
     }
 
     function openThread(doubtId) {
-      state.currentDoubtId = doubtId;
-      const doubts = DB.getDoubts();
-      const d = doubts.find(x => String(x.id) === String(doubtId));
-      if (!d) return;
-
-      // Update URL hash/query dynamically to fit 'page/question/{id}' style (hash routing)
-      const newUrl = `${window.location.pathname}#/question/${doubtId}`;
-      window.history.pushState({ doubtId }, "", newUrl);
-
-      document.getElementById("thread-answer-count").textContent = `${d.answers ? d.answers.length : 0} Answers`;
-
-      // Render Original Post
-      const opHtml = `
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-3">
-            <img src="${d.studentAvatar || 'https://via.placeholder.com/150'}" class="w-10 h-10 rounded-full border border-slate-200 shadow-sm">
-            <div>
-              <div class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                ${d.studentName} 
-                <span class="bg-slate-100 border border-slate-200 text-slate-600 px-1.5 py-0.5 rounded text-[10px] shadow-sm">${d.studentYear}</span>
-              </div>
-              <div class="text-[11px] text-slate-500 font-medium">${d.timestamp || '2 hrs ago'} in ${d.subject}</div>
-            </div>
-          </div>
-          <div class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 shadow-sm flex items-center gap-1.5">
-             <span>🎁</span> ${d.points || 25} pts bounty
-          </div>
-        </div>
-        <h3 class="text-xl font-extrabold text-slate-900 mb-3 flex items-center gap-2 flex-wrap">
-          <span>${d.title}</span>
-          ${d.examMode === "5m" ? '<span class="bg-violet-100 border border-violet-200 text-violet-700 px-2 py-0.5 rounded text-[10px] font-bold align-middle">5 Mark Answer</span>' : ''}
-          ${d.examMode === "10m" ? '<span class="bg-violet-100 border border-violet-200 text-violet-700 px-2 py-0.5 rounded text-[10px] font-bold align-middle">10 Mark Answer</span>' : ''}
-        </h3>
-        <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${d.rawQuery}</p>
-        <div class="mt-5 pt-4 border-t border-slate-100 flex items-center gap-4 text-xs font-bold text-slate-500">
-          <button class="flex items-center gap-1.5 hover:text-indigo-600 transition-colors" onclick="handleUpvote(event, '${d.id}', true)"><i data-lucide="chevron-up" class="w-4 h-4"></i> <span id="modal-upvotes-${d.id}">Upvote (${d.upvotes || 0})</span></button>
-          <button class="flex items-center gap-1.5 hover:text-indigo-600 transition-colors" onclick="handleShare(event, '${d.id}')"><i data-lucide="share-2" class="w-4 h-4"></i> Share</button>
-        </div>
-      `;
-      document.getElementById("thread-op").innerHTML = opHtml;
-
-      // Render Answers
-      const ansContainer = document.getElementById("thread-answers");
-      if (!d.answers || d.answers.length === 0) {
-        ansContainer.innerHTML = `
-          <div class="text-center py-8 bg-slate-50 rounded-xl border border-slate-200 border-dashed">
-            <p class="text-sm text-slate-500 font-medium italic">No answers yet. Be the first to help out!</p>
-          </div>
-        `;
-      } else {
-        ansContainer.innerHTML = d.answers.map(a => {
-          let badgeHtml = "";
-          let bgClass = "bg-white";
-
-          if (a.authorName.includes("Faculty") || a.isFacultyVerified) {
-            bgClass = "bg-emerald-50/30 border-emerald-200";
-            badgeHtml = `<span class="bg-emerald-100 border border-emerald-300 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-extrabold flex items-center gap-1 shadow-sm"><i data-lucide="award" class="w-3 h-3"></i> Faculty Verified ✓</span>`;
-          } else {
-            // Student Senior badge
-            badgeHtml = `<span class="bg-indigo-100 border border-indigo-200 text-indigo-800 px-2 py-0.5 rounded text-[10px] font-extrabold flex items-center gap-1 shadow-sm"><i data-lucide="check-circle" class="w-3 h-3"></i> Answered by Peer ✓</span>`;
-          }
-
-          return `
-            <div class="p-5 rounded-xl border border-slate-200 shadow-sm relative pl-12 ${bgClass}">
-              <!-- Thread connector line -->
-              <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-100 -z-10"></div>
-              
-              <div class="flex items-center gap-3 mb-3">
-                <img src="${a.authorAvatar || 'https://via.placeholder.com/150'}" class="w-8 h-8 rounded-full border-2 border-white shadow-sm absolute left-2 top-4 bg-white">
-                <span class="text-sm font-extrabold text-slate-900">${a.authorName}</span>
-                ${badgeHtml}
-                <span class="text-[10px] text-slate-400 ml-auto font-medium">Just now</span>
-              </div>
-              <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${renderLiteMarkdown(a.content)}</p>
-              
-              <div class="mt-4 flex items-center gap-4 text-xs font-bold text-slate-500">
-                <button class="hover:text-indigo-600 flex items-center gap-1 transition-colors"><i data-lucide="thumbs-up" class="w-4 h-4"></i> Helpful (0)</button>
-              </div>
-            </div>
-          `;
-        }).join("");
-      }
-
-      // Seniority Logic for Reply Box
-      const replyContainer = document.getElementById("thread-reply-container");
-
-      // Target channel year logic (the channel they are currently viewing)
-      // A student can answer if state.userYearValue >= state.activeYearValue
-
-      if (state.user.role === "faculty" || state.userYearValue >= state.activeYearValue) {
-        replyContainer.innerHTML = `
-          <div class="text-[10px] text-slate-500 font-bold mb-2 flex items-center gap-1.5 uppercase tracking-wider">
-             <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Submit an Answer
-          </div>
-          <form onsubmit="submitReply(event)" class="flex flex-col gap-3">
-            <textarea id="reply-text" rows="3" class="w-full text-sm bg-slate-50 border border-slate-300 rounded-xl p-3 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 ring-indigo-100 transition-all resize-none" placeholder="Write a helpful explanation..."></textarea>
-            <div class="flex justify-between items-center">
-              <span class="text-[11px] text-amber-600 font-bold bg-amber-50 px-2 py-1 rounded border border-amber-200">🎁 Earn 25 pts for helping</span>
-              <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white px-5 py-2 rounded-lg text-xs font-bold flex items-center justify-center shadow-sm transition-colors">
-                Post Answer
-              </button>
-            </div>
-          </form>
-        `;
-      } else {
-        replyContainer.innerHTML = `
-          <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-center">
-            <div class="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center mx-auto mb-2 text-slate-500">
-              <i data-lucide="lock" class="w-4 h-4"></i>
-            </div>
-            <p class="text-sm text-slate-600 font-bold">Answering Disabled</p>
-            <p class="text-xs text-slate-500 font-medium mt-1">Only students in ${state.activeYear} or above can answer questions here.</p>
-          </div>
-        `;
-      }
-
-      // Show modal with animation
-      const modal = document.getElementById("thread-modal");
-      modal.classList.remove("hidden");
-
-      // Trigger reflow
-      void modal.offsetWidth;
-
-      modal.classList.remove("opacity-0");
-      modal.children[0].classList.remove("translate-y-full", "sm:translate-y-4");
-
-      lucide.createIcons();
+      window.location.href = `question.html?id=${doubtId}`;
     }
 
-    function closeThreadModal() {
-      const modal = document.getElementById("thread-modal");
-      modal.classList.add("opacity-0");
-      modal.children[0].classList.add("translate-y-full", "sm:translate-y-4");
-
-      // Reset URL to base path
-      window.history.pushState({}, "", window.location.pathname);
-
-      setTimeout(() => {
-        modal.classList.add("hidden");
-      }, 300);
-    }
-
-    async function submitReply(e) {
-      e.preventDefault();
-      const txt = document.getElementById("reply-text").value;
-      if (!txt.trim() || !state.currentDoubtId) return;
-
-      const ansData = {
-        authorName: state.user.name,
-        authorAvatar: state.user.avatar,
-        content: txt,
-        isFacultyVerified: state.user.role === "faculty",
-        isAiVerified: false
-      };
-
-      await DB.resolveDoubt(state.currentDoubtId, ansData);
-      await DB.updateUserPoints(25);
-
-      showToast("Answer posted successfully! Earned 25 pts.", "success");
-      openThread(state.currentDoubtId); // refresh thread
-      renderFeed(); // refresh feed
-    }
 
     function setExamMode(btn, groupId) {
       const group = document.getElementById(groupId);
