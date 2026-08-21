@@ -626,6 +626,11 @@
     let pendingDeleteAnswerId = null;
 
     window.handleDeleteAnswer = (answerId) => {
+      console.log("handleDeleteAnswer called with ID:", answerId);
+      if (!answerId || answerId === "undefined" || answerId === "null") {
+        showToast("Cannot delete: Invalid Answer ID (" + answerId + ")", "error");
+        return;
+      }
       pendingDeleteAnswerId = answerId;
       const modal = document.getElementById("confirm-modal");
       if (modal) {
@@ -646,6 +651,7 @@
     window.executeDeleteAnswer = async () => {
       if (!pendingDeleteAnswerId) return;
       const answerId = pendingDeleteAnswerId;
+      console.log("executeDeleteAnswer starting for:", answerId);
       closeConfirmModal();
       
       try {
@@ -654,22 +660,30 @@
           showToast("Solution deleted successfully.", "success");
           
           // Re-fetch current user profile to update points balance in UI
-          const email = state.user.email;
-          const userResp = await fetch(`http://localhost:8000/api/user/${email}`);
-          if (userResp.ok) {
-            const freshUser = await userResp.json();
-            DB.setCurrentUser(freshUser);
-            state.user = freshUser;
-            document.getElementById("points-balance").textContent = freshUser.points || 0;
+          const email = (state.user && state.user.email) ? state.user.email : "alex.morgan@studybuddy.edu";
+          try {
+            const userResp = await fetch(`http://localhost:8000/api/user/${email}`);
+            if (userResp.ok) {
+              const freshUser = await userResp.json();
+              DB.setCurrentUser(freshUser);
+              state.user = freshUser;
+              const pointsEl = document.getElementById("points-balance");
+              if (pointsEl) {
+                pointsEl.textContent = freshUser.points || 0;
+              }
+            }
+          } catch (fetchErr) {
+            console.warn("Failed to reload user points from API:", fetchErr);
           }
           
           // Reload doubt data
           loadDoubtData();
         } else {
-          showToast("Failed to delete solution.", "error");
+          showToast("Failed to delete solution from database.", "error");
         }
       } catch (err) {
-        showToast("Error deleting solution.", "error");
+        console.error("Error executing delete answer:", err);
+        showToast("Error deleting solution: " + err.message, "error");
       }
     };
 
