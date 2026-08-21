@@ -351,6 +351,17 @@ const DB = {
       if (response.ok) {
         const backendDoubts = await response.json();
         if (backendDoubts && backendDoubts.length > 0) {
+          backendDoubts.forEach(d => {
+            if (d.subject && d.topic && typeof STUDY_BUDDY_DATA !== 'undefined') {
+              const taxonomyMatch = STUDY_BUDDY_DATA.taxonomy.find(t => t.subjectName === d.subject);
+              if (taxonomyMatch) {
+                const topicIndex = taxonomyMatch.topics.findIndex(t => t.topicName === d.topic);
+                if (topicIndex !== -1) {
+                  d.subject = `Unit ${topicIndex + 1}: ${d.topic}`;
+                }
+              }
+            }
+          });
           this.saveDoubts(backendDoubts);
           return backendDoubts;
         }
@@ -381,10 +392,6 @@ const DB = {
   },
 
   async addDoubt(newDoubt) {
-    const doubts = this.getDoubts();
-    doubts.unshift(newDoubt);
-    this.saveDoubts(doubts);
-    
     try {
       const email = (newDoubt.studentName || "").includes("Alex") ? "alex.morgan@studybuddy.edu" :
                     (newDoubt.studentName || "").includes("Rahul") ? "rahul.sharma@studybuddy.edu" :
@@ -405,9 +412,13 @@ const DB = {
       }
     } catch (e) {
       console.warn("Backend unavailable for addDoubt (RAG won't trigger):", e);
+      // Fallback
+      const doubts = this.getDoubts();
+      doubts.unshift(newDoubt);
+      this.saveDoubts(doubts);
     }
     
-    return doubts;
+    return this.getDoubts();
   },
 
   async resolveDoubt(doubtId, answerData) {

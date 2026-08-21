@@ -398,10 +398,16 @@
               if (taxonomyMatch && taxonomyMatch.topics) {
                 html += `<div class="pl-6 pr-2 pt-1 pb-2 space-y-0.5 border-l-2 border-indigo-100 ml-3 mb-1">`;
                 taxonomyMatch.topics.forEach((topic, idx) => {
+                  const unitName = `Unit ${idx + 1}: ${topic.topicName}`;
+                  const isUnitActive = state.activeSubject === unitName;
+                  const unitClass = isUnitActive
+                    ? "bg-slate-200 text-slate-900 font-bold"
+                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-200/50";
+                  
                   html += `
-                    <button class="w-full text-left px-2 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-200/50">
-                      <i data-lucide="hash" class="w-3 h-3 text-slate-400"></i>
-                      <span class="truncate">Unit ${idx + 1}: ${topic.topicName}</span>
+                    <button onclick="switchChannel('${yr}', '${unitName}')" class="w-full text-left px-2 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-1.5 ${unitClass}">
+                      <i data-lucide="hash" class="w-3 h-3 ${isUnitActive ? 'text-indigo-500' : 'text-slate-400'}"></i>
+                      <span class="truncate">${unitName}</span>
                     </button>
                   `;
                 });
@@ -472,9 +478,21 @@
         const doubtYearVal = parseYearValue(d.studentYear);
         const matchesYear = doubtYearVal === state.activeYearValue;
         
-        // We handle legacy dummy data that might not match perfectly
-        const matchesSubject = (d.subject === state.activeSubject) || 
-                               (state.activeSubject === "General" && !SUBJECTS.includes(d.subject));
+        let matchesSubject = (d.subject === state.activeSubject);
+        if (!matchesSubject) {
+          if (state.activeSubject === "General" && !SUBJECTS.includes(d.subject)) {
+            matchesSubject = true;
+          } else if (!state.activeSubject.startsWith("Unit ") && typeof STUDY_BUDDY_DATA !== 'undefined') {
+            // Check if doubt belongs to a unit of the active subject
+            const taxonomyMatch = STUDY_BUDDY_DATA.taxonomy.find(t => t.subjectName === state.activeSubject);
+            if (taxonomyMatch && taxonomyMatch.topics) {
+              const unitTopics = taxonomyMatch.topics.map((t, idx) => `Unit ${idx + 1}: ${t.topicName}`);
+              if (unitTopics.includes(d.subject)) {
+                matchesSubject = true;
+              }
+            }
+          }
+        }
         
         // Fallback: If doubt has no studentYear or is legacy, just show it based on subject to populate the feed.
         if (!d.studentYear) return matchesSubject;
@@ -572,18 +590,9 @@
         await DB.updateUserPoints(-15);
         
         const newDoubt = {
-          id: "doubt-" + Date.now(),
           studentName: state.user.name,
-          studentYear: state.user.year || state.user.yearName,
-          studentAvatar: state.user.avatar,
           title: title,
-          rawQuery: desc,
-          subject: state.activeSubject,
-          concept: "General",
-          status: "Open",
-          timestamp: "Just now",
-          points: 25,
-          answers: []
+          rawQuery: desc
         };
         
         await DB.addDoubt(newDoubt);
@@ -891,8 +900,12 @@
     window.handleGlobalPostDoubt = async (e) => {
       e.preventDefault();
       
-      const title = document.getElementById("global-post-title").value.trim();
-      const desc = document.getElementById("global-post-desc").value.trim();
+      const form = e.target;
+      const titleInput = form.querySelector('input[type="text"]');
+      const descInput = form.querySelector('textarea');
+      
+      const title = titleInput ? titleInput.value.trim() : "";
+      const desc = descInput ? descInput.value.trim() : "";
       
       if (!title || !desc) {
         showToast("Please provide both title and description.", "error");
@@ -911,46 +924,21 @@
       lucide.createIcons();
       
       try {
-        await new Promise(r => setTimeout(r, 600)); // fake delay
-        
-        // Auto-sort logic
-        let sortedSubject = state.activeSubject || "General";
-        if (typeof AutoSortEngine !== 'undefined') {
-          const result = AutoSortEngine.classify(title + " " + desc);
-          if (result && result.subject) {
-            sortedSubject = result.subject;
-            showToast(`✨ AI Sorted into: ${sortedSubject}`, "success");
-          }
-        }
-        
         await DB.updateUserPoints(-15);
         
         const newDoubt = {
-          id: "doubt-" + Date.now(),
           studentName: state.user.name,
-          studentYear: state.user.year || state.user.yearName,
-          studentAvatar: state.user.avatar,
           title: title,
-          rawQuery: desc,
-          subject: sortedSubject,
-          concept: "General",
-          status: "Open",
-          timestamp: "Just now",
-          points: 25,
-          answers: [],
-          upvotes: 0
+          rawQuery: desc
         };
         
         await DB.addDoubt(newDoubt);
         
-        document.getElementById("global-post-title").value = "";
-        document.getElementById("global-post-desc").value = "";
+        if (titleInput) titleInput.value = "";
+        if (descInput) descInput.value = "";
         
-        // Show success and render feed if it happens to be the current channel
-        showToast(`✨ Successfully posted and auto-sorted to ${sortedSubject}!`, "success");
-        if (state.activeSubject === "Dashboard") {
-          renderFeed();
-        }
+        showToast(`✨ Successfully posted and auto-sorted!`, "success");
+        renderFeed();
         
       } catch (err) {
         showToast("Failed to post doubt.", "error");

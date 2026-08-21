@@ -575,15 +575,16 @@ async def health():
 
 @app.get("/api/doubts")
 async def get_doubts(subject: str = "All"):
-    # Fetch doubts joined with student user profiles, subject name, and concept name
+    # Fetch doubts joined with student user profiles, subject name, topic name, and concept name
     query = """
         SELECT d.id, d.title, d.raw_query as "rawQuery", d.difficulty, d.intent, 
                d.detected_misconception as "misconception", d.status, d.created_at, d.points,
                u.full_name as "studentName", u.academic_year as "studentYear", u.avatar_url as "studentAvatar",
-               s.name as "subject", c.name as "concept"
+               s.name as "subject", t.name as "topic", c.name as "concept"
         FROM doubts d
         JOIN users u ON d.student_id = u.id
         LEFT JOIN subjects s ON d.subject_id = s.id
+        LEFT JOIN topics t ON d.topic_id = t.id
         LEFT JOIN concepts c ON d.concept_id = c.id
     """
     params = []
