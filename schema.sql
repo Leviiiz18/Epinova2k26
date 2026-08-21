@@ -4,7 +4,7 @@
 
     -- 1. EXTENSIONS
     CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-    -- CREATE EXTENSION IF NOT EXISTS "vector"; -- Enable when pgvector is active on Neon
+    CREATE EXTENSION IF NOT EXISTS "vector"; -- pgvector for semantic search embeddings
 
     -- 2. ROLES
     CREATE TABLE IF NOT EXISTS roles (
@@ -85,6 +85,7 @@
         detected_misconception TEXT,
         auto_sort_confidence JSONB, -- {"topic": 0.94, "concept": 0.97}
         status VARCHAR(30) DEFAULT 'Open', -- 'Open', 'In Review', 'Resolved'
+        embedding vector(384), -- pgvector embedding for semantic search (all-MiniLM-L6-v2 = 384 dims)
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -96,6 +97,7 @@
         content TEXT NOT NULL,
         explanation_style VARCHAR(30) DEFAULT 'Step-by-step', -- 'Simple', 'Technical', 'Analogy', 'Visual', 'Step-by-step'
         is_faculty_validated BOOLEAN DEFAULT FALSE,
+        verification_state VARCHAR(30) DEFAULT 'AI_PENDING', -- 'AI_PENDING', 'AI_REVIEWED', 'FACULTY_VERIFIED', 'REJECTED'
         helpfulness_upvotes INT DEFAULT 0,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
     );

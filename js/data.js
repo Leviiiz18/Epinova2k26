@@ -407,6 +407,23 @@ const DB = {
     try { return JSON.parse(saved); } catch (e) { return STUDY_BUDDY_DATA.initialDoubts; }
   },
 
+  async syncDoubts() {
+    try {
+      const response = await fetch("http://localhost:8000/api/doubts");
+      if (response.ok) {
+        const backendDoubts = await response.json();
+        if (backendDoubts && backendDoubts.length > 0) {
+          this.saveDoubts(backendDoubts);
+          return backendDoubts;
+        }
+      }
+    } catch (e) {
+      console.warn("Could not sync with real backend API:", e);
+    }
+    return this.getDoubts();
+  },
+
+
   saveDoubts(doubts) {
     localStorage.setItem("studybuddy_doubts", JSON.stringify(doubts));
   },
