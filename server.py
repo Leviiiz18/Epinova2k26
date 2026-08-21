@@ -31,6 +31,26 @@ load_dotenv(dotenv_path=dotenv_path)
 
 app = FastAPI(title="StudyBuddy All-in-One Server", version="2.0")
 
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response
+from fastapi import Request
+
+class PrivateNetworkMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        if request.method == "OPTIONS" and "access-control-request-private-network" in request.headers:
+            response = Response()
+            response.headers["Access-Control-Allow-Origin"] = "*"
+            response.headers["Access-Control-Allow-Methods"] = "*"
+            response.headers["Access-Control-Allow-Headers"] = "*"
+            response.headers["Access-Control-Allow-Private-Network"] = "true"
+            return response
+        response = await call_next(request)
+        if "access-control-request-private-network" in request.headers:
+            response.headers["Access-Control-Allow-Private-Network"] = "true"
+        return response
+
+app.add_middleware(PrivateNetworkMiddleware)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
