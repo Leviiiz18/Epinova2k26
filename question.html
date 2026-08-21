@@ -235,6 +235,7 @@
     function renderQuestionCard() {
       const d = state.activeDoubt;
       const card = document.getElementById("question-card");
+      const isDoubtAuthor = String(d.studentName).trim().toLowerCase() === String(state.user.name).trim().toLowerCase();
 
       card.innerHTML = `
         <div class="flex items-center justify-between mb-4">
@@ -261,21 +262,25 @@
               </button>
               <div id="doubt-menu" class="origin-top-right absolute right-0 mt-1 w-40 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-slate-100 focus:outline-none hidden z-50 border border-slate-200">
                 <div class="py-1">
-                  <button onclick="startEditDoubt()" class="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium">
-                    <i data-lucide="edit-2" class="w-3.5 h-3.5 text-slate-400"></i>
-                    <span>Edit Question</span>
-                  </button>
+                  ${isDoubtAuthor ? `
+                    <button onclick="startEditDoubt()" class="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium">
+                      <i data-lucide="edit-2" class="w-3.5 h-3.5 text-slate-400"></i>
+                      <span>Edit Question</span>
+                    </button>
+                  ` : ''}
                   <button onclick="handleCopyDoubt(event)" class="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium">
                     <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-400"></i>
                     <span>Copy Content</span>
                   </button>
                 </div>
-                <div class="py-1">
-                  <button onclick="handleDeleteDoubt()" class="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 flex items-center gap-2 font-semibold">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-400"></i>
-                    <span>Delete Question</span>
-                  </button>
-                </div>
+                ${isDoubtAuthor ? `
+                  <div class="py-1">
+                    <button onclick="handleDeleteDoubt()" class="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 flex items-center gap-2 font-semibold">
+                      <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-400"></i>
+                      <span>Delete Question</span>
+                    </button>
+                  </div>
+                ` : ''}
               </div>
             </div>
           </div>
@@ -387,7 +392,7 @@
                 </button>
                 <div id="menu-${a.id}" class="origin-top-right absolute right-0 mt-1 w-40 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-slate-100 focus:outline-none hidden z-50 border border-slate-200">
                   <div class="py-1">
-                    ${!a.isAiVerified ? `
+                    ${isAuthor && !a.isAiVerified ? `
                       <button onclick="startEditAnswer('${a.id}', \`${escapedContent}\`)" class="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium">
                         <i data-lucide="edit-2" class="w-3.5 h-3.5 text-slate-400"></i>
                         <span>Edit Answer</span>
@@ -398,7 +403,7 @@
                       <span>Copy Content</span>
                     </button>
                   </div>
-                  ${!a.isAiVerified ? `
+                  ${isAuthor && !a.isAiVerified ? `
                     <div class="py-1">
                       <button onclick="handleDeleteAnswer('${a.id}')" class="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 flex items-center gap-2 font-semibold">
                         <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-400"></i>
