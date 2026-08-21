@@ -1,6 +1,11 @@
 # Environment variables & secrets
 .env
+env
 .env.local
+
+# Python cache & bytecode
+__pycache__/
+*.pyc
 
 # Operating System Files
 .DS_Store
@@ -9,3 +14,6 @@ desktop.ini
 
 # Logs & temp files
 *.log
+*_out.txt
+test_api.py
+

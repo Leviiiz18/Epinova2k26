@@ -1,225 +1,139 @@
 import os
 import json
 import re
-import psycopg2
-from psycopg2.extras import RealDictCursor
+import psycopg
+from fastapi import FastAPI, HTTPException, Request
+from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from dotenv import load_dotenv
-from flask import Flask, request, jsonify
-from flask_cors import CORS
 
-dotenv_path = os.path.join(os.path.dirname(__file__), 'env')
+# Try importing LangChain & OpenRouter dependencies gracefully
+try:
+    from langchain_community.embeddings import HuggingFaceEmbeddings
+    from langchain_postgres.vectorstores import PGVector
+    from langchain_openai import ChatOpenAI
+    from langchain_core.prompts import PromptTemplate
+    from langchain_core.runnables import RunnablePassthrough
+    from langchain_core.output_parsers import StrOutputParser
+    LANGCHAIN_AVAILABLE = True
+except Exception as e:
+    print(f"Warning: LangChain components not available: {e}")
+    LANGCHAIN_AVAILABLE = False
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+dotenv_path = os.path.join(BASE_DIR, '.env')
+if not os.path.exists(dotenv_path):
+    dotenv_path = os.path.join(BASE_DIR, 'env')
 load_dotenv(dotenv_path=dotenv_path)
 
-app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+app = FastAPI(title="StudyBuddy All-in-One Server", version="2.0")
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+# Mount Static Directories for Frontend Assets
+if os.path.exists(os.path.join(BASE_DIR, "css")):
+    app.mount("/css", StaticFiles(directory=os.path.join(BASE_DIR, "css")), name="css")
+if os.path.exists(os.path.join(BASE_DIR, "js")):
+    app.mount("/js", StaticFiles(directory=os.path.join(BASE_DIR, "js")), name="js")
+if os.path.exists(os.path.join(BASE_DIR, "assets")):
+    app.mount("/assets", StaticFiles(directory=os.path.join(BASE_DIR, "assets")), name="assets")
+if os.path.exists(os.path.join(BASE_DIR, "data")):
+    app.mount("/data", StaticFiles(directory=os.path.join(BASE_DIR, "data")), name="data")
+
+DB_URL = os.getenv("DATABASE_URL")
+CONNECTION_STRING = DB_URL.replace("postgresql://", "postgresql+psycopg://") if DB_URL else ""
+
+# Vector store & LLM Setup
+embeddings = None
+vectorstore = None
+retriever = None
+rag_chain = None
+
+if LANGCHAIN_AVAILABLE and DB_URL:
+    try:
+        embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        vectorstore = PGVector(
+            embeddings=embeddings,
+            collection_name="modules_collection",
+            connection=CONNECTION_STRING,
+            use_jsonb=True,
+        )
+        retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+    except Exception as e:
+        print(f"Error initializing PGVector: {e}")
+
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    if api_key:
+        try:
+            llm = ChatOpenAI(
+                model="google/gemini-2.5-flash",
+                openai_api_base="https://openrouter.ai/api/v1",
+                openai_api_key=api_key,
+                max_tokens=1000,
+            )
+            system_prompt = (
+                "You are an AI teaching assistant answering student doubts at night. "
+                "Use the following pieces of retrieved context from the course curriculum to answer the student's question. "
+                "If you don't know the answer based on the context, just say that you don't know. "
+                "Keep your answer clear, educational, and structured.\n\n"
+                "Context:\n{context}"
+            )
+            prompt = PromptTemplate.from_template(system_prompt + "\n\nQuestion: {input}\nAnswer:")
+            def format_docs(docs):
+                return "\n\n".join(doc.page_content for doc in docs)
+            if retriever:
+                rag_chain = (
+                    {"context": retriever | format_docs, "input": RunnablePassthrough()}
+                    | prompt
+                    | llm
+                    | StrOutputParser()
+                )
+        except Exception as e:
+            print(f"LLM chain init error: {e}")
+
+# Database helper functions
 def get_db_connection():
-    return psycopg2.connect(DATABASE_URL)
+    if not DB_URL:
+        raise Exception("DATABASE_URL environment variable is not set!")
+    return psycopg.connect(DB_URL)
 
 def run_query(query, params=None, commit=False, fetch_one=False, fetch_all=False):
-    conn = get_db_connection()
-    cur = conn.cursor(cursor_factory=RealDictCursor)
     try:
-        cur.execute(query, params)
-        if commit:
-            conn.commit()
-        
-        result = None
-        if fetch_one:
-            result = cur.fetchone()
-        elif fetch_all:
-            result = cur.fetchall()
+        conn = get_db_connection()
+        with conn.cursor() as cur:
+            cur.execute(query, params)
+            if commit:
+                conn.commit()
             
+            result = None
+            if fetch_one:
+                row = cur.fetchone()
+                if row and cur.description:
+                    colnames = [desc[0] for desc in cur.description]
+                    result = dict(zip(colnames, row))
+            elif fetch_all:
+                rows = cur.fetchall()
+                if rows and cur.description:
+                    colnames = [desc[0] for desc in cur.description]
+                    result = [dict(zip(colnames, row)) for row in rows]
+                else:
+                    result = []
+        conn.close()
         return result
     except Exception as e:
         print(f"Database Query Error: {e} for query: {query}")
-        conn.rollback()
-        raise e
-    finally:
-        cur.close()
-        conn.close()
+        return None
 
-def init_db():
-    print("Initializing Neon PostgreSQL database...")
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        
-        # 1. Execute schema.sql if tables do not exist
-        schema_path = os.path.join(os.path.dirname(__file__), 'schema.sql')
-        if os.path.exists(schema_path):
-            with open(schema_path, 'r', encoding='utf-8') as f:
-                schema_sql = f.read()
-            # Filter comments
-            clean_lines = []
-            for line in schema_sql.split('\n'):
-                if not line.strip().startswith('--'):
-                    clean_lines.append(line)
-            clean_sql = '\n'.join(clean_lines)
-            
-            # Split by semicolon and run clean executions to avoid transaction errors
-            for statement in clean_sql.split(';'):
-                stmt = statement.strip()
-                if stmt:
-                    cur.execute(stmt)
-            
-        # 2. Alter tables to add new columns if not exist
-        cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS points INT DEFAULT 100;")
-        cur.execute("ALTER TABLE doubts ADD COLUMN IF NOT EXISTS points INT DEFAULT 25;")
-        cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS is_ai_verified BOOLEAN DEFAULT FALSE;")
-        cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS is_faculty_verified BOOLEAN DEFAULT FALSE;")
-        
-        # 3. Seed roles
-        roles = ['student', 'peer_mentor', 'faculty', 'admin']
-        for r in roles:
-            cur.execute("INSERT INTO roles (name) VALUES (%s) ON CONFLICT (name) DO NOTHING;", (r,))
-            
-        # Get role ids
-        cur.execute("SELECT id, name FROM roles;")
-        role_map = {row[1]: row[0] for row in cur.fetchall()}
-        
-        # 4. Seed default users
-        default_users = [
-            ("alex.morgan@studybuddy.edu", "Alex Morgan", "student", "3rd Year", "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150", 100),
-            ("rahul.sharma@studybuddy.edu", "Rahul Sharma", "peer_mentor", "4th Year", "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150", 350),
-            ("elena.vance@studybuddy.edu", "Elena Vance", "peer_mentor", "4th Year", "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150", 280),
-            ("priya.patel@studybuddy.edu", "Priya Patel", "peer_mentor", "3rd Year", "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150", 210),
-            ("jordan.hayes@studybuddy.edu", "Jordan Hayes", "peer_mentor", "2nd Year", "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=150", 110),
-            ("sarah.jenkins@studybuddy.edu", "Dr. Sarah Jenkins", "faculty", "Faculty", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250", 100)
-        ]
-        
-        user_map = {}
-        for email, name, role_name, year, avatar, points in default_users:
-            role_id = role_map[role_name]
-            cur.execute("""
-                INSERT INTO users (email, password_hash, full_name, role_id, avatar_url, academic_year, points)
-                VALUES (%s, 'hash', %s, %s, %s, %s, %s)
-                ON CONFLICT (email) DO UPDATE 
-                SET full_name = EXCLUDED.full_name, avatar_url = EXCLUDED.avatar_url, academic_year = EXCLUDED.academic_year
-                RETURNING id;
-            """, (email, name, role_id, avatar, year, points))
-            user_id = cur.fetchone()[0]
-            user_map[name] = user_id
-            
-        # 5. Seed Taxonomy (Subjects, Topics, Concepts)
-        subject_map = {}
-        topic_map = {}
-        concept_map = {}
-        
-        for subj in TAXONOMY:
-            subj_name = subj["subjectName"]
-            subj_code = subj_name.lower().replace(" ", "_")[:20]
-            cur.execute("""
-                INSERT INTO subjects (code, name, description)
-                VALUES (%s, %s, %s)
-                ON CONFLICT (code) DO UPDATE SET name = EXCLUDED.name
-                RETURNING id;
-            """, (subj_code, subj_name, f"Course in {subj_name}"))
-            subj_id = cur.fetchone()[0]
-            subject_map[subj_name] = subj_id
-            
-            for top in subj["topics"]:
-                top_name = top["topicName"]
-                cur.execute("""
-                    INSERT INTO topics (subject_id, name, description)
-                    VALUES (%s, %s, %s)
-                    ON CONFLICT DO NOTHING
-                    RETURNING id;
-                """, (subj_id, top_name, f"Topic: {top_name}"))
-                top_row = cur.fetchone()
-                if top_row:
-                    top_id = top_row[0]
-                else:
-                    cur.execute("SELECT id FROM topics WHERE subject_id = %s AND name = %s;", (subj_id, top_name))
-                    top_id = cur.fetchone()[0]
-                topic_map[(subj_name, top_name)] = top_id
-                
-                for con in top["concepts"]:
-                    con_name = con["conceptName"]
-                    sub_con = con.get("subConcept", "")
-                    diff = con.get("difficulty", "Beginner")
-                    summary = con.get("canonicalSummary", "")
-                    misconception = con.get("misconception", "")
-                    
-                    cur.execute("""
-                        INSERT INTO concepts (topic_id, name, sub_concept, difficulty_level, canonical_summary, common_misconception)
-                        VALUES (%s, %s, %s, %s, %s, %s)
-                        ON CONFLICT DO NOTHING
-                        RETURNING id;
-                    """, (top_id, con_name, sub_con, diff, summary, misconception))
-                    con_row = cur.fetchone()
-                    if con_row:
-                        con_id = con_row[0]
-                    else:
-                        cur.execute("SELECT id FROM concepts WHERE topic_id = %s AND name = %s;", (top_id, con_name))
-                        con_id = cur.fetchone()[0]
-                    concept_map[con_name] = con_id
-                    
-        # 6. Seed Peer Profiles
-        peers = [
-            ("Rahul Sharma", "Depth-First Search (DFS)", 0.88, 4.92, "Available Today", 28),
-            ("Elena Vance", "Backpropagation", 0.92, 4.88, "Available Today", 19),
-            ("Priya Patel", "Control Flow & Conditionals", 0.85, 4.75, "Available Tomorrow", 12),
-            ("Jordan Hayes", "Binary Search", 0.82, 4.60, "Busy", 8)
-        ]
-        for name, concept_name, exp, help_r, avail, sessions in peers:
-            u_id = user_map.get(name)
-            c_id = concept_map.get(concept_name)
-            if u_id and c_id:
-                cur.execute("""
-                    INSERT INTO peer_profiles (user_id, concept_id, expertise_score, helpfulness_rating, availability_status, total_sessions_completed)
-                    VALUES (%s, %s, %s, %s, %s, %s)
-                    ON CONFLICT (user_id) DO UPDATE
-                    SET concept_id = EXCLUDED.concept_id, expertise_score = EXCLUDED.expertise_score, 
-                        helpfulness_rating = EXCLUDED.helpfulness_rating, availability_status = EXCLUDED.availability_status,
-                        total_sessions_completed = EXCLUDED.total_sessions_completed;
-                """, (u_id, c_id, exp, help_r, avail, sessions))
-                
-        # 7. Seed Resources from load_ppt_metadata()
-        fac_id = user_map["Dr. Sarah Jenkins"]
-        all_metadata = load_ppt_metadata()
-        for res in all_metadata:
-            res_title = res.get("title", "")
-            res_url = res.get("url", "")
-            res_meta = res.get("metadata", {})
-            res_concept_name = res_meta.get("concept", "")
-            
-            c_id = concept_map.get(res_concept_name)
-            if c_id:
-                cur.execute("""
-                    INSERT INTO resources (faculty_id, concept_id, title, resource_type, url, metadata)
-                    VALUES (%s, %s, %s, 'Slides', %s, %s)
-                    ON CONFLICT DO NOTHING;
-                """, (fac_id, c_id, res_title, res_url, json.dumps(res_meta)))
-                
-        conn.commit()
-        print("Database initialized successfully!")
-    except Exception as e:
-        print(f"Error initializing Neon database: {e}")
-        if 'conn' in locals():
-            conn.rollback()
-    finally:
-        if 'cur' in locals():
-            cur.close()
-        if 'conn' in locals():
-            conn.close()
-
-# Load PPT metadata from the separated JSON file
-DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
-PPT_METADATA_FILE = os.path.join(DATA_DIR, 'ppt_metadata.json')
-
-def load_ppt_metadata():
-    try:
-        if os.path.exists(PPT_METADATA_FILE):
-            with open(PPT_METADATA_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-    except Exception as e:
-        print(f"Error loading PPT metadata: {e}")
-    return []
-
-# Taxonomy dataset aligned with schema.sql and js/data.js
+# Taxonomy & Seed Data
 TAXONOMY = [
     {
         "subjectName": "Computer Science",
@@ -470,46 +384,168 @@ TAXONOMY = [
     }
 ]
 
-STOP_WORDS = {
-    'a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and', 'any', 'are', 'arent', 'as', 'at',
-    'be', 'because', 'been', 'before', 'being', 'below', 'between', 'both', 'but', 'by', 'cant', 'cannot', 'could',
-    'did', 'didnt', 'do', 'does', 'doesnt', 'doing', 'dont', 'down', 'during', 'each', 'few', 'for', 'from', 'further',
-    'had', 'hadnt', 'has', 'hasnt', 'have', 'havent', 'having', 'he', 'hed', 'hell', 'hes', 'her', 'here', 'heres',
-    'hers', 'herself', 'him', 'himself', 'his', 'how', 'hows', 'i', 'id', 'ill', 'im', 'ive', 'if', 'in', 'into', 'is',
-    'isnt', 'it', 'its', 'itself', 'lets', 'me', 'more', 'most', 'mustnt', 'my', 'myself', 'no', 'nor', 'not', 'of',
-    'off', 'on', 'once', 'only', 'or', 'other', 'ought', 'our', 'ours', 'ourselves', 'out', 'over', 'own', 'same',
-    'shant', 'she', 'shed', 'shell', 'shes', 'should', 'shouldnt', 'so', 'some', 'such', 'than', 'that', 'thats',
-    'the', 'their', 'theirs', 'them', 'themselves', 'then', 'there', 'theres', 'these', 'they', 'theyd', 'theyll',
-    'theyre', 'theyve', 'this', 'those', 'through', 'to', 'too', 'under', 'until', 'up', 'very', 'was', 'wasnt',
-    'we', 'wed', 'well', 'were', 'weve', 'werent', 'what', 'whats', 'when', 'whens', 'where', 'wheres', 'which',
-    'while', 'who', 'whos', 'whom', 'why', 'whys', 'with', 'wont', 'would', 'wouldnt', 'you', 'youd', 'youll',
-    'youre', 'youve', 'your', 'yours', 'yourself', 'yourselves'
-}
+def load_ppt_metadata():
+    ppt_file = os.path.join(BASE_DIR, 'data', 'ppt_metadata.json')
+    try:
+        if os.path.exists(ppt_file):
+            with open(ppt_file, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading ppt_metadata.json: {e}")
+    return []
 
+def init_database():
+    print("Initializing Neon PostgreSQL database...")
+    if not DB_URL:
+        print("DATABASE_URL not set. Skipping DB initialization.")
+        return
+    try:
+        conn = get_db_connection()
+        with conn.cursor() as cur:
+            schema_path = os.path.join(BASE_DIR, 'schema.sql')
+            if os.path.exists(schema_path):
+                with open(schema_path, 'r', encoding='utf-8') as f:
+                    schema_sql = f.read()
+                clean_lines = [l for l in schema_sql.split('\n') if not l.strip().startswith('--')]
+                clean_sql = '\n'.join(clean_lines)
+                for stmt in clean_sql.split(';'):
+                    s = stmt.strip()
+                    if s:
+                        try:
+                            cur.execute(s)
+                            conn.commit()
+                        except Exception as st_err:
+                            conn.rollback()
+
+            cur.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS points INT DEFAULT 100;")
+            cur.execute("ALTER TABLE doubts ADD COLUMN IF NOT EXISTS points INT DEFAULT 25;")
+            cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS is_ai_verified BOOLEAN DEFAULT FALSE;")
+            cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS is_faculty_verified BOOLEAN DEFAULT FALSE;")
+            cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS verification_state VARCHAR(50) DEFAULT 'Reviewing';")
+            cur.execute("ALTER TABLE doubts ADD COLUMN IF NOT EXISTS embedding vector(384);")
+            conn.commit()
+
+            roles = ['student', 'peer_mentor', 'faculty', 'admin']
+            for r in roles:
+                cur.execute("INSERT INTO roles (name) VALUES (%s) ON CONFLICT (name) DO NOTHING;", (r,))
+            conn.commit()
+
+            cur.execute("SELECT id, name FROM roles;")
+            role_map = {row[1]: row[0] for row in cur.fetchall()}
+
+            default_users = [
+                ("alex.morgan@studybuddy.edu", "Alex Morgan", "student", "3rd Year", "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150", 100),
+                ("rahul.sharma@studybuddy.edu", "Rahul Sharma", "peer_mentor", "4th Year", "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150", 350),
+                ("elena.vance@studybuddy.edu", "Elena Vance", "peer_mentor", "4th Year", "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150", 280),
+                ("priya.patel@studybuddy.edu", "Priya Patel", "peer_mentor", "3rd Year", "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150", 210),
+                ("jordan.hayes@studybuddy.edu", "Jordan Hayes", "peer_mentor", "2nd Year", "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=150", 110),
+                ("sarah.jenkins@studybuddy.edu", "Dr. Sarah Jenkins", "faculty", "Faculty", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250", 100),
+                ("ai@studybuddy.com", "AI Teaching Assistant", "admin", "AI Agent", "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=150", 999)
+            ]
+            user_map = {}
+            for email, name, role_name, year, avatar, points in default_users:
+                role_id = role_map[role_name]
+                cur.execute("""
+                    INSERT INTO users (email, password_hash, full_name, role_id, avatar_url, academic_year, points)
+                    VALUES (%s, 'hash', %s, %s, %s, %s, %s)
+                    ON CONFLICT (email) DO UPDATE 
+                    SET full_name = EXCLUDED.full_name, avatar_url = EXCLUDED.avatar_url, academic_year = EXCLUDED.academic_year
+                    RETURNING id;
+                """, (email, name, role_id, avatar, year, points))
+                u_id = cur.fetchone()[0]
+                user_map[name] = u_id
+            conn.commit()
+
+            for subj in TAXONOMY:
+                subj_name = subj["subjectName"]
+                subj_code = subj_name.lower().replace(" ", "_")[:20]
+                cur.execute("""
+                    INSERT INTO subjects (code, name, description)
+                    VALUES (%s, %s, %s)
+                    ON CONFLICT (code) DO UPDATE SET name = EXCLUDED.name
+                    RETURNING id;
+                """, (subj_code, subj_name, f"Course in {subj_name}"))
+                subj_id = cur.fetchone()[0]
+
+                for top in subj["topics"]:
+                    top_name = top["topicName"]
+                    cur.execute("""
+                        INSERT INTO topics (subject_id, name, description)
+                        VALUES (%s, %s, %s)
+                        ON CONFLICT DO NOTHING;
+                    """, (subj_id, top_name, f"Topic: {top_name}"))
+                    conn.commit()
+
+                    cur.execute("SELECT id FROM topics WHERE subject_id = %s AND name = %s;", (subj_id, top_name))
+                    top_row = cur.fetchone()
+                    top_id = top_row[0] if top_row else None
+
+                    if top_id:
+                        for con in top["concepts"]:
+                            con_name = con["conceptName"]
+                            sub_con = con.get("subConcept", "")
+                            diff = con.get("difficulty", "Beginner")
+                            summary = con.get("canonicalSummary", "")
+                            misconception = con.get("misconception", "")
+
+                            cur.execute("""
+                                INSERT INTO concepts (topic_id, name, sub_concept, difficulty_level, canonical_summary, common_misconception)
+                                VALUES (%s, %s, %s, %s, %s, %s)
+                                ON CONFLICT DO NOTHING;
+                            """, (top_id, con_name, sub_con, diff, summary, misconception))
+                            conn.commit()
+
+            print("Neon PostgreSQL Database initialized & seeded successfully!")
+        conn.close()
+    except Exception as e:
+        print(f"Error during DB initialization: {e}")
+
+@app.on_event("startup")
+def startup_event():
+    init_database()
+
+# Frontend HTML Page Routes
+@app.get("/")
+def read_root():
+    return FileResponse(os.path.join(BASE_DIR, "student-dashboard.html"))
+
+@app.get("/student-dashboard.html")
+def read_student_dashboard():
+    return FileResponse(os.path.join(BASE_DIR, "student-dashboard.html"))
+
+@app.get("/faculty-dashboard.html")
+def read_faculty_dashboard():
+    return FileResponse(os.path.join(BASE_DIR, "faculty-dashboard.html"))
+
+@app.get("/login.html")
+def read_login():
+    return FileResponse(os.path.join(BASE_DIR, "login.html"))
+
+@app.get("/index.html")
+def read_index():
+    return FileResponse(os.path.join(BASE_DIR, "index.html"))
+
+# NLP Helpers
 def tokenize(text):
-    if not text:
-        return []
-    words = re.sub(r'[^\w\s]', ' ', text.lower()).split()
-    return [w for w in words if len(w) > 1]
+    return re.findall(r'\b\w+\b', text.lower())
 
 def get_keywords(tokens):
-    return [t for t in tokens if t not in STOP_WORDS]
+    stopwords = {'why', 'does', 'need', 'recursion', 'what', 'happens', 'if', 'we', 'don', 't', 'use', 'it', 
+                 'is', 'the', 'of', 'in', 'and', 'to', 'a', 'for', 'on', 'with', 'an', 'by', 'that', 'from',
+                 'how', 'when', 'should', 'at', 'which', 'or', 'about'}
+    return [t for t in tokens if t not in stopwords and len(t) > 2]
 
 def calculate_match_score(query_keywords, target_text):
-    if not target_text:
+    if not query_keywords:
         return 0.0
     target_tokens = tokenize(target_text)
-    if not target_tokens:
-        return 0.0
-    
-    matches = 0.0
+    matches = 0
     for kw in query_keywords:
         if kw in target_tokens:
             matches += 1.0
         elif any(kw in tok or tok in kw for tok in target_tokens):
             matches += 0.5
-            
-    return matches / len(query_keywords) if query_keywords else 0.0
+    return matches / max(1, len(target_tokens))
 
 def generate_graph_path(topic_name, concept):
     path = []
@@ -523,52 +559,52 @@ def generate_graph_path(topic_name, concept):
 def generate_explanations(concept_name):
     if concept_name == "Binary Search":
         return {
-            "Step-by-step": "1. Find the middle element of the sorted array.\n2. Compare target with the middle element.\n3. If target matches, return index.\n4. If target is smaller, repeat on left half.\n5. If target is larger, repeat on right half.\n*Note: Array must be sorted first!*",
-            "Analogy": "Searching an unsorted list is like looking for a word in a dictionary where the pages are shuffled in random order—you'd have to check page-by-page. Sorting the array is what allows you to open directly to the middle page and know which direction to turn.",
-            "Technical": "Binary search is a divide-and-conquer algorithm with O(log N) time complexity. It relies on the random-access property of arrays and strict monotonic ordering, where indices establish a transitive relationship: A[i] <= A[j] for all i < j."
+            "Step-by-step": "1. Find the middle element of the sorted array.\n2. Compare target with middle element.\n3. If target matches, return index.\n4. If target is smaller, repeat on left half.\n5. If target is larger, repeat on right half.\n*Note: Array must be sorted first!*",
+            "Analogy": "Searching an unsorted list is like looking for a word in a dictionary with shuffled pages. Sorting allows you to open right to the middle page and know which way to turn.",
+            "Technical": "Binary search is a divide-and-conquer algorithm with O(log N) complexity operating on monotonically ordered array structures."
         }
     elif concept_name == "Depth-First Search (DFS)":
         return {
-            "Step-by-step": "1. Push the start node onto the stack.\n2. Mark it as visited.\n3. While stack is not empty, pop the top node.\n4. Push all unvisited neighbors onto the stack, marking them visited.\n5. Repeat until all connected components are explored.",
-            "Analogy": "DFS is like exploring a maze: you walk down a single path as far as you can go. When you hit a dead-end, you backtrack to the last fork in the road and try the other direction. Recursion handles this backtracking automatically using the call stack.",
-            "Technical": "DFS visits graph vertices by traversing deep along each branch before backtracking. It operates in O(V + E) time. It uses a LIFO discipline, either implicitly via recursive runtime call stack frames or explicitly via a Stack data structure."
+            "Step-by-step": "1. Push start node to stack.\n2. Mark visited.\n3. While stack not empty, pop top node.\n4. Push unvisited neighbors.\n5. Repeat until explored.",
+            "Analogy": "DFS is like exploring a maze: walk down a single path as far as possible. At a dead end, backtrack to the last fork.",
+            "Technical": "DFS visits graph vertices by going deep along branches before backtracking. Operates in O(V + E) using LIFO stack semantics."
         }
     elif concept_name == "Backpropagation":
         return {
-            "Step-by-step": "1. Perform a forward pass to calculate predictions and loss.\n2. Compute the gradient of the loss with respect to output activation.\n3. Apply the mathematical chain rule layer by layer backwards.\n4. Multiply local derivatives to find parameter gradients.\n5. Update weights using gradient descent.",
-            "Analogy": "Imagine a factory assembly line making toy cars. At the end, a quality checker flags errors. Backpropagation is like traced feedback going backwards along the line, telling each worker exactly how much their specific action contributed to the final defect.",
-            "Technical": "Backpropagation computes the gradient of a loss function with respect to weights using the reverse-mode automatic differentiation chain rule: ∂L/∂w_ij = (∂L/∂z_j) * (∂z_j/∂w_ij). For Softmax with Cross-Entropy, the vector gradient simplifies directly to the error vector (y_hat - y)."
+            "Step-by-step": "1. Forward pass for predictions.\n2. Compute loss derivative.\n3. Apply calculus chain rule backwards.\n4. Calculate weight gradients.\n5. Update via gradient descent.",
+            "Analogy": "Traced feedback along an assembly line, telling each stage how much it contributed to the output defect.",
+            "Technical": "Backpropagation computes loss gradients w.r.t weights via reverse-mode automatic differentiation chain rule."
         }
-    
     return {
-        "Step-by-step": f"1. Analyze target concept: {concept_name}.\n2. Resolve dependencies.\n3. Implement recursively or iteratively.",
-        "Analogy": f"Like building block assemblies where {concept_name} is the structural component.",
-        "Technical": f"System execution of {concept_name} utilizes O(N) allocation boundaries."
+        "Step-by-step": f"1. Analyze concept: {concept_name}.\n2. Resolve prerequisites.\n3. Execute computation.",
+        "Analogy": f"Structural component in {concept_name} hierarchy.",
+        "Technical": f"Execution of {concept_name} utilizes O(N) allocation boundaries."
     }
 
-@app.route('/health', methods=['GET'])
+# API Endpoints (Handling both /api/ and non-/api/ prefixes)
+@app.get("/api/health")
+@app.get("/health")
 def health():
-    return jsonify({"status": "ok", "engine": "Python AutoSort 1.0 (PostgreSQL active)"})
+    return {"status": "ok", "db": "PostgreSQL Neon Active", "server": "FastAPI Unified Server"}
 
-@app.route('/doubts', methods=['GET'])
-def get_doubts():
-    subject_filter = request.args.get('subject', 'All')
-    
-    # Fetch doubts joined with student user profiles, subject name, and concept name
+@app.get("/api/doubts")
+@app.get("/doubts")
+def get_doubts(subject: str = "All"):
     query = """
         SELECT d.id, d.title, d.raw_query as "rawQuery", d.difficulty, d.intent, 
                d.detected_misconception as "misconception", d.status, d.created_at, d.points,
                u.full_name as "studentName", u.academic_year as "studentYear", u.avatar_url as "studentAvatar",
-               s.name as "subject", c.name as "concept"
+               s.name as "subject", t.name as "topic", c.name as "concept"
         FROM doubts d
         JOIN users u ON d.student_id = u.id
         LEFT JOIN subjects s ON d.subject_id = s.id
+        LEFT JOIN topics t ON d.topic_id = t.id
         LEFT JOIN concepts c ON d.concept_id = c.id
     """
     params = []
-    if subject_filter != 'All':
+    if subject != "All":
         query += " WHERE s.name = %s"
-        params.append(subject_filter)
+        params.append(subject)
         
     query += " ORDER BY d.created_at DESC"
     
@@ -576,11 +612,10 @@ def get_doubts():
     if doubts_rows is None:
         doubts_rows = []
         
-    # Map answers array for each doubt
     for d in doubts_rows:
         ans_query = """
             SELECT a.id, a.content, a.explanation_style as "style", a.is_ai_verified as "isAiVerified", a.is_faculty_verified as "isFacultyVerified",
-                   u.full_name as "authorName", u.avatar_url as "authorAvatar"
+                   a.verification_state as "verificationState", u.full_name as "authorName", u.avatar_url as "authorAvatar"
             FROM answers a
             JOIN users u ON a.author_id = u.id
             WHERE a.doubt_id = %s
@@ -588,20 +623,25 @@ def get_doubts():
         """
         answers = run_query(ans_query, [d['id']], fetch_all=True)
         d['answers'] = answers if answers else []
-        d['created_at'] = d['created_at'].isoformat() if d['created_at'] else 'Just now'
+        d['id'] = str(d['id'])
+        d['created_at'] = str(d['created_at'])
         d['timestamp'] = d['created_at']
         
-    return jsonify(doubts_rows)
+    return doubts_rows
 
-@app.route('/doubts', methods=['POST'])
-def create_doubt():
-    data = request.get_json() or {}
-    raw_query = data.get('rawQuery', '')
-    
+class DoubtRequest(BaseModel):
+    student_id: str = "alex.morgan@studybuddy.edu"
+    title: str = ""
+    raw_query: str
+
+@app.post("/api/ask")
+@app.post("/api/doubts")
+@app.post("/doubts")
+def ask_doubt(request: DoubtRequest):
+    raw_query = request.raw_query
     if not raw_query.strip():
-        return jsonify({"error": "Empty doubt query"}), 400
+        raise HTTPException(status_code=400, detail="Empty doubt query")
         
-    # AI Classification logic
     tokens = tokenize(raw_query)
     keywords = get_keywords(tokens)
     
@@ -660,7 +700,6 @@ def create_doubt():
         if matches >= min(2, len(mis_words)):
             is_misconception_triggered = True
             
-    # Lookup foreign key IDs in Postgres
     subj_row = run_query("SELECT id FROM subjects WHERE name = %s;", [best_match["subject"]], fetch_one=True)
     subj_id = subj_row['id'] if subj_row else None
     
@@ -670,29 +709,93 @@ def create_doubt():
     concept_row = run_query("SELECT id FROM concepts WHERE name = %s AND topic_id = %s;", [concept["conceptName"], topic_id], fetch_one=True)
     concept_id = concept_row['id'] if concept_row else None
     
-    # Get student ID (Alex Morgan)
-    user_row = run_query("SELECT id FROM users WHERE email = %s;", ["alex.morgan@studybuddy.edu"], fetch_one=True)
+    user_row = run_query("SELECT id FROM users WHERE email = %s;", [request.student_id], fetch_one=True)
+    if not user_row:
+        user_row = run_query("SELECT id FROM users WHERE email = 'alex.morgan@studybuddy.edu';", fetch_one=True)
     student_id = user_row['id'] if user_row else None
     
-    title = raw_query.split('?')[0] + '?' if '?' in raw_query else raw_query + '?'
+    run_query("UPDATE users SET points = GREATEST(0, points - 15) WHERE id = %s;", [student_id], commit=True)
+    
+    title = request.title if request.title else (raw_query.split('?')[0] + '?' if '?' in raw_query else raw_query + '?')
     detected_misconception = concept["misconception"] if is_misconception_triggered else "No common misconception active. Query aligns with canonical understanding."
     
+    query_embedding = None
+    if embeddings:
+        try:
+            query_embedding = embeddings.embed_query(raw_query)
+        except Exception as e:
+            print(f"Error embedding query: {e}")
+            
+    existing_resolved = None
+    if query_embedding:
+        try:
+            match_row = run_query("""
+                SELECT d.id, a.content, a.verification_state, (d.embedding <=> %s::vector) as distance
+                FROM doubts d
+                JOIN answers a ON a.doubt_id = d.id
+                WHERE d.embedding IS NOT NULL
+                ORDER BY distance LIMIT 1
+            """, [str(query_embedding)], fetch_one=True)
+            if match_row and match_row['distance'] < 0.20:
+                existing_resolved = match_row
+        except Exception as e:
+            print(f"Error querying semantic cache: {e}")
+
+    if existing_resolved:
+        run_query("UPDATE users SET points = points + 15 WHERE id = %s;", [student_id], commit=True)
+        return {
+            "id": str(existing_resolved['id']),
+            "subject": best_match["subject"],
+            "topic": best_match["topic"],
+            "concept": concept["conceptName"],
+            "subConcept": concept.get("subConcept", ""),
+            "difficulty": concept.get("difficulty", "Beginner"),
+            "intent": intent,
+            "misconception": detected_misconception,
+            "isMisconceptionTriggered": is_misconception_triggered,
+            "prerequisites": concept.get("prerequisites", []),
+            "confidence": confidence,
+            "graphPath": generate_graph_path(best_match["topic"], concept),
+            "explanation": {
+                "Step-by-step": f"[Retrieved Existing Answer] {existing_resolved['content']}",
+                "Analogy": f"[Retrieved Existing Answer] {existing_resolved['content']}",
+                "Technical": f"[Retrieved Existing Answer] {existing_resolved['content']}"
+            },
+            "resources": [],
+            "cacheHit": True
+        }
+
+    answer_text = ""
+    if rag_chain:
+        try:
+            answer_text = rag_chain.invoke(raw_query)
+        except Exception as e:
+            print(f"LLM chain invoke warning: {e}")
+            exps = generate_explanations(concept["conceptName"])
+            answer_text = f"**{concept['conceptName']} Overview:**\n{exps['Step-by-step']}\n\n*Note: AI LLM is operating in fallback mode using cached course materials.*"
+    else:
+        exps = generate_explanations(concept["conceptName"])
+        answer_text = f"**{concept['conceptName']} Overview:**\n{exps['Step-by-step']}"
+
     insert_query = """
-        INSERT INTO doubts (student_id, subject_id, topic_id, concept_id, title, raw_query, difficulty, intent, detected_misconception, auto_sort_confidence, status, points)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'Open', 25)
+        INSERT INTO doubts (student_id, subject_id, topic_id, concept_id, title, raw_query, difficulty, intent, detected_misconception, auto_sort_confidence, status, points, embedding)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'Open', 25, %s::vector)
         RETURNING id;
     """
     confidence_json = json.dumps({"topic": confidence, "concept": confidence})
     inserted = run_query(insert_query, [
         student_id, subj_id, topic_id, concept_id, title, raw_query, 
         concept.get("difficulty", "Beginner"), intent, detected_misconception, 
-        confidence_json
+        confidence_json, str(query_embedding) if query_embedding else None
     ], commit=True, fetch_one=True)
     
-    # Deduct points from asking student (Alex Morgan)
-    run_query("UPDATE users SET points = GREATEST(0, points - 15) WHERE id = %s;", [student_id], commit=True)
-    
-    # Fetch resources matching the concept
+    ai_user = run_query("SELECT id FROM users WHERE email = 'ai@studybuddy.com';", fetch_one=True)
+    if ai_user and inserted:
+        run_query("""
+            INSERT INTO answers (doubt_id, author_id, content, explanation_style, is_ai_verified, is_faculty_verified, verification_state)
+            VALUES (%s, %s, %s, 'Step-by-step', TRUE, FALSE, 'AI_REVIEWED');
+        """, [inserted['id'], ai_user['id'], answer_text], commit=True)
+
     matching_resources = run_query("""
         SELECT title, url, metadata 
         FROM resources 
@@ -701,9 +804,9 @@ def create_doubt():
     if matching_resources:
         for r in matching_resources:
             r['metadata'] = r['metadata'] if isinstance(r['metadata'], dict) else json.loads(r['metadata'])
-            
+
     result = {
-        "id": inserted['id'],
+        "id": str(inserted['id']) if inserted else "",
         "subject": best_match["subject"],
         "topic": best_match["topic"],
         "concept": concept["conceptName"],
@@ -718,85 +821,92 @@ def create_doubt():
         "explanation": generate_explanations(concept["conceptName"]),
         "resources": matching_resources if matching_resources else []
     }
-    
-    return jsonify(result)
+    return result
 
-@app.route('/doubts/<doubt_id>/answers', methods=['POST'])
-def add_answer(doubt_id):
-    data = request.get_json() or {}
-    content = data.get('content', '')
-    author_email = data.get('authorEmail', 'rahul.sharma@studybuddy.edu')
-    
+class AnswerRequest(BaseModel):
+    content: str
+    authorEmail: str = "rahul.sharma@studybuddy.edu"
+
+@app.post("/api/doubts/{doubt_id}/answers")
+@app.post("/doubts/{doubt_id}/answers")
+def add_answer(doubt_id: str, request: AnswerRequest):
+    content = request.content
     if not content.strip():
-        return jsonify({"error": "Empty answer content"}), 400
+        raise HTTPException(status_code=400, detail="Empty answer content")
         
-    user_row = run_query("SELECT id FROM users WHERE email = %s;", [author_email], fetch_one=True)
+    user_row = run_query("SELECT id FROM users WHERE email = %s;", [request.authorEmail], fetch_one=True)
     if not user_row:
-        return jsonify({"error": "User not found"}), 404
+        raise HTTPException(status_code=404, detail="User not found")
     author_id = user_row['id']
     
-    # Get doubt bounty points
     doubt_row = run_query("SELECT points FROM doubts WHERE id = %s;", [doubt_id], fetch_one=True)
     bounty = doubt_row['points'] if doubt_row else 25
     
-    # Insert answer record
     ans_query = """
-        INSERT INTO answers (doubt_id, author_id, content, explanation_style, is_ai_verified, is_faculty_verified)
-        VALUES (%s, %s, %s, 'Technical', FALSE, FALSE)
+        INSERT INTO answers (doubt_id, author_id, content, explanation_style, is_ai_verified, is_faculty_verified, verification_state)
+        VALUES (%s, %s, %s, 'Technical', FALSE, FALSE, 'Reviewing')
         RETURNING id;
     """
     inserted = run_query(ans_query, [doubt_id, author_id, content], commit=True, fetch_one=True)
-    
-    # Update doubt status
     run_query("UPDATE doubts SET status = 'Resolved' WHERE id = %s;", [doubt_id], commit=True)
-    
-    # Award base bounty points to answering student
     run_query("UPDATE users SET points = points + %s WHERE id = %s;", [bounty, author_id], commit=True)
     
-    return jsonify({
+    return {
         "success": True,
-        "answerId": inserted['id'],
+        "answerId": str(inserted['id']) if inserted else "",
         "bountyAwarded": bounty
-    })
+    }
 
-@app.route('/answers/<answer_id>/verify', methods=['POST'])
-def verify_answer(answer_id):
-    run_query("UPDATE answers SET is_faculty_verified = TRUE WHERE id = %s;", [answer_id], commit=True)
+@app.post("/api/answers/{answer_id}/verify")
+@app.post("/answers/{answer_id}/verify")
+def verify_answer(answer_id: str):
+    run_query("""
+        UPDATE answers 
+        SET is_faculty_verified = TRUE, verification_state = 'FACULTY_VERIFIED' 
+        WHERE id = %s;
+    """, [answer_id], commit=True)
     
-    # Award additional +15 points to author
     author_row = run_query("SELECT author_id FROM answers WHERE id = %s;", [answer_id], fetch_one=True)
     if author_row:
         author_id = author_row['author_id']
         run_query("UPDATE users SET points = points + 15 WHERE id = %s;", [author_id], commit=True)
         
-    return jsonify({"success": True, "message": "Answer verified by Faculty. +15 points awarded."})
+    return {"success": True, "message": "Answer verified by Faculty. +15 points awarded."}
 
-@app.route('/answers/<answer_id>/verify_ai', methods=['POST'])
-def verify_ai_answer(answer_id):
-    data = request.get_json() or {}
-    verified = data.get('verified', False)
-    
-    if verified:
-        run_query("UPDATE answers SET is_ai_verified = TRUE WHERE id = %s;", [answer_id], commit=True)
-        # Award additional +10 points to author
+class VerifyAiRequest(BaseModel):
+    verified: bool
+
+@app.post("/api/answers/{answer_id}/verify_ai")
+@app.post("/answers/{answer_id}/verify_ai")
+def verify_ai_answer(answer_id: str, request: VerifyAiRequest):
+    if request.verified:
+        run_query("""
+            UPDATE answers 
+            SET is_ai_verified = TRUE, verification_state = 'AI_REVIEWED' 
+            WHERE id = %s;
+        """, [answer_id], commit=True)
         author_row = run_query("SELECT author_id FROM answers WHERE id = %s;", [answer_id], fetch_one=True)
         if author_row:
             author_id = author_row['author_id']
             run_query("UPDATE users SET points = points + 10 WHERE id = %s;", [author_id], commit=True)
             
-    return jsonify({"success": True, "message": "AI verification state updated in PostgreSQL."})
+    return {"success": True, "message": "AI verification state synchronized."}
 
-@app.route('/validate_answer', methods=['POST'])
-def validate_answer():
-    data = request.get_json() or {}
-    query = data.get('query', '')
-    answer = data.get('answer', '')
-    concept = data.get('concept', '')
+class ValidateRequest(BaseModel):
+    query: str
+    answer: str
+    concept: str
+
+@app.post("/api/validate_answer")
+@app.post("/validate_answer")
+def validate_answer(request: ValidateRequest):
+    query = request.query
+    answer = request.answer
+    concept = request.concept
     
     if not answer.strip():
-        return jsonify({"verified": False, "reason": "Answer is empty."})
+        return {"verified": False, "reason": "Answer is empty."}
         
-    # Get resources from PostgreSQL database dynamically
     matching_res = run_query("""
         SELECT r.title, r.metadata
         FROM resources r
@@ -814,7 +924,6 @@ def validate_answer():
         
     answer_tokens = tokenize(answer)
     answer_keywords = get_keywords(answer_tokens)
-    
     ref_tokens = tokenize(target_reference)
     ref_keywords = get_keywords(ref_tokens)
     
@@ -823,17 +932,18 @@ def validate_answer():
     
     reason = f"Evaluated against course slide content: '{resource_title}'."
     if verified:
-        return jsonify({
+        return {
             "verified": True,
             "reason": f"{reason} AI verified alignment on key terms: {', '.join(overlap[:3])}."
-        })
+        }
     else:
-        return jsonify({
+        return {
             "verified": False,
             "reason": f"{reason} Insufficient technical overlap with course materials."
-        })
+        }
 
-@app.route('/leaderboard', methods=['GET'])
+@app.get("/api/leaderboard")
+@app.get("/leaderboard")
 def get_leaderboard():
     query = """
         SELECT u.full_name as "name", u.academic_year as "year", u.avatar_url as "avatar", u.points,
@@ -844,8 +954,9 @@ def get_leaderboard():
         ORDER BY u.points DESC;
     """
     rows = run_query(query, fetch_all=True)
-    
-    # Map ranks
+    if rows is None:
+        rows = []
+        
     for idx, row in enumerate(rows):
         if idx == 0:
             row['rank'] = "Expert"
@@ -858,10 +969,11 @@ def get_leaderboard():
         else:
             row['rank'] = "Novice"
             
-    return jsonify(rows)
+    return rows
 
-@app.route('/user/<email>', methods=['GET'])
-def get_user(email):
+@app.get("/api/user/{email}")
+@app.get("/user/{email}")
+def get_user(email: str):
     row = run_query("""
         SELECT u.id, u.full_name as "name", u.academic_year as "year", u.avatar_url as "avatar", u.points,
                r.name as "role"
@@ -870,25 +982,27 @@ def get_user(email):
         WHERE u.email = %s;
     """, [email], fetch_one=True)
     if not row:
-        return jsonify({"error": "User not found"}), 404
-    return jsonify(row)
+        raise HTTPException(status_code=404, detail="User not found")
+    row['id'] = str(row['id'])
+    return row
 
-@app.route('/user/<email>/points', methods=['POST'])
-def update_user_points_route(email):
-    data = request.get_json() or {}
-    diff = data.get('diff', 0)
-    
+class PointsRequest(BaseModel):
+    diff: int
+
+@app.post("/api/user/{email}/points")
+@app.post("/user/{email}/points")
+def update_user_points(email: str, request: PointsRequest):
     row = run_query("SELECT id, points FROM users WHERE email = %s;", [email], fetch_one=True)
     if not row:
-        return jsonify({"error": "User not found"}), 404
+        raise HTTPException(status_code=404, detail="User not found")
         
-    new_points = max(0, row['points'] + diff)
+    new_points = max(0, row['points'] + request.diff)
     run_query("UPDATE users SET points = %s WHERE id = %s;", [new_points, row['id']], commit=True)
     
-    return jsonify({"success": True, "points": new_points})
-
+    return {"success": True, "points": new_points}
 
 if __name__ == '__main__':
-    init_db()
-    print("Starting StudyBuddy Auto-Sort Python Server...")
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    import uvicorn
+    print("Starting StudyBuddy Unified Server on http://127.0.0.1:8000...")
+    uvicorn.run(app, host="127.0.0.1", port=8000)
+

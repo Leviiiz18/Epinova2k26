@@ -547,5 +547,30 @@ const DB = {
       console.warn("Points sync with DB failed:", e);
     }
     return user.points;
+  },
+
+  getFacultyById(facId) {
+    const defaultFaculty = {
+      id: facId || "fac-ai-01",
+      name: "Dr. Sarah Jenkins",
+      title: "Lead Faculty - Computer Science",
+      domain: "Artificial Intelligence & Data Structures",
+      email: "sarah.jenkins@studybuddy.edu",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250",
+      status: "online"
+    };
+    return defaultFaculty;
+  },
+
+  getFacultyForDomain(domain) {
+    return {
+      id: "fac-ai-01",
+      name: "Dr. Sarah Jenkins",
+      title: `Faculty Lead - ${domain || "Computer Science"}`,
+      domain: domain || "Computer Science & Engineering",
+      email: "sarah.jenkins@studybuddy.edu",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250",
+      status: "online"
+    };
   }
 };
