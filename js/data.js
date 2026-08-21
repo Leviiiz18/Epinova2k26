@@ -384,6 +384,29 @@ const DB = {
     const doubts = this.getDoubts();
     doubts.unshift(newDoubt);
     this.saveDoubts(doubts);
+    
+    try {
+      const email = (newDoubt.studentName || "").includes("Alex") ? "alex.morgan@studybuddy.edu" :
+                    (newDoubt.studentName || "").includes("Rahul") ? "rahul.sharma@studybuddy.edu" :
+                    (newDoubt.studentName || "").includes("Elena") ? "elena.vance@studybuddy.edu" :
+                    (newDoubt.studentName || "").includes("Priya") ? "priya.patel@studybuddy.edu" : "jordan.hayes@studybuddy.edu";
+                    
+      const response = await fetch(`http://localhost:8000/api/doubts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          student_id: email,
+          title: newDoubt.title,
+          raw_query: newDoubt.rawQuery
+        })
+      });
+      if (response.ok) {
+        await this.syncDoubts();
+      }
+    } catch (e) {
+      console.warn("Backend unavailable for addDoubt (RAG won't trigger):", e);
+    }
+    
     return doubts;
   },
 

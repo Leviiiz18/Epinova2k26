@@ -70,7 +70,7 @@ function loginAsDemo(role, specificId = null) {
       id: "student-alex",
       name: "Alex Morgan",
       yearId: "year-3",
-      yearName: "3rd Year (Junior)",
+      yearName: "3rd Year",
       email: "alex.morgan@student.studybuddy.edu",
       avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150"
     };

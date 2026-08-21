@@ -97,7 +97,7 @@ def calculate_match_score(query_keywords, target_text):
             matches += 1.0
         elif any(kw in tok or tok in kw for tok in target_tokens):
             matches += 0.5
-    return matches / len(query_keywords)
+    return matches / max(1, len(target_tokens))
 
 def generate_graph_path(topic_name, concept):
     path = []
@@ -204,6 +204,32 @@ TAXONOMY = [
                         "canonicalSummary": "Conditional execution and loop constructs.",
                         "misconception": "Loops always terminate automatically",
                         "prerequisites": ["C Variables & Data Types"]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "subjectName": "Digital Image Processing",
+        "topics": [
+            {
+                "topicName": "Image Representation",
+                "concepts": [
+                    {
+                        "conceptName": "Digital Image Processing Basics",
+                        "subConcept": "Sampling & Quantization",
+                        "difficulty": "Intermediate",
+                        "canonicalSummary": "Discretization of continuous image frames.",
+                        "misconception": "Higher sampling rates always increase perceptual quality infinitely",
+                        "prerequisites": []
+                    },
+                    {
+                        "conceptName": "Image Enhancement",
+                        "subConcept": "Histogram Transformations",
+                        "difficulty": "Intermediate",
+                        "canonicalSummary": "Methods of modifying contrast and spatial domain filters.",
+                        "misconception": "Histogram equalization is a lossless operation",
+                        "prerequisites": ["Digital Image Processing Basics"]
                     }
                 ]
             }

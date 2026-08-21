@@ -169,7 +169,7 @@
           <i data-lucide="inbox" class="w-4 h-4 text-slate-600"></i>
           Faculty Doubt Queue &amp; Auto-Sort Verification
         </h2>
-        <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg">Domain: Computer Science</span>
+        <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg" id="fac-header-domain">Domain: Artificial Intelligence</span>
       </div>
       <div id="faculty-queue-list" class="space-y-4">
         <!-- Injected via JS -->
@@ -228,6 +228,8 @@
         if (nameEl && user.name) nameEl.textContent = user.name;
         const avatarEl = document.getElementById("fac-header-avatar");
         if (avatarEl && user.avatar) avatarEl.src = user.avatar;
+        const domainEl = document.getElementById("fac-header-domain");
+        if (domainEl && user.domain) domainEl.textContent = `Domain: ${user.domain}`;
       }
       await DB.syncDoubts();
       renderFacultyQueue();

@@ -45,7 +45,7 @@ const AutoSortEngine = {
       }
     });
 
-    return matches / queryKeywords.length;
+    return matches / Math.max(1, targetTokens.length);
   },
 
   classify(rawQuery) {
