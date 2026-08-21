@@ -453,10 +453,10 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       // Force seed upgrade for gamification peer doubts
-      const doubts = DB.getDoubts();
-      if (doubts.length < 5 || doubts[0].points === undefined) {
+      if (localStorage.getItem("studybuddy_db_version") !== "3.1") {
         localStorage.removeItem("studybuddy_doubts");
         localStorage.removeItem("studybuddy_current_user");
+        localStorage.setItem("studybuddy_db_version", "3.1");
       }
       
       const user = DB.getCurrentUser();
@@ -837,36 +837,54 @@
       showToast(`Answer posted! Claimed +${pointsWon} base BrainPoints. Evaluating...`, "warning");
 
       // 1. AI Agent Verification (1.5s delay)
-      setTimeout(() => {
+      setTimeout(async () => {
+        let isAiVerified = false;
+        let aiReason = "";
+        
+        try {
+          const valResponse = await fetch("http://localhost:5000/validate_answer", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              query: doubt.rawQuery,
+              answer: content,
+              concept: doubt.concept
+            })
+          });
+          
+          if (valResponse.ok) {
+            const valResult = await valResponse.json();
+            isAiVerified = valResult.verified;
+            aiReason = valResult.reason;
+          }
+        } catch (err) {
+          console.warn("Python server is offline for answer validation. Using local keyword check fallback.");
+          const matchKeywords = ["recursion", "stack", "search", "array", "sorted", "binary", "tree", "graph", "node", "interface", "class", "fuzzy", "logic", "membership", "sugeno", "mamdani", "gradient", "derivation", "chain", "rule"];
+          const lowerContent = content.toLowerCase();
+          const overlap = matchKeywords.filter(k => lowerContent.includes(k));
+          isAiVerified = overlap.length >= 2;
+          aiReason = isAiVerified 
+            ? "Offline AI verified matching terms: " + overlap.join(", ") 
+            : "Offline validation failed: Answer lacks technical keywords.";
+        }
+
         const activeDoubts = DB.getDoubts();
         const curDoubt = activeDoubts.find(d => d.id === doubtId);
         if (curDoubt && curDoubt.answers) {
           const ansIdx = curDoubt.answers.findIndex(a => a.authorName.includes(currentUser.name));
           if (ansIdx !== -1) {
-            DB.setAnswerAiVerified(doubtId, ansIdx, true);
-            DB.updateUserPoints(10); // +10 points for AI verify
-            renderDoubtsFeed();
-            renderLeaderboard();
-            showToast("🤖 AI Agent verified your answer! +10 pts awarded.", "success");
+            if (isAiVerified) {
+              DB.setAnswerAiVerified(doubtId, ansIdx, true);
+              DB.updateUserPoints(10); // +10 points for AI verify
+              renderDoubtsFeed();
+              renderLeaderboard();
+              showToast(`🤖 AI Agent verified answer! +10 pts: ${aiReason}`, "success");
+            } else {
+              showToast(`⚠️ AI Agent validation failed: ${aiReason}`, "error");
+            }
           }
         }
       }, 1500);
-
-      // 2. Faculty Verification (4.5s delay)
-      setTimeout(() => {
-        const activeDoubts = DB.getDoubts();
-        const curDoubt = activeDoubts.find(d => d.id === doubtId);
-        if (curDoubt && curDoubt.answers) {
-          const ansIdx = curDoubt.answers.findIndex(a => a.authorName.includes(currentUser.name));
-          if (ansIdx !== -1) {
-            DB.setAnswerFacultyVerified(doubtId, ansIdx, true);
-            DB.updateUserPoints(15); // +15 points for Faculty verify
-            renderDoubtsFeed();
-            renderLeaderboard();
-            showToast("🎓 Prof. Sarah Jenkins verified your answer! +15 pts awarded.", "success");
-          }
-        }
-      }, 4500);
     }
 
     function renderLeaderboard() {

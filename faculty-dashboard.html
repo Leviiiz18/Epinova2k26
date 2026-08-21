@@ -237,13 +237,57 @@
       const doubts = DB.getDoubts();
       const container = document.getElementById("faculty-queue-list");
 
+      if (doubts.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center bg-white border border-slate-200 rounded-lg text-slate-400 text-xs shadow-sm">
+            <i data-lucide="info" class="w-8 h-8 mx-auto mb-2 text-slate-300"></i>
+            <span>No incoming doubts in the queue. The dashboard is clean!</span>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
       container.innerHTML = doubts.map(d => {
         const isResolved = d.status === "Resolved";
+        
+        let peerAnswersBlock = "";
+        if (d.answers && d.answers.length > 0) {
+          peerAnswersBlock = d.answers.map((a, idx) => {
+            const isPeer = a.authorName.includes("Peer Mentor");
+            const verifyBtn = (isPeer && !a.isFacultyVerified) ? `
+              <button type="button" onclick="facultyVerifyPeerAnswer('${d.id}', ${idx})" class="mt-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded font-bold transition-all text-[10px] flex items-center gap-1 shadow-sm">
+                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                <span>Approve & Verify Answer (Award Tag)</span>
+              </button>
+            ` : (a.isFacultyVerified ? `
+              <span class="text-emerald-600 font-bold text-[10px] flex items-center gap-0.5 mt-2">
+                <i data-lucide="award" class="w-3.5 h-3.5"></i>
+                <span>Officially Faculty Verified</span>
+              </span>
+            ` : '');
+
+            return `
+              <div class="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+                <div class="flex items-center justify-between font-bold text-slate-700 mb-1">
+                  <span>Solution by: ${a.authorName}</span>
+                  <div class="flex items-center gap-1.5">
+                    ${a.isAiVerified ? '<span class="bg-purple-100 text-purple-700 text-[8px] font-extrabold px-1.5 py-0.5 rounded flex items-center gap-0.5">🤖 AI Verified</span>' : ''}
+                    ${a.isFacultyVerified ? '<span class="bg-emerald-100 text-emerald-700 text-[8px] font-extrabold px-1.5 py-0.5 rounded flex items-center gap-0.5">🎓 Faculty Verified</span>' : ''}
+                  </div>
+                </div>
+                <p class="text-slate-600 pl-2 border-l-2 border-slate-300 italic">${a.content}</p>
+                ${verifyBtn}
+              </div>
+            `;
+          }).join("");
+        }
+
         return `
-          <div class="crisp-card p-5 bg-white border border-slate-200">
+          <div class="crisp-card p-5 bg-white border border-slate-200 hover:shadow-md transition-shadow">
             <div class="flex items-center justify-between gap-2 mb-2">
               <div class="flex items-center gap-1.5">
-                <span class="badge-clean-neutral px-2 py-0.5 rounded text-[10px] font-bold">${d.concept}</span>
+                <span class="badge-clean-neutral px-2 py-0.5 rounded text-[10px] font-bold">${d.subject} &bull; ${d.concept}</span>
                 <span class="badge-clean-neutral px-2 py-0.5 rounded text-[10px] text-slate-500">${d.difficulty}</span>
                 <span class="badge-clean-purple px-2 py-0.5 rounded text-[10px] font-bold">Auto-Sort: ${d.intent}</span>
               </div>
@@ -259,7 +303,9 @@
               <strong>Detected Misconception:</strong> ${d.misconception}
             </div>
 
-            <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+            ${peerAnswersBlock}
+
+            <div class="flex items-center justify-between pt-2.5 mt-3 border-t border-slate-100 text-xs">
               <span class="text-slate-500">Student: <strong>${d.studentName}</strong> (${d.studentYear})</span>
               <button type="button" onclick="openFacultyAnswer('${d.id}')" class="btn-primary px-3 py-1.5 text-xs font-semibold">
                 ${isResolved ? 'Update / Validate Solution' : 'Answer Doubt'}
@@ -270,6 +316,16 @@
       }).join("");
 
       lucide.createIcons();
+    }
+
+    function facultyVerifyPeerAnswer(doubtId, answerIdx) {
+      DB.setAnswerFacultyVerified(doubtId, answerIdx, true);
+      
+      // Award extra 15 points to the peer mentor student
+      DB.updateUserPoints(15);
+      
+      showToast("Peer solution verified! Faculty approval tag awarded (+15 pts).", "success");
+      renderFacultyQueue();
     }
 
     function openFacultyAnswer(doubtId) {
@@ -286,7 +342,8 @@
         authorName: "Dr. Sarah Jenkins (Faculty Lead)",
         authorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250",
         style: "Technical",
-        isFacultyValidated: true,
+        isAiVerified: true,
+        isFacultyVerified: true,
         content: text
       };
 

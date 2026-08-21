@@ -447,6 +447,65 @@ def classify():
     return jsonify(result)
 
 
+@app.route('/validate_answer', methods=['POST'])
+def validate_answer():
+    data = request.get_json() or {}
+    query = data.get('query', '')
+    answer = data.get('answer', '')
+    concept = data.get('concept', '')
+    
+    if not answer.strip():
+        return jsonify({"verified": False, "reason": "Answer is empty."})
+        
+    all_resources = load_ppt_metadata()
+    matching_res = None
+    
+    # Try exact match on concept
+    for res in all_resources:
+        res_concept = res.get("metadata", {}).get("concept", "")
+        if res_concept.lower() == concept.lower() or concept.lower() in res_concept.lower():
+            matching_res = res
+            break
+            
+    # Fallback to query keyword matching if concept has no exact resource match
+    if not matching_res:
+        query_words = get_keywords(tokenize(query))
+        for res in all_resources:
+            res_desc = res.get("metadata", {}).get("description", "").lower()
+            res_concept = res.get("metadata", {}).get("concept", "").lower()
+            if any(w in res_desc or w in res_concept for w in query_words):
+                matching_res = res
+                break
+                
+    if not matching_res:
+        target_reference = query + " " + concept
+    else:
+        target_reference = matching_res.get("metadata", {}).get("description", "") + " " + matching_res.get("metadata", {}).get("concept", "")
+        
+    answer_tokens = tokenize(answer)
+    answer_keywords = get_keywords(answer_tokens)
+    
+    ref_tokens = tokenize(target_reference)
+    ref_keywords = get_keywords(ref_tokens)
+    
+    overlap = [w for w in answer_keywords if w in ref_keywords]
+    verified = len(overlap) >= 2
+    
+    resource_title = matching_res.get('title') if matching_res else concept
+    reason = f"Evaluated against slide content: '{resource_title}'."
+    
+    if verified:
+        return jsonify({
+            "verified": True,
+            "reason": f"{reason} AI verified alignment on key terms: {', '.join(overlap[:3])}."
+        })
+    else:
+        return jsonify({
+            "verified": False,
+            "reason": f"{reason} Insufficient technical overlap with course materials."
+        })
+
+
 if __name__ == '__main__':
     print("Starting StudyBuddy Auto-Sort Python Server...")
     app.run(host='127.0.0.1', port=5000, debug=True)
