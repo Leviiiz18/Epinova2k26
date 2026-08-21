@@ -31,26 +31,18 @@
         </div>
       </a>
 
-      <!-- Quick Actions & Faculty Profile -->
-      <div class="flex items-center gap-3">
-        <!-- Switch to Student View -->
-        <a href="student-dashboard.html" title="Switch to Student View" class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors">
-          <i data-lucide="repeat" class="w-3.5 h-3.5"></i>
-          <span>Student View</span>
-        </a>
-
-        <!-- Faculty Profile Pill -->
-        <div class="flex items-center gap-2.5 pl-2 border-l border-slate-200">
-          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250" class="w-8 h-8 rounded-full border border-slate-200 object-cover" alt="Faculty Avatar">
-          <div class="hidden sm:block text-left">
-            <div class="text-xs font-bold text-slate-900 leading-tight">Dr. Sarah Jenkins</div>
-            <div class="text-[10px] text-slate-500 font-medium">Computer Science Lead</div>
-          </div>
-          <button type="button" onclick="logout()" title="Logout" aria-label="Log out" class="p-1.5 text-slate-400 hover:text-slate-700 transition-colors">
-            <i data-lucide="log-out" class="w-4 h-4"></i>
-          </button>
+      <!-- Faculty Profile -->
+      <div class="flex items-center gap-2.5">
+        <img id="fac-header-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250" class="w-8 h-8 rounded-full border border-slate-200 object-cover" alt="Faculty Avatar">
+        <div class="hidden sm:block text-left">
+          <div class="text-xs font-bold text-slate-900 leading-tight" id="fac-header-name">Dr. Sarah Jenkins</div>
+          <div class="text-[10px] text-slate-500 font-medium">Faculty &bull; Computer Science</div>
         </div>
-
+        <div class="w-px h-6 bg-slate-200 mx-1"></div>
+        <button type="button" onclick="logout()" title="Log out" aria-label="Log out" class="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 transition-colors px-2 py-1.5 rounded-md hover:bg-slate-100">
+          <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline font-medium">Log out</span>
+        </button>
       </div>
     </div>
   </header>
@@ -58,45 +50,47 @@
   <!-- Main Container -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 flex-1 w-full">
 
-    <!-- 1. TOP STATS BAR (Section 15: Faculty Intelligence) -->
-    <div class="crisp-card p-6 bg-white shadow-sm border border-slate-200">
-      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-        <div>
-          <div class="badge-clean-neutral inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider mb-1">
-            Section 15 &bull; Campus Learning Intelligence
+    <!-- 1. TOP STATS BAR -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="p-6 pb-5">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div>
+            <span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+              Section 15 &bull; Campus Learning Intelligence
+            </span>
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-950 leading-tight">
+              Campus Concept Analytics &amp; Learning Gaps
+            </h1>
+            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed max-w-xl">
+              Real-time doubt clustering, prerequisite failure patterns, and recommended classroom interventions.
+            </p>
           </div>
-          <h1 class="text-xl sm:text-2xl font-bold text-slate-950">
-            Campus Concept Analytics &amp; Learning Gaps
-          </h1>
-          <p class="text-xs text-slate-500 mt-0.5">
-            Real-time doubt clustering, prerequisite failure patterns, and recommended classroom interventions.
-          </p>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <span class="badge-clean-emerald text-xs font-semibold px-3 py-1 rounded">
+          <span class="badge-clean-emerald text-xs font-semibold px-3 py-1.5 rounded-lg self-start whitespace-nowrap">
             NeonDB Sync Active
           </span>
         </div>
       </div>
-
-      <!-- 4 Intelligence Metrics -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-1">
-        <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
-          <div class="text-[10px] font-bold text-slate-500 uppercase">Active Doubt Volume</div>
-          <div class="text-xl font-bold text-slate-900 mt-0.5">42 Queries</div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 border-t border-slate-100">
+        <div class="p-4 border-r border-slate-100">
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Active Doubts</div>
+          <div class="text-2xl font-bold text-slate-900">42</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">queries in queue</div>
         </div>
-        <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
-          <div class="text-[10px] font-bold text-slate-500 uppercase">Top Unresolved Gap</div>
-          <div class="text-xl font-bold text-amber-600 mt-0.5">Unsorted Binary Search</div>
+        <div class="p-4 sm:border-r border-slate-100">
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Top Gap</div>
+          <div class="text-sm font-bold text-amber-600 leading-snug mt-0.5">Unsorted Binary Search</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">unresolved concept</div>
         </div>
-        <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
-          <div class="text-[10px] font-bold text-slate-500 uppercase">Peer Resolution Rate</div>
-          <div class="text-xl font-bold text-emerald-600 mt-0.5">78.4%</div>
+        <div class="p-4 border-r border-t sm:border-t-0 border-slate-100">
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Peer Resolution</div>
+          <div class="text-2xl font-bold text-emerald-600">78.4%</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">success rate</div>
         </div>
-        <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
-          <div class="text-[10px] font-bold text-slate-500 uppercase">Prerequisite Warning</div>
-          <div class="text-xl font-bold text-slate-900 mt-0.5">Stack &bull; Recursion</div>
+        <div class="p-4 border-t sm:border-t-0 border-slate-100">
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Prerequisite Alert</div>
+          <div class="text-sm font-bold text-slate-900 leading-snug mt-0.5">Stack &bull; Recursion</div>
+          <div class="text-[11px] text-slate-500 mt-0.5">linked gaps</div>
         </div>
       </div>
     </div>
@@ -168,18 +162,17 @@
 
     </div>
 
-    <!-- 3. INCOMING DOUBT RESOLUTION QUEUE -->
-    <div class="space-y-3">
-      <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-        <h3 class="text-base font-bold text-slate-950 flex items-center gap-2">
-          <i data-lucide="inbox" class="w-4 h-4 text-slate-700"></i>
-          <span>Faculty Doubt Queue &amp; Auto-Sort Verification</span>
-        </h3>
-        <span class="text-xs text-slate-500 font-medium">Domain: Computer Science</span>
+    <!-- 3. DOUBT QUEUE -->
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-base font-bold text-slate-950 flex items-center gap-2">
+          <i data-lucide="inbox" class="w-4 h-4 text-slate-600"></i>
+          Faculty Doubt Queue &amp; Auto-Sort Verification
+        </h2>
+        <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg">Domain: Computer Science</span>
       </div>
-
-      <div id="faculty-queue-list" class="space-y-3.5">
-        <!-- Injected dynamically via JS -->
+      <div id="faculty-queue-list" class="space-y-4">
+        <!-- Injected via JS -->
       </div>
     </div>
 

@@ -31,35 +31,32 @@
         </div>
       </a>
 
-      <!-- Quick Action Buttons & Profile -->
+      <!-- Header Right -->
       <div class="flex items-center gap-3">
 
-        <!-- Post Doubt Action -->
+        <!-- Ask Doubt CTA -->
         <button type="button" onclick="scrollToDoubtInput()" class="btn-primary px-3.5 py-1.5 text-xs font-semibold flex items-center gap-1.5">
           <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-          <span>Ask Doubt (Auto-Sort)</span>
+          <span class="hidden sm:inline">Ask Doubt</span>
+          <span class="sm:hidden">Ask</span>
         </button>
 
-        <!-- Switch to Faculty Demo Pill -->
-        <a href="faculty-dashboard.html" title="Switch to Faculty View" class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 border border-slate-200 bg-slate-50 hover:bg-slate-100 transition-colors">
-          <i data-lucide="repeat" class="w-3.5 h-3.5"></i>
-          <span>Faculty View</span>
-        </a>
+        <!-- Points Wallet -->
+        <div id="user-points-wallet" class="flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-bold px-2.5 py-1 rounded-full cursor-pointer hover:bg-amber-100 transition-colors select-none" title="Your BrainPoints Balance" onclick="showPointsInfo()">
+          <span>🪙</span>
+          <span id="header-points-balance">100</span>
+          <span class="text-[9px] text-amber-500 font-semibold">pts</span>
+        </div>
 
-        <!-- User Profile & Points Wallet Pill -->
-        <div class="flex items-center gap-2.5 pl-2 border-l border-slate-200">
-          <div id="user-points-wallet" class="flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-bold px-2.5 py-1 rounded-full cursor-pointer hover:bg-amber-100 transition-colors shadow-sm select-none" title="Your BrainPoints Balance. Answer peer doubts to earn more!" onclick="showPointsInfo()">
-            <span>🪙</span>
-            <span id="header-points-balance">100</span>
-            <span class="text-[9px] text-amber-500 font-semibold">pts</span>
-          </div>
-          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150" class="w-8 h-8 rounded-full border border-slate-200 object-cover" alt="Alex">
+        <!-- Profile -->
+        <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150" class="w-8 h-8 rounded-full border border-slate-200 object-cover" alt="Student avatar" id="student-header-avatar">
           <div class="hidden sm:block text-left">
-            <div class="text-xs font-bold text-slate-900 leading-tight">Alex Morgan</div>
+            <div class="text-xs font-bold text-slate-900 leading-tight" id="student-header-name">Alex Morgan</div>
             <div class="text-[10px] text-slate-500 font-medium">3rd Year Student</div>
           </div>
-          <button type="button" onclick="logout()" title="Logout" aria-label="Log out" class="p-1.5 text-slate-400 hover:text-slate-700 transition-colors">
-            <i data-lucide="log-out" class="w-4 h-4"></i>
+          <button type="button" onclick="logout()" title="Log out" aria-label="Log out" class="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 transition-colors px-2 py-1.5 rounded-md hover:bg-slate-100 ml-1">
+            <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
           </button>
         </div>
 
@@ -100,19 +97,6 @@
           <span class="flex items-center gap-0.5">⚡ Auto-sorting to relevant courses</span>
         </div>
 
-        <!-- Quick Demo Question Pills for Judge / Evaluation -->
-        <div class="flex flex-wrap items-center justify-center gap-2 pt-2 text-xs">
-          <span class="text-slate-500 text-[11px] font-semibold">⚡ Try Seed Scenarios:</span>
-          <button type="button" onclick="setDemoQuery('Why does DFS need recursion?')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-[11px] transition-colors">
-            &ldquo;DFS recursion dependency&rdquo;
-          </button>
-          <button type="button" onclick="setDemoQuery('Why doesn\'t binary search work on my unsorted array [5, 2, 8, 1, 9]?')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-[11px] transition-colors">
-            &ldquo;Binary search sorting requirement&rdquo;
-          </button>
-          <button type="button" onclick="setDemoQuery('Explain fuzzy logic membership functions')" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-[11px] transition-colors">
-            &ldquo;Fuzzy logic FIS&rdquo;
-          </button>
-        </div>
       </form>
 
       <!-- LIVE AUTO-SORT RESULT PANEL (Injected on Submit) -->
@@ -453,10 +437,10 @@
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
       // Force seed upgrade for gamification peer doubts
-      if (localStorage.getItem("studybuddy_db_version") !== "3.1") {
+      if (localStorage.getItem("studybuddy_db_version") !== "3.2") {
         localStorage.removeItem("studybuddy_doubts");
         localStorage.removeItem("studybuddy_current_user");
-        localStorage.setItem("studybuddy_db_version", "3.1");
+        localStorage.setItem("studybuddy_db_version", "3.2");
       }
       
       const user = DB.getCurrentUser();

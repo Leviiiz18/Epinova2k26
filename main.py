@@ -126,8 +126,29 @@ async def ask_doubt(request: DoubtRequest):
                         "message": "Retrieved an existing verified answer from semantic search!"
                     }
                     
-                # No existing answer found, fallback to RAG
-                print("No relevant existing answer found. Generating provisional answer via RAG...")
+                # Check if there are very less users (threshold = 5)
+                cur.execute("SELECT COUNT(*) FROM users")
+                user_count = cur.fetchone()[0]
+                
+                if user_count >= 5:
+                    print("Many users online. Forwarding to peer mentors instead of RAG...")
+                    # Insert the new doubt with its embedding, no AI answer generated
+                    cur.execute(
+                        "INSERT INTO doubts (student_id, title, raw_query, status, embedding) VALUES (%s, %s, %s, %s, %s::vector) RETURNING id",
+                        (request.student_id, request.title, request.raw_query, "Open", query_embedding)
+                    )
+                    doubt_id = cur.fetchone()[0]
+                    conn.commit()
+                    return {
+                        "status": "success",
+                        "answer": "Your doubt has been forwarded to peer mentors as there are many active users currently available to help you!",
+                        "is_faculty_validated": False,
+                        "verification_state": "PENDING_PEER",
+                        "message": "Forwarded to peers"
+                    }
+
+                # No existing answer found, and few users: fallback to RAG
+                print("Few users online. Generating provisional answer via RAG...")
                 answer_text = rag_chain.invoke(request.raw_query)
                 
                 # Insert the new doubt with its embedding
