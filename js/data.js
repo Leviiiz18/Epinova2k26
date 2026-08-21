@@ -457,6 +457,21 @@ const DB = {
     return doubts;
   },
 
+  async deleteAnswer(answerId) {
+    try {
+      const response = await fetch(`http://localhost:8000/api/answers/${answerId}`, {
+        method: "DELETE"
+      });
+      if (response.ok) {
+        await this.syncDoubts();
+        return true;
+      }
+    } catch (e) {
+      console.warn("Error deleting answer:", e);
+    }
+    return false;
+  },
+
   async setAnswerAiVerified(doubtId, answerIdx, isVerified) {
     const doubts = this.getDoubts();
     const doubt = doubts.find(d => d.id === doubtId);

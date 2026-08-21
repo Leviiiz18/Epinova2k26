@@ -1087,6 +1087,39 @@ def verify_ai_answer(answer_id: str, request: VerifyAiRequest):
             
     return {"success": True, "message": "AI verification state synchronized."}
 
+@app.delete("/api/answers/{answer_id}")
+@app.delete("/answers/{answer_id}")
+def delete_answer(answer_id: str):
+    ans_row = run_query("""
+        SELECT doubt_id, author_id, is_faculty_verified, is_ai_verified 
+        FROM answers 
+        WHERE id = %s;
+    """, [answer_id], fetch_one=True)
+    if not ans_row:
+        raise HTTPException(status_code=404, detail="Answer not found")
+        
+    doubt_id = ans_row['doubt_id']
+    author_id = ans_row['author_id']
+    
+    doubt_row = run_query("SELECT points FROM doubts WHERE id = %s;", [doubt_id], fetch_one=True)
+    bounty = doubt_row['points'] if doubt_row else 25
+    
+    deduction = bounty
+    if ans_row['is_faculty_verified']:
+        deduction += 15
+    if ans_row['is_ai_verified']:
+        deduction += 10
+        
+    run_query("DELETE FROM answers WHERE id = %s;", [answer_id], commit=True)
+    run_query("UPDATE users SET points = GREATEST(0, points - %s) WHERE id = %s;", [deduction, author_id], commit=True)
+    
+    rem = run_query("SELECT COUNT(*) FROM answers WHERE doubt_id = %s;", [doubt_id], fetch_one=True)
+    rem_count = rem[0] if rem else 0
+    if rem_count == 0:
+        run_query("UPDATE doubts SET status = 'Open' WHERE id = %s;", [doubt_id], commit=True)
+        
+    return {"success": True, "message": "Answer deleted successfully.", "deductedPoints": deduction}
+
 class ValidateRequest(BaseModel):
     query: str
     answer: str

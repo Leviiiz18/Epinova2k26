@@ -303,6 +303,8 @@
           `;
         }
 
+        const isAuthor = String(a.authorName).trim().toLowerCase() === String(state.user.name).trim().toLowerCase();
+
         return `
           <div class="p-5 bg-white rounded-2xl border ${borderClass} shadow-sm space-y-3">
             <div class="flex items-center justify-between">
@@ -316,6 +318,11 @@
                   <div class="text-[10px] text-slate-400 font-medium">Answered recently</div>
                 </div>
               </div>
+              ${isAuthor ? `
+                <button onclick="handleDeleteAnswer('${a.id}')" class="text-slate-400 hover:text-rose-600 transition-colors p-1.5 rounded-lg hover:bg-rose-50" title="Delete Answer">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              ` : ''}
             </div>
 
             <div class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${renderLiteMarkdown(a.content)}</div>
@@ -482,6 +489,34 @@
         lucide.createIcons();
       }
     }
+
+    window.handleDeleteAnswer = async (answerId) => {
+      if (!confirm("Are you sure you want to delete your solution? This will also revert the points awarded for this answer.")) return;
+      
+      try {
+        const success = await DB.deleteAnswer(answerId);
+        if (success) {
+          showToast("Solution deleted successfully.", "success");
+          
+          // Re-fetch current user profile to update points balance in UI
+          const email = state.user.email;
+          const userResp = await fetch(`http://localhost:8000/api/user/${email}`);
+          if (userResp.ok) {
+            const freshUser = await userResp.json();
+            DB.setCurrentUser(freshUser);
+            state.user = freshUser;
+            document.getElementById("points-balance").textContent = freshUser.points || 0;
+          }
+          
+          // Reload doubt data
+          loadDoubtData();
+        } else {
+          showToast("Failed to delete solution.", "error");
+        }
+      } catch (err) {
+        showToast("Error deleting solution.", "error");
+      }
+    };
 
     function showPointsInfo() {
       showToast(`Wallet: ${state.user.points || 0} pts. Complete peer reviews to gain more!`, "info");
