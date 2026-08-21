@@ -497,12 +497,17 @@
 
       // Attempt to classification from Python backend
       try {
-        const response = await fetch("http://localhost:5000/classify", {
+        const response = await fetch("http://localhost:8000/api/doubts", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ query: rawQuery })
+          body: JSON.stringify({ 
+            student_id: currentUser.email,
+            title: rawQuery.split('?')[0] + '?',
+            raw_query: rawQuery,
+            query: rawQuery 
+          })
         });
         
         if (response.ok) {
@@ -582,41 +587,44 @@
       }
 
       // Deduct points for asking doubt
-      DB.updateUserPoints(-15);
+      await DB.updateUserPoints(-15);
 
       // Create new doubt record in DB
-      const newDoubtId = "eeeeeeee-" + Math.random().toString(36).substr(2, 9);
-      const newDoubt = {
-        id: newDoubtId,
-        studentName: currentUser.name,
-        studentYear: currentUser.year,
-        studentAvatar: currentUser.avatar,
-        rawQuery: rawQuery,
-        title: rawQuery.includes('?') ? rawQuery.split('?')[0] + '?' : rawQuery + '?',
-        subject: classification.subject,
-        topic: classification.topic || "U1",
-        concept: classification.concept,
-        subConcept: classification.subConcept || "General",
-        difficulty: classification.difficulty || "Beginner",
-        intent: classification.intent,
-        misconception: classification.misconception,
-        prerequisites: classification.prerequisites || [],
-        confidence: { topic: classification.confidence, concept: classification.confidence },
-        status: "Open",
-        timestamp: "Just now",
-        similarCount: Math.floor(Math.random() * 5),
-        points: 25,
-        answers: [],
-        understandingCheck: {
-          id: "gggggggg-" + Math.random().toString(36).substr(2, 9),
-          question: `Regarding ${classification.concept}, which of the following is correct?`,
-          options: ["Option A", "Option B", "Option C", "Option D"],
-          correctIndex: 0,
-          explanation: `Explaining the details of ${classification.concept}.`
-        }
-      };
-
-      DB.addDoubt(newDoubt);
+      if (usingServer) {
+        await DB.syncDoubts();
+      } else {
+        const newDoubtId = "eeeeeeee-" + Math.random().toString(36).substr(2, 9);
+        const newDoubt = {
+          id: newDoubtId,
+          studentName: currentUser.name,
+          studentYear: currentUser.year,
+          studentAvatar: currentUser.avatar,
+          rawQuery: rawQuery,
+          title: rawQuery.includes('?') ? rawQuery.split('?')[0] + '?' : rawQuery + '?',
+          subject: classification.subject,
+          topic: classification.topic || "U1",
+          concept: classification.concept,
+          subConcept: classification.subConcept || "General",
+          difficulty: classification.difficulty || "Beginner",
+          intent: classification.intent,
+          misconception: classification.misconception,
+          prerequisites: classification.prerequisites || [],
+          confidence: { topic: classification.confidence, concept: classification.confidence },
+          status: "Open",
+          timestamp: "Just now",
+          similarCount: Math.floor(Math.random() * 5),
+          points: 25,
+          answers: [],
+          understandingCheck: {
+            id: "gggggggg-" + Math.random().toString(36).substr(2, 9),
+            question: `Regarding ${classification.concept}, which of the following is correct?`,
+            options: ["Option A", "Option B", "Option C", "Option D"],
+            correctIndex: 0,
+            explanation: `Explaining the details of ${classification.concept}.`
+          }
+        };
+        await DB.addDoubt(newDoubt);
+      }
       renderDoubtsFeed();
       renderLeaderboard();
 
@@ -838,7 +846,7 @@
         let aiReason = "";
         
         try {
-          const valResponse = await fetch("http://localhost:5000/validate_answer", {
+          const valResponse = await fetch("http://localhost:8000/api/validate_answer", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
