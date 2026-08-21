@@ -146,7 +146,7 @@
       </div>
       <div class="flex gap-2 justify-center pt-2">
         <button onclick="closeConfirmModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
-        <button onclick="executeDeleteAnswer()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition-colors shadow-md shadow-rose-100">Yes, Delete</button>
+        <button id="confirm-delete-btn-action" onclick="executeDeleteAnswer()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition-colors shadow-md shadow-rose-100">Yes, Delete</button>
       </div>
     </div>
   </div>
@@ -248,13 +248,45 @@
               <div class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">${d.subject} &bull; ${d.timestamp || 'Just now'}</div>
             </div>
           </div>
-          <div class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 shadow-sm flex items-center gap-1.5">
-            <span>🎁</span> ${d.points || 25} pts bounty
+          
+          <div class="flex items-center gap-3">
+            <div class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 shadow-sm flex items-center gap-1.5">
+              <span>🎁</span> ${d.points || 25} pts bounty
+            </div>
+            
+            <!-- Three-dot Dropdown Options for Question -->
+            <div class="relative inline-block text-left">
+              <button onclick="toggleDoubtMenu(event)" class="text-slate-400 hover:text-slate-700 transition-colors p-1.5 rounded-lg hover:bg-slate-100" title="Options">
+                <i data-lucide="more-vertical" class="w-4 h-4"></i>
+              </button>
+              <div id="doubt-menu" class="origin-top-right absolute right-0 mt-1 w-40 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-slate-100 focus:outline-none hidden z-50 border border-slate-200">
+                <div class="py-1">
+                  <button onclick="startEditDoubt()" class="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium">
+                    <i data-lucide="edit-2" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span>Edit Question</span>
+                  </button>
+                  <button onclick="handleCopyDoubt(event)" class="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium">
+                    <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span>Copy Content</span>
+                  </button>
+                </div>
+                <div class="py-1">
+                  <button onclick="handleDeleteDoubt()" class="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 flex items-center gap-2 font-semibold">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-400"></i>
+                    <span>Delete Question</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <h1 class="text-2xl font-extrabold text-slate-900 mb-3 leading-snug">${d.title}</h1>
-        <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${d.rawQuery}</p>
+        <div id="doubt-title-container">
+          <h1 class="text-2xl font-extrabold text-slate-900 mb-3 leading-snug">${d.title}</h1>
+        </div>
+        <div id="doubt-query-container">
+          <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${d.rawQuery}</p>
+        </div>
 
         ${d.detected_misconception ? `
           <div class="mt-4 p-3 bg-amber-50/50 border border-amber-100 rounded-xl text-xs flex gap-2">
@@ -355,25 +387,21 @@
                 </button>
                 <div id="menu-${a.id}" class="origin-top-right absolute right-0 mt-1 w-40 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-slate-100 focus:outline-none hidden z-50 border border-slate-200">
                   <div class="py-1">
-                    ${isAuthor ? `
-                      <button onclick="startEditAnswer('${a.id}', \`${escapedContent}\`)" class="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium">
-                        <i data-lucide="edit-2" class="w-3.5 h-3.5 text-slate-400"></i>
-                        <span>Edit Answer</span>
-                      </button>
-                    ` : ''}
+                    <button onclick="startEditAnswer('${a.id}', \`${escapedContent}\`)" class="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium">
+                      <i data-lucide="edit-2" class="w-3.5 h-3.5 text-slate-400"></i>
+                      <span>Edit Answer</span>
+                    </button>
                     <button onclick="handleCopyAnswer(event, '${a.id}')" class="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium">
                       <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-400"></i>
                       <span>Copy Content</span>
                     </button>
                   </div>
-                  ${isAuthor ? `
-                    <div class="py-1">
-                      <button onclick="handleDeleteAnswer('${a.id}')" class="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 flex items-center gap-2 font-semibold">
-                        <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-400"></i>
-                        <span>Delete Answer</span>
-                      </button>
-                    </div>
-                  ` : ''}
+                  <div class="py-1">
+                    <button onclick="handleDeleteAnswer('${a.id}')" class="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 flex items-center gap-2 font-semibold">
+                      <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-400"></i>
+                      <span>Delete Answer</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -632,6 +660,19 @@
         return;
       }
       pendingDeleteAnswerId = answerId;
+
+      // Reset confirm card content back to answer deletion settings
+      const modalText = document.querySelector("#confirm-modal p");
+      const modalTitle = document.querySelector("#confirm-modal h4");
+      const confirmBtn = document.getElementById("confirm-delete-btn-action");
+      
+      if (modalTitle) modalTitle.textContent = "Are you absolutely sure?";
+      if (modalText) modalText.textContent = "This action will delete your solution and revert any points awarded for this answer. This cannot be undone.";
+      if (confirmBtn) {
+        confirmBtn.setAttribute("onclick", "executeDeleteAnswer()");
+        confirmBtn.textContent = "Yes, Delete";
+      }
+
       const modal = document.getElementById("confirm-modal");
       if (modal) {
         modal.classList.remove("hidden");
@@ -646,6 +687,7 @@
         modal.classList.add("hidden");
       }
       pendingDeleteAnswerId = null;
+      pendingDeleteDoubtId = null;
     };
 
     window.executeDeleteAnswer = async () => {
@@ -684,6 +726,123 @@
       } catch (err) {
         console.error("Error executing delete answer:", err);
         showToast("Error deleting solution: " + err.message, "error");
+      }
+    };
+
+    // Doubt options & handlers
+    window.toggleDoubtMenu = (e) => {
+      e.stopPropagation();
+      const menu = document.getElementById("doubt-menu");
+      
+      // Close other menus first
+      document.querySelectorAll('[id^="menu-"]').forEach(m => m.classList.add("hidden"));
+      
+      if (menu) {
+        menu.classList.toggle("hidden");
+      }
+    };
+
+    window.startEditDoubt = () => {
+      const titleContainer = document.getElementById("doubt-title-container");
+      const queryContainer = document.getElementById("doubt-query-container");
+      if (!titleContainer || !queryContainer) return;
+
+      const menu = document.getElementById("doubt-menu");
+      if (menu) menu.classList.add("hidden");
+
+      const currentTitle = state.activeDoubt.title;
+      const currentQuery = state.activeDoubt.rawQuery;
+
+      titleContainer.innerHTML = `
+        <input type="text" id="edit-doubt-title" class="w-full text-lg font-bold bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 ring-indigo-100 transition-all mb-2" value="${currentTitle.replace(/"/g, '&quot;')}">
+      `;
+      queryContainer.innerHTML = `
+        <textarea id="edit-doubt-query" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 ring-indigo-100 transition-all resize-none mb-2" rows="3">${currentQuery}</textarea>
+        <div class="flex gap-2 justify-end">
+          <button onclick="cancelEditDoubt()" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button onclick="saveEditDoubt()" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm">Save</button>
+        </div>
+      `;
+    };
+
+    window.cancelEditDoubt = () => {
+      renderQuestionCard();
+    };
+
+    window.saveEditDoubt = async () => {
+      const titleInput = document.getElementById("edit-doubt-title");
+      const queryTextarea = document.getElementById("edit-doubt-query");
+      if (!titleInput || !queryTextarea) return;
+
+      const title = titleInput.value.trim();
+      const rawQuery = queryTextarea.value.trim();
+
+      if (!title || !rawQuery) {
+        showToast("Title and description cannot be empty.", "error");
+        return;
+      }
+
+      try {
+        const success = await DB.updateDoubt(state.currentDoubtId, title, rawQuery);
+        if (success) {
+          showToast("Question updated successfully.", "success");
+          loadDoubtData();
+        } else {
+          showToast("Failed to update question.", "error");
+        }
+      } catch (err) {
+        showToast("Error updating question.", "error");
+      }
+    };
+
+    window.handleCopyDoubt = (e) => {
+      e.stopPropagation();
+      const content = `${state.activeDoubt.title}\n\n${state.activeDoubt.rawQuery}`;
+      navigator.clipboard.writeText(content).then(() => {
+        showToast("Question copied to clipboard!", "info");
+      });
+    };
+
+    window.handleDeleteDoubt = () => {
+      pendingDeleteDoubtId = state.currentDoubtId;
+      
+      const modalTitle = document.querySelector("#confirm-modal h4");
+      const modalText = document.querySelector("#confirm-modal p");
+      const confirmBtn = document.getElementById("confirm-delete-btn-action");
+      
+      if (modalTitle) modalTitle.textContent = "Delete this question?";
+      if (modalText) modalText.textContent = "This will delete the question, refund the 15 bounty points, and remove all answers. This action cannot be undone.";
+      if (confirmBtn) {
+        confirmBtn.setAttribute("onclick", "executeDeleteDoubt()");
+        confirmBtn.textContent = "Yes, Delete Question";
+      }
+
+      const modal = document.getElementById("confirm-modal");
+      if (modal) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+    };
+
+    let pendingDeleteDoubtId = null;
+
+    window.executeDeleteDoubt = async () => {
+      if (!pendingDeleteDoubtId) return;
+      const doubtId = pendingDeleteDoubtId;
+      closeConfirmModal();
+
+      try {
+        const success = await DB.deleteDoubt(doubtId);
+        if (success) {
+          showToast("Question deleted. Refunding bounty...", "success");
+          setTimeout(() => {
+            window.location.href = "student-dashboard.html";
+          }, 1500);
+        } else {
+          showToast("Failed to delete question.", "error");
+        }
+      } catch (err) {
+        showToast("Error deleting question.", "error");
       }
     };
 

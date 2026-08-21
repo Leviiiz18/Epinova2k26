@@ -1209,6 +1209,39 @@ def update_answer(answer_id: str, request: UpdateAnswerRequest):
     run_query("UPDATE answers SET content = %s WHERE id = %s;", [content, answer_id], commit=True)
     return {"success": True, "message": "Answer updated successfully."}
 
+class UpdateDoubtRequest(BaseModel):
+    title: str
+    raw_query: str
+
+@app.put("/api/doubts/{doubt_id}")
+@app.put("/doubts/{doubt_id}")
+def update_doubt(doubt_id: str, request: UpdateDoubtRequest):
+    if not request.title.strip() or not request.raw_query.strip():
+        raise HTTPException(status_code=400, detail="Title and query cannot be empty")
+        
+    db_doubt = run_query("SELECT id FROM doubts WHERE id = %s;", [doubt_id], fetch_one=True)
+    if not db_doubt:
+        raise HTTPException(status_code=404, detail="Doubt not found")
+        
+    run_query("""
+        UPDATE doubts 
+        SET title = %s, raw_query = %s 
+        WHERE id = %s;
+    """, [request.title, request.raw_query, doubt_id], commit=True)
+    return {"success": True, "message": "Doubt updated successfully."}
+
+@app.delete("/api/doubts/{doubt_id}")
+@app.delete("/doubts/{doubt_id}")
+def delete_doubt(doubt_id: str):
+    db_doubt = run_query("SELECT student_id FROM doubts WHERE id = %s;", [doubt_id], fetch_one=True)
+    if not db_doubt:
+        raise HTTPException(status_code=404, detail="Doubt not found")
+        
+    student_id = db_doubt['student_id']
+    run_query("UPDATE users SET points = points + 15 WHERE id = %s;", [student_id], commit=True)
+    run_query("DELETE FROM doubts WHERE id = %s;", [doubt_id], commit=True)
+    return {"success": True, "message": "Doubt deleted successfully."}
+
 class ValidateRequest(BaseModel):
     query: str
     answer: str

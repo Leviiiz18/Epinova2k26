@@ -489,6 +489,38 @@ const DB = {
     return false;
   },
 
+  async deleteDoubt(doubtId) {
+    try {
+      const response = await fetch(`http://localhost:8000/api/doubts/${doubtId}`, {
+        method: "DELETE"
+      });
+      if (response.ok) {
+        await this.syncDoubts();
+        return true;
+      }
+    } catch (e) {
+      console.warn("Error deleting doubt:", e);
+    }
+    return false;
+  },
+
+  async updateDoubt(doubtId, title, rawQuery) {
+    try {
+      const response = await fetch(`http://localhost:8000/api/doubts/${doubtId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, raw_query: rawQuery })
+      });
+      if (response.ok) {
+        await this.syncDoubts();
+        return true;
+      }
+    } catch (e) {
+      console.warn("Error updating doubt:", e);
+    }
+    return false;
+  },
+
   async setAnswerAiVerified(doubtId, answerIdx, isVerified) {
     const doubts = this.getDoubts();
     const doubt = doubts.find(d => d.id === doubtId);
