@@ -1185,8 +1185,8 @@ def delete_answer(answer_id: str):
     run_query("DELETE FROM answers WHERE id = %s;", [answer_id], commit=True)
     run_query("UPDATE users SET points = GREATEST(0, points - %s) WHERE id = %s;", [deduction, author_id], commit=True)
     
-    rem = run_query("SELECT COUNT(*) FROM answers WHERE doubt_id = %s;", [doubt_id], fetch_one=True)
-    rem_count = rem[0] if rem else 0
+    rem = run_query("SELECT COUNT(*) as cnt FROM answers WHERE doubt_id = %s;", [doubt_id], fetch_one=True)
+    rem_count = rem['cnt'] if rem else 0
     if rem_count == 0:
         run_query("UPDATE doubts SET status = 'Open' WHERE id = %s;", [doubt_id], commit=True)
         
