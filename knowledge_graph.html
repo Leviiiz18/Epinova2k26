@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Buddy • Interactive Knowledge Graph</title>
+  <meta name="description" content="Explore connected academic concepts with interactive circle-to-card expansion and concept taxonomy navigation.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            slate: {
+              850: '#172033',
+              950: '#0b0f19'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 crisp-nav bg-white/95 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+
+      <!-- Brand Logo & Context -->
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white shadow-sm">
+            <i data-lucide="git-branch" class="w-4 h-4 text-indigo-400"></i>
+          </div>
+          <div>
+            <span class="text-base font-bold text-slate-900 tracking-tight">Study Buddy</span>
+            <span class="badge-clean-purple text-[10px] font-semibold px-2 py-0.5 rounded ml-2">Knowledge Graph</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Quick Navigation Actions -->
+      <div class="flex items-center gap-3">
+        <!-- Search Input -->
+        <div class="relative hidden sm:block w-64">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input id="conceptSearch" type="text" placeholder="Search concept..." 
+                 class="w-full bg-slate-100/80 border border-slate-200 pl-9 pr-3 py-1.5 rounded-lg text-xs focus:bg-white focus:outline-none focus:border-indigo-600 transition-colors"
+                 oninput="handleSearch(this.value)">
+          <div id="searchResults" class="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl py-1 hidden z-50 max-h-60 overflow-y-auto"></div>
+        </div>
+
+        <button onclick="toggleSidebar()" class="btn-secondary px-3 py-1.5 text-xs font-medium flex items-center gap-1.5">
+          <i data-lucide="list-tree" class="w-3.5 h-3.5"></i>
+          <span class="hidden md:inline">Topic Directory</span>
+        </button>
+
+        <a href="student-dashboard.html" class="btn-primary px-3.5 py-1.5 text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+          <span>Student Portal</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+    <!-- Header / Banner & Breadcrumbs -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200/80 pb-5">
+      <div>
+        <!-- Breadcrumb path -->
+        <div class="flex items-center gap-1.5 text-xs text-slate-500 mb-2 font-medium overflow-x-auto py-0.5" id="breadcrumbTrail">
+          <span class="hover:text-indigo-600 cursor-pointer" onclick="switchTopic('Algorithms')">Computer Science</span>
+          <i data-lucide="chevron-right" class="w-3 h-3 text-slate-400"></i>
+          <span class="text-slate-900 font-semibold" id="activeBreadcrumb">Algorithms</span>
+        </div>
+
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-950 flex items-center gap-3">
+          <span>Concept Knowledge Network</span>
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl">
+          Click any concept to expand into its detailed explanation card. Surrounding satellite circles represent linked prerequisites and sub-topics.
+        </p>
+      </div>
+
+      <!-- Domain Category Filter Pills -->
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <button class="domain-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-900 text-white transition-colors" onclick="filterCategory('all', this)">
+          All Domains
+        </button>
+        <button class="domain-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" onclick="filterCategory('Algorithms', this)">
+          Algorithms
+        </button>
+        <button class="domain-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" onclick="filterCategory('Neural Networks & Optimization', this)">
+          Neural Networks
+        </button>
+        <button class="domain-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" onclick="filterCategory('Data Structures', this)">
+          Data Structures
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Canvas & Detail Workspace -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- Graph Canvas Container -->
+      <div class="lg:col-span-12 relative crisp-card bg-white p-4 sm:p-6 shadow-sm overflow-hidden">
+        
+        <!-- Canvas Top Toolbar -->
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-slate-600 bg-slate-100 px-2.5 py-1 rounded">
+              <i data-lucide="network" class="w-3.5 h-3.5 text-indigo-600"></i>
+              Concept Network
+            </span>
+            <span id="activeTopicBadge" class="badge-clean-blue text-[11px] font-semibold px-2 py-0.5 rounded">
+              Focus: Algorithms
+            </span>
+          </div>
+
+          <!-- Controls & View Mode -->
+          <div class="flex items-center gap-2">
+            <button id="toggleExpandBtn" onclick="toggleCenterExpansion()" class="btn-secondary px-2.5 py-1 text-xs font-medium flex items-center gap-1">
+              <i data-lucide="maximize-2" class="w-3.5 h-3.5 text-slate-600"></i>
+              <span id="expandBtnLabel">Switch to Compact Circle (0.25s)</span>
+            </button>
+            <button onclick="resetGraph()" class="btn-secondary px-2.5 py-1 text-xs font-medium flex items-center gap-1">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5 text-slate-600"></i>
+              <span>Reset</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Visual Graph Area -->
+        <div id="graphCanvas" class="relative h-[720px] rounded-xl kg-canvas-container overflow-hidden border border-slate-200 shadow-inner select-none flex items-center justify-center">
+          <!-- Graph Nodes and SVG connections are injected dynamically via JavaScript -->
+        </div>
+
+        <!-- Bottom Guidance Strip -->
+        <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-2">
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-md bg-indigo-600 inline-block"></span>
+              <span>Active Concept (Expanded Card)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3 h-3 rounded-full bg-white border-2 border-indigo-500 inline-block"></span>
+              <span>Connected Concepts (Click to Focus)</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-0.5 bg-indigo-400 inline-block"></span>
+              <span>Prerequisite / Sub-concept Relation</span>
+            </div>
+          </div>
+          <div class="text-[11px] text-slate-500">
+            Click any satellite bubble to glide and expand its explanation
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Slide-over Topic Directory Sidebar -->
+  <div id="topicSidebar" class="fixed inset-y-0 right-0 w-80 bg-white border-l border-slate-200 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+    <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+      <div class="flex items-center gap-2">
+        <i data-lucide="book-marked" class="w-4 h-4 text-indigo-600"></i>
+        <h3 class="font-bold text-sm text-slate-900">Concept Directory</h3>
+      </div>
+      <button onclick="toggleSidebar()" class="p-1 rounded-md text-slate-400 hover:text-slate-700">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <div class="p-3 border-b border-slate-100 bg-white">
+      <input type="text" placeholder="Filter topics..." class="w-full bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg text-xs focus:outline-none focus:border-indigo-600" oninput="filterDirectoryList(this.value)">
+    </div>
+
+    <div id="directoryList" class="flex-1 overflow-y-auto p-3 space-y-1.5">
+      <!-- Injected dynamically -->
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 mt-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+      <div class="flex items-center gap-2">
+        <span>Study Buddy Academic Knowledge Engine</span>
+        <span>&bull;</span>
+        <span>PS-01 Knowledge Architecture</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="student-dashboard.html" class="hover:text-slate-900 transition-colors">Student Portal</a>
+        <a href="faculty-dashboard.html" class="hover:text-slate-900 transition-colors">Faculty Portal</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Core Knowledge Graph Script -->
+  <script>
+    // Knowledge Base Data mapping to the taxonomy
+    const KNOWLEDGE_GRAPH_DATA = {
+      "Algorithms": {
+        id: "bbbbbbbb-0000-0000-0000-000000000001",
+        title: "Algorithms",
+        category: "Algorithms",
+        difficulty: "Core Domain",
+        summary: "Step-by-step computational procedures for calculations, data processing, and automated reasoning.",
+        explanation: "An algorithm is a finite sequence of well-defined instructions to solve computational problems. In computer science, algorithms are categorized by paradigm (divide-and-conquer, dynamic programming, search, traversal) and evaluated by time and space complexity.",
+        keyPoints: [
+          "Defines structured steps to transform input into desired output",
+          "Characterized by Correctness, Finiteness, and Asymptotic Efficiency",
+          "Includes Binary Search, Recursion, Dynamic Programming, and Search paradigms"
+        ],
+        misconception: "An algorithm is just code; an algorithm is an abstract blueprint independent of programming language.",
+        prerequisites: ["Discrete Math", "Basic Programming", "Data Structures"],
+        children: [
+          { name: "Binary Search", rel: "Divide & Conquer" },
+          { name: "Recursion", rel: "Core Paradigm" },
+          { name: "Dynamic Programming", rel: "Optimization" },
+          { name: "Sorting", rel: "Prerequisite Order" }
+        ]
+      },
+
+      "Binary Search": {
+        id: "cccccccc-0000-0000-0000-000000000001",
+        title: "Binary Search",
+        category: "Algorithms",
+        difficulty: "Beginner",
+        summary: "Divide-and-conquer search requiring monotonic ordering.",
+        explanation: "Binary Search locates the target position within a monotonically sorted collection by repeatedly comparing the target to the middle element. If unequal, the half in which the target cannot lie is discarded in O(1) time.",
+        keyPoints: [
+          "Mandatory Prerequisite: Array or search space MUST be monotonically sorted",
+          "Time Complexity: O(log N) — Halves candidate range on each iteration",
+          "Space Complexity: O(1) iterative or O(log N) recursive"
+        ],
+        misconception: "Binary search works on unsorted data. Running it on unsorted elements produces unpredictable incorrect answers.",
+        prerequisites: ["Arrays", "Monotonic Ordering"],
+        children: [
+          { name: "Arrays", rel: "Data Structure" },
+          { name: "Monotonic Ordering", rel: "Prerequisite Requirement" },
+          { name: "Algorithms", rel: "Parent Domain" },
+          { name: "Recursion", rel: "Implementation Variant" }
+        ]
+      },
+
+      "Recursion": {
+        id: "cccccccc-0000-0000-0000-000000000002",
+        title: "Recursion",
+        category: "Algorithms",
+        difficulty: "Beginner",
+        summary: "Self-referencing function execution requiring terminal state.",
+        explanation: "Recursion is a computational approach where a function solves a problem by calling a copy of itself with a smaller input. It relies on the Call Stack to maintain state between invocations until reaching a terminating Base Case.",
+        keyPoints: [
+          "Requires a strict Base Case to prevent infinite Call Stack overflow",
+          "Recursive step reduces the problem state closer to the base condition",
+          "Syntactic sugar for maintaining state on an explicit LIFO Call Stack"
+        ],
+        misconception: "Recursion has no stopping condition and executes forever without base case validation.",
+        prerequisites: ["Functions", "Conditionals"],
+        children: [
+          { name: "Base Case & Call Stack", rel: "Underlying Mechanism" },
+          { name: "Functions", rel: "Language Construct" },
+          { name: "Algorithms", rel: "Parent Domain" },
+          { name: "Dynamic Programming", rel: "Optimization Target" }
+        ]
+      },
+
+      "Dynamic Programming": {
+        id: "bbbbbbbb-0000-0000-0000-000000000002",
+        title: "Dynamic Programming",
+        category: "Algorithms",
+        difficulty: "Advanced",
+        summary: "Algorithm design paradigm solving complex problems by breaking them into overlapping subproblems with optimal substructure.",
+        explanation: "Dynamic Programming (DP) optimizes recursive solutions by caching sub-problem solutions (Memoization) or building solutions iteratively from the ground up (Tabulation), preventing exponential re-computation of identical states.",
+        keyPoints: [
+          "Requires Overlapping Subproblems and Optimal Substructure",
+          "Top-Down Approach: Recursion + Memoization (Cache Table)",
+          "Bottom-Up Approach: Iterative Tabulation (State Transition Equations)"
+        ],
+        misconception: "DP is just recursion with caching; identifying state transitions and bounding the state space is the core challenge.",
+        prerequisites: ["Recursion", "Mathematical Induction"],
+        children: [
+          { name: "Recursion", rel: "Foundational Pattern" },
+          { name: "Algorithms", rel: "Parent Domain" },
+          { name: "Backpropagation", rel: "Analogy (Chain Rule DP)" }
+        ]
+      },
+
+      "Neural Networks & Optimization": {
+        id: "bbbbbbbb-0000-0000-0000-000000000003",
+        title: "Neural Networks & Optimization",
+        category: "Neural Networks & Optimization",
+        difficulty: "Advanced",
+        summary: "Layered parameterized function approximators trained via gradient-based optimization.",
+        explanation: "Neural networks process multi-dimensional data across interconnected layers of weights and non-linear activations, updating parameters via gradient computation of an objective loss function.",
+        keyPoints: [
+          "Layers compute affine transformations followed by non-linear activations",
+          "Loss function evaluates divergence between predictions and targets",
+          "Trained using Backpropagation and Gradient Descent"
+        ],
+        misconception: "Neural networks are black boxes that cannot be analyzed mathematically; they are differentiable computational graphs.",
+        prerequisites: ["Linear Algebra", "Multivariate Calculus", "Optimization"],
+        children: [
+          { name: "Backpropagation", rel: "Core Training Engine" },
+          { name: "Softmax & Cross-Entropy", rel: "Loss Formulations" },
+          { name: "Chain Rule", rel: "Mathematical Basis" }
+        ]
+      },
+
+      "Backpropagation": {
+        id: "cccccccc-0000-0000-0000-000000000004",
+        title: "Backpropagation",
+        category: "Neural Networks & Optimization",
+        difficulty: "Advanced",
+        summary: "Chain-rule gradient computation across network layers.",
+        explanation: "Backpropagation calculates the gradient of the loss function with respect to each weight by applying the calculus chain rule backwards from output to input layer, enabling gradient-based parameter updates.",
+        keyPoints: [
+          "Applies the Chain Rule backwards through computational layers",
+          "Calculates partial derivatives ∂L/∂w for all tunable parameters",
+          "Combined with optimizers like SGD, Adam, or RMSprop"
+        ],
+        misconception: "Softmax derivatives require individual Jacobian matrix inversion; summation over cross-terms cancels into the clean error residual (y_hat - y).",
+        prerequisites: ["Multivariate Calculus", "Chain Rule", "Log-Likelihood Loss"],
+        children: [
+          { name: "Neural Networks & Optimization", rel: "Host Domain" },
+          { name: "Chain Rule", rel: "Calculus Foundation" },
+          { name: "Softmax & Cross-Entropy", rel: "Loss Gradient" }
+        ]
+      },
+
+      "Softmax & Cross-Entropy": {
+        id: "cccccccc-0000-0000-0000-000000000005",
+        title: "Softmax & Cross-Entropy",
+        category: "Neural Networks & Optimization",
+        difficulty: "Advanced",
+        summary: "Softmax & Cross-Entropy Gradient calculation and cancellation.",
+        explanation: "Softmax converts unnormalized raw logits into normalized probability distributions. Cross-entropy quantifies the divergence between predicted probabilities and ground truth one-hot targets. Their combined analytical gradient simplifies directly to (y_hat - y).",
+        keyPoints: [
+          "Softmax maps K logits to sum-to-1 probabilities: e^(z_i) / ∑ e^(z_j)",
+          "Cross-Entropy Loss: -∑ y_i * log(p_i)",
+          "Analytical Derivative: ∂L/∂z_i = (y_hat_i - y_i) — Pure prediction error"
+        ],
+        misconception: "Softmax and cross-entropy should be computed in separate isolated steps; computing them jointly avoids numerical underflow via log-sum-exp.",
+        prerequisites: ["Probability Distributions", "Logarithms", "Backpropagation"],
+        children: [
+          { name: "Backpropagation", rel: "Gradient Pipeline" },
+          { name: "Neural Networks & Optimization", rel: "Context" }
+        ]
+      },
+
+      "Base Case & Call Stack": {
+        id: "cccccccc-0000-0000-0000-000000000006",
+        title: "Base Case & Call Stack",
+        category: "Data Structures",
+        difficulty: "Beginner",
+        summary: "LIFO execution frame management for recursive procedures.",
+        explanation: "The Call Stack manages function invocation in modern runtimes. When a function is called, a stack frame containing local variables and return address is pushed; upon reaching the Base Case, frames unwind in LIFO order.",
+        keyPoints: [
+          "Base Case provides the terminal halting condition",
+          "Call Stack allocates activation records per subroutine invocation",
+          "Stack overflow occurs when recursion depth exceeds allotted thread memory"
+        ],
+        misconception: "Call stack memory is unbounded; unbounded recursive calls result in StackOverflowError.",
+        prerequisites: ["Functions", "Conditionals"],
+        children: [
+          { name: "Recursion", rel: "Parent Concept" },
+          { name: "Algorithms", rel: "Domain" }
+        ]
+      },
+
+      "Monotonic Ordering": {
+        id: "cccccccc-0000-0000-0000-000000000007",
+        title: "Monotonic Ordering",
+        category: "Algorithms",
+        difficulty: "Beginner",
+        summary: "Strict monotonic sequence requirement enabling logarithmic halving.",
+        explanation: "A sequence is monotonic if it is either entirely non-increasing or non-decreasing. This order property allows binary search to definitively discard half the remaining search space on each comparison.",
+        keyPoints: [
+          "Sequence satisfies a[i] <= a[i+1] (or >= for descending)",
+          "Preserves invariant needed for midpoint direction decision",
+          "Achieved via sorting algorithms in O(N log N) time"
+        ],
+        misconception: "Partial sorting is sufficient; any disorder breaks the binary elimination invariant.",
+        prerequisites: ["Arrays", "Sorting"],
+        children: [
+          { name: "Binary Search", rel: "Required By" },
+          { name: "Sorting", rel: "Enabler" }
+        ]
+      },
+
+      "Chain Rule": {
+        id: "cccccccc-0000-0000-0000-000000000008",
+        title: "Chain Rule",
+        category: "Neural Networks & Optimization",
+        difficulty: "Intermediate",
+        summary: "Calculus rule for computing the derivative of composite functions.",
+        explanation: "The Chain Rule states that for composite functions f(g(x)), the derivative with respect to x is f'(g(x)) * g'(x). In neural networks, this enables reverse-mode automatic differentiation across deep layers.",
+        keyPoints: [
+          "∂z/∂x = (∂z/∂y) * (∂y/∂x)",
+          "Applied iteratively backwards in computational graphs",
+          "Fundamental mathematical engine behind backpropagation"
+        ],
+        misconception: "Derivatives must be calculated symbolically for whole networks; backpropagation computes numerical local gradients layer-by-layer.",
+        prerequisites: ["Multivariate Calculus"],
+        children: [
+          { name: "Backpropagation", rel: "Applied In" },
+          { name: "Neural Networks & Optimization", rel: "Domain" }
+        ]
+      },
+
+      "Arrays": {
+        id: "cccccccc-0000-0000-0000-000000000009",
+        title: "Arrays",
+        category: "Data Structures",
+        difficulty: "Beginner",
+        summary: "Contiguous memory sequence of homogeneous elements with O(1) index lookup.",
+        explanation: "An array stores elements at contiguous memory locations, allowing constant time random access via pointer arithmetic: memory_address = base + index * element_size.",
+        keyPoints: [
+          "O(1) random access by index",
+          "Contiguous block in virtual memory",
+          "Foundation for binary search and sorting procedures"
+        ],
+        misconception: "Insertion at arbitrary positions is O(1); shifting elements requires O(N) time.",
+        prerequisites: ["Data Types"],
+        children: [
+          { name: "Binary Search", rel: "Application" },
+          { name: "Monotonic Ordering", rel: "Property" }
+        ]
+      },
+
+      "Sorting": {
+        id: "cccccccc-0000-0000-0000-000000000010",
+        title: "Sorting",
+        category: "Algorithms",
+        difficulty: "Beginner",
+        summary: "Arranging elements in monotonic order using comparison or non-comparison algorithms.",
+        explanation: "Sorting re-orders elements so they satisfy monotonic ordering. Comparison sorts (MergeSort, QuickSort, HeapSort) are bounded by O(N log N) lower bound; linear non-comparison sorts (Counting, Radix) trade space for O(N) time.",
+        keyPoints: [
+          "Enables logarithmic Binary Search",
+          "Comparison sort lower bound is Ω(N log N)",
+          "In-place vs extra memory tradeoffs"
+        ],
+        misconception: "Sorting is always faster than linear scan for a single query; sorting is beneficial when amortized over multiple subsequent queries.",
+        prerequisites: ["Arrays", "Comparison Operators"],
+        children: [
+          { name: "Monotonic Ordering", rel: "Output Property" },
+          { name: "Binary Search", rel: "Prerequisite For" },
+          { name: "Algorithms", rel: "Parent Domain" }
+        ]
+      },
+
+      "Functions": {
+        id: "cccccccc-0000-0000-0000-000000000011",
+        title: "Functions",
+        category: "Data Structures",
+        difficulty: "Beginner",
+        summary: "Reusable blocks of code encapsulating specific computational subroutines.",
+        explanation: "Functions accept parameters, execute scoped operations, and return results. In recursion, a function invokes itself with modified arguments until a terminal condition is met.",
+        keyPoints: [
+          "Encapsulates input parameters and return values",
+          "Creates isolated local variable activation scopes",
+          "Underlying construct for recursive problem decomposition"
+        ],
+        misconception: "Functions create permanent memory structures; local frames are deallocated upon return.",
+        prerequisites: ["Variables", "Control Flow"],
+        children: [
+          { name: "Recursion", rel: "Enables" },
+          { name: "Base Case & Call Stack", rel: "Execution Context" }
+        ]
+      }
+    };
+
+    // State
+    let currentTopic = "Algorithms";
+    let isExpanded = true;
+    let isTransitioning = false;
+    let historyStack = ["Algorithms"];
+    let currentCategoryFilter = "all";
+
+    // DOM Elements
+    const canvas = document.getElementById("graphCanvas");
+    const breadcrumbTrail = document.getElementById("breadcrumbTrail");
+    const activeBreadcrumb = document.getElementById("activeBreadcrumb");
+    const activeTopicBadge = document.getElementById("activeTopicBadge");
+    const expandBtnLabel = document.getElementById("expandBtnLabel");
+
+    // Initialize
+    window.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      renderGraph(currentTopic, false);
+      populateDirectoryList();
+    });
+
+    // Resize handler for responsive SVG recalculation
+    window.addEventListener("resize", () => {
+      if (!isTransitioning) {
+        renderGraph(currentTopic, false);
+      }
+    });
+
+    // Main Graph Rendering Engine with Even Satellite Spacing
+    function renderGraph(topicKey, animated = true) {
+      if (!KNOWLEDGE_GRAPH_DATA[topicKey]) {
+        topicKey = "Algorithms";
+      }
+
+      currentTopic = topicKey;
+      const data = KNOWLEDGE_GRAPH_DATA[topicKey];
+
+      // Update Header & Breadcrumbs
+      activeBreadcrumb.textContent = data.title;
+      activeTopicBadge.textContent = `Focus: ${data.title}`;
+
+      // Update Breadcrumbs trail
+      updateBreadcrumbUI();
+
+      // Clear Canvas
+      canvas.innerHTML = "";
+
+      const w = canvas.clientWidth || 800;
+      const h = canvas.clientHeight || 700;
+      const cx = w / 2;
+      const cy = h / 2;
+
+      // SVG Connective Layer
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "absolute inset-0 w-full h-full pointer-events-none");
+      svg.setAttribute("id", "graphSvgLayer");
+      canvas.appendChild(svg);
+
+      // Create Center Node
+      const centerNode = createCenterNode(data, cx, cy);
+      canvas.appendChild(centerNode);
+
+      // Orbital Satellite Children with Even Spacing Outside Card
+      const children = data.children || [];
+      const count = children.length;
+
+      // Even parametric spacing:
+      // When expanded (card mode), we give generous horizontal and vertical radii so satellites NEVER overlap the 540x500 card
+      const orbitRadiusX = isExpanded ? Math.min(cx - 70, Math.max(380, w * 0.42)) : 220;
+      const orbitRadiusY = isExpanded ? Math.min(cy - 60, Math.max(310, h * 0.42)) : 210;
+
+      children.forEach((childItem, i) => {
+        const childName = typeof childItem === "string" ? childItem : childItem.name;
+        const relLabel = typeof childItem === "object" ? childItem.rel : "Related";
+
+        // Even radial angle distribution
+        const angle = (Math.PI * 2 / count) * i - Math.PI / 2;
+        const x = cx + orbitRadiusX * Math.cos(angle);
+        const y = cy + orbitRadiusY * Math.sin(angle);
+
+        // Draw animated curved SVG edge
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        const cpX = (cx + x) / 2;
+        const cpY = (cy + y) / 2 + (Math.sin(angle) * 15);
+        const d = `M ${cx} ${cy} Q ${cpX} ${cpY} ${x} ${y}`;
+        
+        path.setAttribute("d", d);
+        path.setAttribute("fill", "none");
+        path.setAttribute("stroke", "#94a3b8");
+        path.setAttribute("stroke-width", "2");
+        path.setAttribute("stroke-opacity", "0.6");
+        path.setAttribute("class", "kg-edge-line");
+        svg.appendChild(path);
+
+        // Create Orbiting Satellite Node Bubble
+        const satNode = createSatelliteNode(childName, relLabel, x, y, cx, cy);
+        if (animated) {
+          satNode.classList.add("node-entering");
+          satNode.style.animationDelay = `${i * 35}ms`;
+        }
+        canvas.appendChild(satNode);
+      });
+
+      lucide.createIcons();
+    }
+
+    // Creates the central node (Expanded Card or Clean Circular Header without click subtitles)
+    function createCenterNode(data, cx, cy) {
+      const container = document.createElement("div");
+      container.id = "centerActiveNode";
+      container.style.left = `${cx}px`;
+      container.style.top = `${cy}px`;
+
+      if (isExpanded) {
+        // EXPANDED RECTANGULAR EXPLANATION CARD (0.25s transition)
+        container.className = "kg-center-morph kg-morph-expanding z-20 bg-white/95 backdrop-blur-md rounded-2xl border border-indigo-200 text-slate-900 p-5 sm:p-6 w-[92%] sm:w-[540px] max-h-[500px] overflow-y-auto";
+
+        const difficultyColor = 
+          data.difficulty === "Beginner" ? "badge-clean-emerald" :
+          data.difficulty === "Intermediate" ? "badge-clean-blue" : "badge-clean-purple";
+
+        container.innerHTML = `
+          <div class="kg-content-fade-in space-y-3">
+            <!-- Card Header & Badge Strip -->
+            <div class="flex items-start justify-between gap-3 pb-3 border-b border-slate-100 mb-2">
+              <div>
+                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                  <span class="${difficultyColor} text-[10px] font-bold uppercase px-2 py-0.5 rounded tracking-wider">
+                    ${data.difficulty}
+                  </span>
+                  <span class="badge-clean-neutral text-[10px] font-medium px-2 py-0.5 rounded">
+                    ${data.category}
+                  </span>
+                </div>
+                <h3 class="text-xl sm:text-2xl font-bold text-slate-950 flex items-center gap-2">
+                  ${data.title}
+                </h3>
+              </div>
+              
+              <button onclick="collapseCenterToCircle()" title="Minimize to Circle Bubble (0.25s)" class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+                <i data-lucide="minimize-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <!-- Concept Summary / What it means -->
+            <div>
+              <div class="text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1 flex items-center gap-1">
+                <i data-lucide="book-open" class="w-3.5 h-3.5 text-indigo-600"></i>
+                Conceptual Definition
+              </div>
+              <p class="text-slate-700 leading-relaxed bg-slate-50/80 p-3 rounded-lg border border-slate-200/60 text-xs sm:text-sm">
+                ${data.explanation}
+              </p>
+            </div>
+
+            <!-- Key Mechanics / How it works -->
+            <div>
+              <div class="text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1.5 flex items-center gap-1">
+                <i data-lucide="cpu" class="w-3.5 h-3.5 text-indigo-600"></i>
+                Key Core Mechanics
+              </div>
+              <ul class="space-y-1.5 pl-1">
+                ${(data.keyPoints || []).map(pt => `
+                  <li class="flex items-start gap-2 text-slate-700 text-xs">
+                    <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5"></i>
+                    <span>${pt}</span>
+                  </li>
+                `).join("")}
+              </ul>
+            </div>
+
+            <!-- Common Misconceptions & Pitfalls -->
+            ${data.misconception ? `
+              <div class="p-2.5 rounded-lg bg-amber-50/80 border border-amber-200/80 text-amber-900 text-xs">
+                <div class="font-bold flex items-center gap-1.5 mb-0.5 text-amber-800">
+                  <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-amber-600"></i>
+                  Common Misconception Trap
+                </div>
+                <div class="text-amber-950/90 leading-snug">${data.misconception}</div>
+              </div>
+            ` : ""}
+
+            <!-- Prerequisites & Linked Tokens -->
+            <div>
+              <div class="text-[11px] font-bold uppercase text-slate-500 tracking-wider mb-1 flex items-center gap-1">
+                <i data-lucide="git-commit" class="w-3.5 h-3.5 text-slate-500"></i>
+                Prerequisites & Connections
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                ${(data.prerequisites || []).map(p => `
+                  <button onclick="handleSatelliteClick('${p}', null)" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 border border-slate-200 transition-colors">
+                    ${p}
+                  </button>
+                `).join("")}
+              </div>
+            </div>
+
+            <!-- Interactive Action Row -->
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">
+              <a href="student-dashboard.html" class="px-3.5 py-1.5 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-colors flex items-center gap-1">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                Ask Doubt in Portal
+              </a>
+            </div>
+
+          </div>
+        `;
+      } else {
+        // COMPACT CIRCLE NODE MODE (Clean without subtitle)
+        container.className = "kg-center-morph kg-circle-mode kg-morph-minimizing z-20 w-36 h-36 rounded-full bg-indigo-600 text-white font-bold shadow-2xl flex flex-col items-center justify-center text-center p-3 cursor-pointer hover:bg-indigo-700 border-4 border-white ring-4 ring-indigo-200";
+
+        container.innerHTML = `
+          <div class="kg-content-fade-in flex flex-col items-center justify-center">
+            <i data-lucide="layers" class="w-6 h-6 mb-1 text-indigo-200"></i>
+            <span class="text-xs sm:text-sm font-bold leading-tight line-clamp-2 px-1">${data.title}</span>
+          </div>
+        `;
+
+        container.onclick = () => {
+          expandCenterToRectangle();
+        };
+      }
+
+      return container;
+    }
+
+    // Creates the orbiting satellite circle nodes with glide event handler
+    function createSatelliteNode(title, relationship, x, y, cx, cy) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "kg-satellite-node z-10 w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-white border-2 border-slate-300 text-slate-800 shadow-md flex flex-col items-center justify-center text-center p-2 group hover:border-indigo-600";
+      btn.style.left = `${x}px`;
+      btn.style.top = `${y}px`;
+
+      btn.innerHTML = `
+        <span class="text-[9px] font-semibold uppercase text-indigo-600 bg-indigo-50 px-1.5 py-0.2 rounded-full mb-0.5 line-clamp-1 border border-indigo-100">
+          ${relationship}
+        </span>
+        <span class="text-xs font-bold leading-tight group-hover:text-indigo-600 text-slate-900 transition-colors line-clamp-2">
+          ${title}
+        </span>
+      `;
+
+      btn.addEventListener("click", () => {
+        handleSatelliteClick(title, btn);
+      });
+
+      return btn;
+    }
+
+    // Handles smooth glide transition when user clicks an additional connected circle
+    function handleSatelliteClick(newTopic, clickedNodeElement) {
+      if (isTransitioning) return;
+      isTransitioning = true;
+
+      const w = canvas.clientWidth || 800;
+      const h = canvas.clientHeight || 700;
+      const cx = w / 2;
+      const cy = h / 2;
+
+      // 1. Fade out unneeded satellite nodes
+      const allSatellites = document.querySelectorAll(".kg-satellite-node");
+      allSatellites.forEach(node => {
+        if (node !== clickedNodeElement) {
+          node.classList.add("node-exiting");
+        }
+      });
+
+      const svgLayer = document.getElementById("graphSvgLayer");
+      if (svgLayer) {
+        svgLayer.style.transition = "opacity 0.18s ease";
+        svgLayer.style.opacity = "0";
+      }
+
+      // 2. Animate current center node fading
+      const currentCenter = document.getElementById("centerActiveNode");
+      if (currentCenter) {
+        currentCenter.classList.add("kg-content-fade-out");
+      }
+
+      // 3. Smoothly glide clicked node to center over 0.25s
+      if (clickedNodeElement) {
+        clickedNodeElement.classList.add("node-gliding");
+        clickedNodeElement.style.left = `${cx}px`;
+        clickedNodeElement.style.top = `${cy}px`;
+        clickedNodeElement.style.transform = "translate(-50%, -50%) scale(1.15)";
+      }
+
+      // 4. Seamlessly swap to the new main node and expand
+      setTimeout(() => {
+        if (historyStack[historyStack.length - 1] !== newTopic) {
+          historyStack.push(newTopic);
+        }
+        currentTopic = newTopic;
+        isExpanded = true;
+        expandBtnLabel.textContent = "Switch to Compact Circle (0.25s)";
+        
+        renderGraph(currentTopic, true);
+        isTransitioning = false;
+      }, 250);
+    }
+
+    // Expands center node from circle to rectangle over 0.25 seconds
+    function expandCenterToRectangle() {
+      if (isTransitioning) return;
+      const node = document.getElementById("centerActiveNode");
+      if (!node) return;
+
+      isTransitioning = true;
+      node.className = "kg-center-morph kg-morph-expanding z-20 bg-white/95 backdrop-blur-md rounded-2xl border border-indigo-200 text-slate-900 p-5 sm:p-6 w-[92%] sm:w-[540px] max-h-[500px] overflow-y-auto";
+      
+      isExpanded = true;
+      expandBtnLabel.textContent = "Switch to Compact Circle (0.25s)";
+
+      setTimeout(() => {
+        renderGraph(currentTopic, false);
+        isTransitioning = false;
+      }, 250);
+    }
+
+    // Minimizes center node from rectangle to circle in 0.25 seconds with instant text removal
+    function collapseCenterToCircle() {
+      if (isTransitioning) return;
+      const node = document.getElementById("centerActiveNode");
+      if (!node) return;
+
+      isTransitioning = true;
+
+      // Priority 1: Instantly hide detailed text content
+      const content = node.querySelector(".kg-content-fade-in") || node.firstElementChild;
+      if (content) {
+        content.classList.add("kg-text-exit");
+      }
+
+      // Priority 2: Instantly set clean circle inner structure (no subtitle)
+      node.innerHTML = `
+        <div class="kg-content-fade-in flex flex-col items-center justify-center pointer-events-none">
+          <i data-lucide="layers" class="w-6 h-6 mb-1 text-indigo-200"></i>
+          <span class="text-xs sm:text-sm font-bold leading-tight line-clamp-2 px-1">${KNOWLEDGE_GRAPH_DATA[currentTopic]?.title || currentTopic}</span>
+        </div>
+      `;
+      lucide.createIcons();
+
+      node.className = "kg-center-morph kg-circle-mode kg-morph-minimizing z-20 w-36 h-36 rounded-full bg-indigo-600 text-white font-bold shadow-2xl flex flex-col items-center justify-center text-center p-3 cursor-pointer hover:bg-indigo-700 border-4 border-white ring-4 ring-indigo-200";
+
+      isExpanded = false;
+      expandBtnLabel.textContent = "Expand to Concept Card (0.25s)";
+
+      setTimeout(() => {
+        renderGraph(currentTopic, false);
+        isTransitioning = false;
+      }, 250);
+    }
+
+    // Toggles between Expanded Card and Compact Circle
+    function toggleCenterExpansion() {
+      if (isExpanded) {
+        collapseCenterToCircle();
+      } else {
+        expandCenterToRectangle();
+      }
+    }
+
+    // Resets to root concept
+    function resetGraph() {
+      historyStack = ["Algorithms"];
+      currentTopic = "Algorithms";
+      isExpanded = true;
+      expandBtnLabel.textContent = "Switch to Compact Circle (0.25s)";
+      renderGraph("Algorithms", true);
+    }
+
+    // Updates the visual breadcrumb trail
+    function updateBreadcrumbUI() {
+      breadcrumbTrail.innerHTML = `
+        <span class="hover:text-indigo-600 cursor-pointer" onclick="resetGraph()">Computer Science</span>
+        <i data-lucide="chevron-right" class="w-3 h-3 text-slate-400"></i>
+        ${historyStack.slice(-3).map((item, idx, arr) => `
+          <span class="${idx === arr.length - 1 ? 'text-indigo-600 font-bold' : 'hover:text-indigo-600 cursor-pointer text-slate-600'}" onclick="switchTopic('${item}')">
+            ${item}
+          </span>
+          ${idx < arr.length - 1 ? '<i data-lucide="chevron-right" class="w-3 h-3 text-slate-400"></i>' : ''}
+        `).join("")}
+      `;
+    }
+
+    // Direct switch topic wrapper
+    function switchTopic(newTopic) {
+      handleSatelliteClick(newTopic, null);
+    }
+
+    // Search bar functionality
+    function handleSearch(query) {
+      const resultsDiv = document.getElementById("searchResults");
+      if (!query || query.trim().length === 0) {
+        resultsDiv.classList.add("hidden");
+        return;
+      }
+
+      const q = query.toLowerCase();
+      const matched = Object.keys(KNOWLEDGE_GRAPH_DATA).filter(k => 
+        k.toLowerCase().includes(q) || 
+        KNOWLEDGE_GRAPH_DATA[k].summary?.toLowerCase().includes(q) ||
+        KNOWLEDGE_GRAPH_DATA[k].category?.toLowerCase().includes(q)
+      );
+
+      if (matched.length === 0) {
+        resultsDiv.innerHTML = `<div class="px-3 py-2 text-xs text-slate-400">No matching concepts found.</div>`;
+      } else {
+        resultsDiv.innerHTML = matched.map(k => `
+          <button onclick="handleSatelliteClick('${k}', null); document.getElementById('searchResults').classList.add('hidden'); document.getElementById('conceptSearch').value = '';" 
+                  class="w-full text-left px-3 py-2 text-xs hover:bg-indigo-50 flex items-center justify-between border-b border-slate-50 last:border-0">
+            <div>
+              <span class="font-bold text-slate-900">${k}</span>
+              <span class="text-[10px] text-slate-400 block">${KNOWLEDGE_GRAPH_DATA[k].category}</span>
+            </div>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-medium">${KNOWLEDGE_GRAPH_DATA[k].difficulty}</span>
+          </button>
+        `).join("");
+      }
+
+      resultsDiv.classList.remove("hidden");
+    }
+
+    // Category Filter Buttons
+    function filterCategory(category, btnElement) {
+      currentCategoryFilter = category;
+      document.querySelectorAll(".domain-btn").forEach(btn => {
+        btn.className = "domain-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors";
+      });
+      btnElement.className = "domain-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-900 text-white transition-colors";
+
+      if (category === "all") {
+        switchTopic("Algorithms");
+      } else if (category === "Algorithms") {
+        switchTopic("Binary Search");
+      } else if (category === "Neural Networks & Optimization") {
+        switchTopic("Backpropagation");
+      } else if (category === "Data Structures") {
+        switchTopic("Base Case & Call Stack");
+      }
+    }
+
+    // Topic Directory Sidebar Handlers
+    function toggleSidebar() {
+      const sb = document.getElementById("topicSidebar");
+      sb.classList.toggle("translate-x-full");
+    }
+
+    function populateDirectoryList() {
+      const list = document.getElementById("directoryList");
+      if (!list) return;
+
+      const keys = Object.keys(KNOWLEDGE_GRAPH_DATA);
+      list.innerHTML = keys.map(k => {
+        const item = KNOWLEDGE_GRAPH_DATA[k];
+        return `
+          <button onclick="handleSatelliteClick('${k}', null); toggleSidebar();" class="w-full text-left p-2.5 rounded-lg border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 transition-all text-xs flex items-center justify-between group">
+            <div>
+              <div class="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">${item.title}</div>
+              <div class="text-[10px] text-slate-500">${item.category} &bull; ${item.difficulty}</div>
+            </div>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 transition-colors"></i>
+          </button>
+        `;
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    function filterDirectoryList(query) {
+      const q = query.toLowerCase();
+      const buttons = document.querySelectorAll("#directoryList button");
+      buttons.forEach(btn => {
+        const text = btn.textContent.toLowerCase();
+        btn.style.display = text.includes(q) ? "flex" : "none";
+      });
+    }
+
+    // Close search dropdown on clicking outside
+    document.addEventListener("click", (e) => {
+      const searchBox = document.getElementById("conceptSearch");
+      const resultsDiv = document.getElementById("searchResults");
+      if (searchBox && resultsDiv && !searchBox.contains(e.target) && !resultsDiv.contains(e.target)) {
+        resultsDiv.classList.add("hidden");
+      }
+    });
+  </script>
+
+</body>
+
+</html>
