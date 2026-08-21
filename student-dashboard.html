@@ -147,7 +147,8 @@
 
       <div class="flex items-center gap-3">
         <!-- Knowledge Graph Nav -->
-        <a href="knowledge_graph.html" title="Explore Concept Knowledge Graph" class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-indigo-700 hover:text-indigo-900 border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100 transition-colors">
+        <a href="knowledge_graph.html" title="Explore Concept Knowledge Graph"
+          class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-indigo-700 hover:text-indigo-900 border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100 transition-colors">
           <i data-lucide="git-branch" class="w-3.5 h-3.5 text-indigo-600"></i>
           <span>Knowledge Graph</span>
         </a>
@@ -728,7 +729,6 @@
       window.location.href = `question.html?id=${doubtId}`;
     }
 
-
     function setExamMode(btn, groupId) {
       const group = document.getElementById(groupId);
       if (!group) return;
@@ -888,10 +888,35 @@
       // Auto-sort is now handled directly by handleGlobalPostDoubt
     };
 
+    // Normalizes text for duplicate comparison: lowercase, trimmed, and with
+    // repeated whitespace collapsed, so "Confused about DFS!" and
+    // "confused   about dfs" are treated as the same question.
+    function normalizeForDuplicateCheck(str) {
+      return (str || "").toLowerCase().trim().replace(/\s+/g, " ").replace(/[?.!]+$/g, "");
+    }
+
+    // Looks for a doubt this same student already posted with essentially
+    // the same question text (matches the backend's unique constraint on
+    // student_id + raw_query, but checked instantly on the client instead
+    // of round-tripping to the server and hitting a DB error).
+    function findDuplicateDoubt(rawQuery) {
+      const normalizedQuery = normalizeForDuplicateCheck(rawQuery);
+      const doubts = DB.getDoubts();
+      return doubts.find(d =>
+        d.studentName === state.user.name &&
+        normalizeForDuplicateCheck(d.rawQuery) === normalizedQuery
+      );
+    }
+
     window.handleGlobalPostDoubt = async (e) => {
       e.preventDefault();
 
       const form = e.target;
+      const btn = form.querySelector('button[type="submit"]');
+
+      // Guard: ignore this submit entirely if a previous submit is still in flight.
+      if (btn && btn.disabled) return;
+
       const titleInput = form.querySelector('input[type="text"]');
       const descInput = form.querySelector('textarea');
       const examToggle = form.querySelector('[id$="exam-toggle"]');
@@ -910,7 +935,22 @@
         return;
       }
 
-      const btn = e.target.querySelector('button[type="submit"]');
+      // Same question already posted by you? Don't create a duplicate —
+      // just take them straight to the existing thread instead.
+      const duplicate = findDuplicateDoubt(desc);
+      if (duplicate) {
+        showToast("You've already asked this — opening your existing question.", "info");
+        titleInput.value = "";
+        descInput.value = "";
+        const askModal = document.getElementById("ask-doubt-modal");
+        if (askModal) {
+          askModal.classList.add("hidden");
+          askModal.classList.remove("flex");
+        }
+        openThread(duplicate.id);
+        return;
+      }
+
       const originalText = btn.innerHTML;
       btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-violet-200"></i> Sorting...';
       btn.disabled = true;
