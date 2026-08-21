@@ -222,6 +222,13 @@
   <script src="js/app.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
+      const user = DB.getCurrentUser();
+      if (user) {
+        const nameEl = document.getElementById("fac-header-name");
+        if (nameEl && user.name) nameEl.textContent = user.name;
+        const avatarEl = document.getElementById("fac-header-avatar");
+        if (avatarEl && user.avatar) avatarEl.src = user.avatar;
+      }
       await DB.syncDoubts();
       renderFacultyQueue();
       lucide.createIcons();

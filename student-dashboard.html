@@ -444,7 +444,13 @@
       }
       
       const user = DB.getCurrentUser();
-      document.getElementById("header-points-balance").textContent = user.points || 100;
+      if (user) {
+        document.getElementById("header-points-balance").textContent = user.points || 100;
+        const nameEl = document.getElementById("student-header-name");
+        if (nameEl && user.name) nameEl.textContent = user.name;
+        const avatarEl = document.getElementById("student-header-avatar");
+        if (avatarEl && user.avatar) avatarEl.src = user.avatar;
+      }
 
       // Show loading state
       const feedContainer = document.getElementById("doubts-feed-container");
