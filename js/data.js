@@ -404,11 +404,14 @@ const DB = {
         body: JSON.stringify({
           student_id: email,
           title: newDoubt.title,
-          raw_query: newDoubt.rawQuery
+          raw_query: newDoubt.rawQuery,
+          exam_mode: newDoubt.examMode || "none"
         })
       });
       if (response.ok) {
+        const data = await response.json();
         await this.syncDoubts();
+        return data;
       }
     } catch (e) {
       console.warn("Backend unavailable for addDoubt (RAG won't trigger):", e);

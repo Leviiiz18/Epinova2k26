@@ -428,7 +428,42 @@
 
       // Auto-trigger switch to user's default channel
       switchChannel(state.activeYear, state.activeSubject);
+      
+      checkUrlForDoubt();
     });
+
+    window.addEventListener("popstate", () => {
+      const hash = window.location.hash;
+      if (hash && hash.includes("/question/")) {
+        checkUrlForDoubt();
+      } else {
+        const modal = document.getElementById("thread-modal");
+        if (modal && !modal.classList.contains("hidden")) {
+          modal.classList.add("opacity-0");
+          modal.children[0].classList.add("translate-y-full", "sm:translate-y-4");
+          setTimeout(() => {
+            modal.classList.add("hidden");
+          }, 300);
+        }
+      }
+    });
+
+    function checkUrlForDoubt() {
+      const hash = window.location.hash;
+      const params = new URLSearchParams(window.location.search);
+      let doubtId = params.get("doubt") || params.get("question") || params.get("questionId") || params.get("id");
+      
+      if (!doubtId && hash && hash.includes("/question/")) {
+        const parts = hash.split("/question/");
+        if (parts.length > 1) {
+          doubtId = parts[1];
+        }
+      }
+      
+      if (doubtId) {
+        openThread(doubtId);
+      }
+    }
 
     function renderSidebar() {
       const buildSidebarHTML = () => {
@@ -740,8 +775,12 @@
     function openThread(doubtId) {
       state.currentDoubtId = doubtId;
       const doubts = DB.getDoubts();
-      const d = doubts.find(x => x.id === doubtId);
+      const d = doubts.find(x => String(x.id) === String(doubtId));
       if (!d) return;
+
+      // Update URL hash/query dynamically to fit 'page/question/{id}' style (hash routing)
+      const newUrl = `${window.location.pathname}#/question/${doubtId}`;
+      window.history.pushState({ doubtId }, "", newUrl);
 
       document.getElementById("thread-answer-count").textContent = `${d.answers ? d.answers.length : 0} Answers`;
 
@@ -867,6 +906,9 @@
       const modal = document.getElementById("thread-modal");
       modal.classList.add("opacity-0");
       modal.children[0].classList.add("translate-y-full", "sm:translate-y-4");
+
+      // Reset URL to base path
+      window.history.pushState({}, "", window.location.pathname);
 
       setTimeout(() => {
         modal.classList.add("hidden");
@@ -1038,7 +1080,7 @@
 
     window.handleShare = (e, doubtId) => {
       e.stopPropagation();
-      const shareUrl = `${window.location.origin}${window.location.pathname}?doubt=${doubtId}`;
+      const shareUrl = `${window.location.origin}${window.location.pathname}#/question/${doubtId}`;
       navigator.clipboard.writeText(shareUrl).then(() => {
         showToast("Link copied to clipboard!", "info");
       });
@@ -1111,7 +1153,7 @@
           examMode
         };
 
-        await DB.addDoubt(newDoubt);
+        const res = await DB.addDoubt(newDoubt);
 
         // Drop the optimistic placeholder now that the real (auto-sorted) doubt is in
         const refreshed = DB.getDoubts().filter(d => d.id !== tempId);
@@ -1119,6 +1161,10 @@
 
         showToast(`✨ Successfully posted and auto-sorted!`, "success");
         renderFeed();
+
+        if (res && res.id) {
+          openThread(res.id);
+        }
 
       } catch (err) {
         showToast("Failed to post doubt.", "error");

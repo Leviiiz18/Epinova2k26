@@ -201,7 +201,7 @@
           <h3 class="text-base font-bold text-slate-900">Faculty Knowledge Validation</h3>
           <p class="text-xs text-slate-500">Provide official faculty explanation or validate peer response</p>
         </div>
-        <button type="button" onclick="closeModal('faculty-answer-modal')" aria-label="Close modal"
+        <button type="button" onclick="closeFacultyModal()" aria-label="Close modal"
           class="text-slate-400 hover:text-slate-700 p-1">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
@@ -219,7 +219,7 @@
         </div>
 
         <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
-          <button type="button" onclick="closeModal('faculty-answer-modal')"
+          <button type="button" onclick="closeFacultyModal()"
             class="px-3.5 py-2 text-xs font-medium text-slate-600 hover:text-slate-900">
             Cancel
           </button>
@@ -253,7 +253,42 @@
       await DB.syncDoubts();
       renderFacultyQueue();
       lucide.createIcons();
+      checkUrlForFaculty();
     });
+
+    window.addEventListener("popstate", () => {
+      const hash = window.location.hash;
+      if (hash && hash.includes("/question/")) {
+        checkUrlForFaculty();
+      } else {
+        const modal = document.getElementById("faculty-answer-modal");
+        if (modal && !modal.classList.contains("hidden")) {
+          closeModal("faculty-answer-modal");
+        }
+      }
+    });
+
+    function checkUrlForFaculty() {
+      const hash = window.location.hash;
+      const params = new URLSearchParams(window.location.search);
+      let doubtId = params.get("doubt") || params.get("question") || params.get("questionId") || params.get("id");
+      
+      if (!doubtId && hash && hash.includes("/question/")) {
+        const parts = hash.split("/question/");
+        if (parts.length > 1) {
+          doubtId = parts[1];
+        }
+      }
+      
+      if (doubtId) {
+        openFacultyAnswer(doubtId);
+      }
+    }
+
+    function closeFacultyModal() {
+      closeModal("faculty-answer-modal");
+      window.history.pushState({}, "", window.location.pathname);
+    }
 
     // Minimal markdown -> HTML for the AI's exam-style answers (just **bold**)
     function renderLiteMarkdown(text) {
@@ -364,6 +399,9 @@
     function openFacultyAnswer(doubtId) {
       document.getElementById("fac-hidden-doubt-id").value = doubtId;
       openModal("faculty-answer-modal");
+      
+      const newUrl = `${window.location.pathname}#/question/${doubtId}`;
+      window.history.pushState({ doubtId }, "", newUrl);
     }
 
     async function submitFacultyAnswer(e) {
@@ -381,7 +419,7 @@
       };
 
       await DB.resolveDoubt(doubtId, answerData);
-      closeModal("faculty-answer-modal");
+      closeFacultyModal();
       showToast("Solution saved & knowledge validated in NeonDB!", "success");
       renderFacultyQueue();
     }
