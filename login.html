@@ -255,10 +255,47 @@
       }
     }
 
+    function loginAsDemo(role, facultyId = null) {
+      if (role === 'student') {
+        const user = {
+          role: "student", id: "student-" + Date.now(),
+          name: "Alex Morgan", yearId: "year-3", yearName: "3rd Year (Junior)", email: "alex.morgan@studybuddy.edu",
+          avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150"
+        };
+        DB.setCurrentUser(user);
+        window.location.href = "student-dashboard.html";
+      } else {
+        const user = {
+          role: "faculty", id: facultyId || "fac-ai-01", name: "Dr. Sarah Jenkins",
+          title: "Lead Faculty", domain: "Artificial Intelligence & ML", email: "sarah.jenkins@studybuddy.edu",
+          avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250", status: "online"
+        };
+        DB.setCurrentUser(user);
+        window.location.href = "faculty-dashboard.html";
+      }
+    }
+
     function handleAuthSubmit(e) {
       e.preventDefault();
-      const email = document.getElementById("input-email").value;
-      const name  = document.getElementById("input-name").value || (currentRole === "student" ? "Alex Morgan" : "Dr. Sarah Jenkins");
+      const email = document.getElementById("input-email").value.toLowerCase();
+      
+      // Auto-detect role from email if not explicitly set
+      if (email.includes('faculty') || email.includes('jenkins') || email.includes('dr.')) {
+        currentRole = 'faculty';
+      } else {
+        currentRole = 'student';
+      }
+
+      let name = document.getElementById("input-name").value;
+      if (!name) {
+         let prefix = email.split('@')[0];
+         prefix = prefix.replace(/[^a-zA-Z]/g, ' ').trim();
+         if (!prefix) {
+             name = currentRole === "student" ? "Alex Morgan" : "Dr. Sarah Jenkins";
+         } else {
+             name = prefix.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+         }
+      }
 
       if (currentRole === "student") {
         const yearSelect = document.getElementById("input-year");
@@ -277,7 +314,7 @@
         const domain       = domainSelect ? domainSelect.value : "Artificial Intelligence & ML";
         const facultyMatch = DB.getFacultyForDomain ? DB.getFacultyForDomain(domain) : { id: "fac-ai-01", name: "Dr. Sarah Jenkins", title: "Lead Faculty", domain, email, avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250", status: "online" };
         const user = {
-          role: "faculty", id: facultyMatch.id, name: name || facultyMatch.name,
+          role: "faculty", id: facultyMatch.id, name,
           title: facultyMatch.title, domain, email,
           avatar: facultyMatch.avatar, status: "online"
         };
