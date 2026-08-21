@@ -502,7 +502,9 @@ def init_database():
             cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS helpfulness_upvotes INT DEFAULT 0;")
             cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS rating DECIMAL(3,2) DEFAULT NULL;")
             cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS rating_count INT DEFAULT 0;")
-            cur.execute("UPDATE answers SET rating = NULL, rating_count = 0 WHERE rating = 5.00 AND rating_count = 1;")
+            cur.execute("ALTER TABLE answers ALTER COLUMN rating SET DEFAULT NULL;")
+            cur.execute("ALTER TABLE answers ALTER COLUMN rating_count SET DEFAULT 0;")
+            cur.execute("UPDATE answers SET rating = NULL, rating_count = 0 WHERE rating = 5.00 OR rating_count = 1 OR rating_count IS NULL;")
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS answer_replies (
                     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -511,6 +513,16 @@ def init_database():
                     author_avatar VARCHAR(200),
                     content TEXT NOT NULL,
                     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+                );
+            """)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS answer_ratings (
+                    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                    answer_id UUID REFERENCES answers(id) ON DELETE CASCADE,
+                    user_email VARCHAR(200) NOT NULL,
+                    rating DECIMAL(3,2) NOT NULL,
+                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(answer_id, user_email)
                 );
             """)
             cur.execute("ALTER TABLE doubts ADD COLUMN IF NOT EXISTS embedding vector(384);")
@@ -1390,6 +1402,7 @@ def like_answer(answer_id: str):
 
 class RateRequest(BaseModel):
     rating: float
+    userEmail: str
 
 @app.post("/api/answers/{answer_id}/rate")
 @app.post("/answers/{answer_id}/rate")
@@ -1397,19 +1410,26 @@ def rate_answer(answer_id: str, request: RateRequest):
     if request.rating < 1 or request.rating > 5:
         raise HTTPException(status_code=400, detail="Rating must be between 1 and 5")
     
-    row = run_query("SELECT rating, rating_count FROM answers WHERE id = %s;", [answer_id], fetch_one=True)
+    row = run_query("SELECT id FROM answers WHERE id = %s;", [answer_id], fetch_one=True)
     if not row:
         raise HTTPException(status_code=404, detail="Answer not found")
     
-    curr_rating = float(row['rating']) if row['rating'] is not None else None
-    curr_count = row['rating_count'] if row['rating_count'] is not None else 0
+    # Upsert: insert or replace the user's rating for this answer
+    run_query("""
+        INSERT INTO answer_ratings (answer_id, user_email, rating)
+        VALUES (%s, %s, %s)
+        ON CONFLICT (answer_id, user_email)
+        DO UPDATE SET rating = EXCLUDED.rating;
+    """, [answer_id, request.userEmail, request.rating], commit=True)
     
-    if curr_rating is None or curr_count == 0:
-        new_rating = request.rating
-        new_count = 1
-    else:
-        new_count = curr_count + 1
-        new_rating = ((curr_rating * curr_count) + request.rating) / new_count
+    # Recalculate the average from all individual ratings
+    agg = run_query("""
+        SELECT COALESCE(AVG(rating), 0) as avg_rating, COUNT(*) as total_count
+        FROM answer_ratings WHERE answer_id = %s;
+    """, [answer_id], fetch_one=True)
+    
+    new_rating = float(agg['avg_rating'])
+    new_count = agg['total_count']
     
     run_query("UPDATE answers SET rating = %s, rating_count = %s WHERE id = %s;", [new_rating, new_count, answer_id], commit=True)
     return {"success": True, "rating": new_rating, "ratingCount": new_count}

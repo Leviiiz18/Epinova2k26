@@ -536,12 +536,12 @@ const DB = {
     return null;
   },
 
-  async rateAnswer(answerId, rating) {
+  async rateAnswer(answerId, rating, userEmail) {
     try {
       const response = await fetch(`http://localhost:8000/api/answers/${answerId}/rate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rating })
+        body: JSON.stringify({ rating, userEmail })
       });
       if (response.ok) {
         await this.syncDoubts();

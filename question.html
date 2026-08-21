@@ -1056,22 +1056,15 @@
     };
 
     window.executeRateAnswer = async (answerId, rating) => {
-      // OPTIMISTIC UPDATE: Calculate new average locally & render
+      // OPTIMISTIC UPDATE: Set rating directly (user rates once, replaces previous)
       const doubts = DB.getDoubts();
       let found = false;
       doubts.forEach(d => {
         if (d.answers) {
           const ans = d.answers.find(a => String(a.id) === String(answerId));
           if (ans) {
-            const currRating = ans.rating;
-            const currCount = ans.ratingCount || 0;
-            if (currRating === null || currRating === undefined || currCount === 0) {
-              ans.rating = rating;
-              ans.ratingCount = 1;
-            } else {
-              ans.ratingCount = currCount + 1;
-              ans.rating = ((currRating * currCount) + rating) / ans.ratingCount;
-            }
+            ans.rating = rating;
+            ans.ratingCount = Math.max(ans.ratingCount || 0, 1);
             found = true;
           }
         }
@@ -1082,9 +1075,24 @@
         showToast(`Rated ${rating} stars!`, "success");
       }
 
-      // Sync with database in background
-      DB.rateAnswer(answerId, rating).then(res => {
-        if (!res || !res.success) {
+      // Sync with database in background (backend upserts per-user and recalculates average)
+      const userEmail = state.user?.email || '';
+      DB.rateAnswer(answerId, rating, userEmail).then(res => {
+        if (res && res.success) {
+          // Update with the true server-computed average
+          const doubts2 = DB.getDoubts();
+          doubts2.forEach(d => {
+            if (d.answers) {
+              const ans = d.answers.find(a => String(a.id) === String(answerId));
+              if (ans) {
+                ans.rating = res.rating;
+                ans.ratingCount = res.ratingCount;
+              }
+            }
+          });
+          DB.saveDoubts(doubts2);
+          loadDoubtData();
+        } else {
           console.error("Failed to sync rating to DB.");
         }
       }).catch(err => {
