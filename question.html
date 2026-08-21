@@ -638,17 +638,32 @@
         return;
       }
 
-      try {
-        const success = await DB.updateAnswer(answerId, newContent);
-        if (success) {
-          showToast("Answer updated successfully.", "success");
-          loadDoubtData();
-        } else {
-          showToast("Failed to update answer.", "error");
+      // OPTIMISTIC UPDATE: Save to local doubts immediately & render
+      const doubts = DB.getDoubts();
+      let found = false;
+      doubts.forEach(d => {
+        if (d.answers) {
+          const ans = d.answers.find(a => String(a.id) === String(answerId));
+          if (ans) {
+            ans.content = newContent;
+            found = true;
+          }
         }
-      } catch (err) {
-        showToast("Error updating answer.", "error");
+      });
+      if (found) {
+        DB.saveDoubts(doubts);
+        loadDoubtData();
+        showToast("Answer updated successfully.", "success");
       }
+
+      // Sync with database in the background (no awaiting!)
+      DB.updateAnswer(answerId, newContent).then(success => {
+        if (!success) {
+          console.error("Failed to sync answer update to DB.");
+        }
+      }).catch(err => {
+        console.error("Background sync error:", err);
+      });
     };
 
     let pendingDeleteAnswerId = null;
@@ -696,37 +711,50 @@
       console.log("executeDeleteAnswer starting for:", answerId);
       closeConfirmModal();
       
-      try {
-        const success = await DB.deleteAnswer(answerId);
-        if (success) {
-          showToast("Solution deleted successfully.", "success");
-          
-          // Re-fetch current user profile to update points balance in UI
-          const email = (state.user && state.user.email) ? state.user.email : "alex.morgan@studybuddy.edu";
-          try {
-            const userResp = await fetch(`http://localhost:8000/api/user/${email}`);
-            if (userResp.ok) {
-              const freshUser = await userResp.json();
-              DB.setCurrentUser(freshUser);
-              state.user = freshUser;
-              const pointsEl = document.getElementById("points-balance");
-              if (pointsEl) {
-                pointsEl.textContent = freshUser.points || 0;
-              }
-            }
-          } catch (fetchErr) {
-            console.warn("Failed to reload user points from API:", fetchErr);
+      // OPTIMISTIC UPDATE: Remove from local doubts immediately & render
+      const doubts = DB.getDoubts();
+      let found = false;
+      doubts.forEach(d => {
+        if (d.answers) {
+          const idx = d.answers.findIndex(a => String(a.id) === String(answerId));
+          if (idx !== -1) {
+            d.answers.splice(idx, 1);
+            found = true;
           }
-          
-          // Reload doubt data
-          loadDoubtData();
-        } else {
-          showToast("Failed to delete solution from database.", "error");
         }
-      } catch (err) {
-        console.error("Error executing delete answer:", err);
-        showToast("Error deleting solution: " + err.message, "error");
+      });
+      if (found) {
+        DB.saveDoubts(doubts);
+        loadDoubtData();
+        showToast("Solution deleted successfully.", "success");
       }
+
+      // Sync with database in the background (no awaiting!)
+      DB.deleteAnswer(answerId).then(success => {
+        if (success) {
+          // Re-fetch current user profile to update points balance in UI in the background
+          const email = (state.user && state.user.email) ? state.user.email : "alex.morgan@studybuddy.edu";
+          fetch(`http://localhost:8000/api/user/${email}`)
+            .then(res => {
+              if (res.ok) return res.json();
+            })
+            .then(freshUser => {
+              if (freshUser) {
+                DB.setCurrentUser(freshUser);
+                state.user = freshUser;
+                const pointsEl = document.getElementById("points-balance");
+                if (pointsEl) {
+                  pointsEl.textContent = freshUser.points || 0;
+                }
+              }
+            })
+            .catch(fetchErr => console.warn("Failed to reload user points from API:", fetchErr));
+        } else {
+          console.error("Failed to sync answer deletion to DB.");
+        }
+      }).catch(err => {
+        console.error("Background sync error:", err);
+      });
     };
 
     // Doubt options & handlers
@@ -782,17 +810,25 @@
         return;
       }
 
-      try {
-        const success = await DB.updateDoubt(state.currentDoubtId, title, rawQuery);
-        if (success) {
-          showToast("Question updated successfully.", "success");
-          loadDoubtData();
-        } else {
-          showToast("Failed to update question.", "error");
-        }
-      } catch (err) {
-        showToast("Error updating question.", "error");
+      // OPTIMISTIC UPDATE: Save to local doubts immediately & render
+      const doubts = DB.getDoubts();
+      const doubt = doubts.find(d => String(d.id) === String(state.currentDoubtId));
+      if (doubt) {
+        doubt.title = title;
+        doubt.rawQuery = rawQuery;
+        DB.saveDoubts(doubts);
+        loadDoubtData();
+        showToast("Question updated successfully.", "success");
       }
+
+      // Sync with database in the background (no awaiting!)
+      DB.updateDoubt(state.currentDoubtId, title, rawQuery).then(success => {
+        if (!success) {
+          console.error("Failed to sync question update to DB.");
+        }
+      }).catch(err => {
+        console.error("Background sync error:", err);
+      });
     };
 
     window.handleCopyDoubt = (e) => {
@@ -831,19 +867,26 @@
       const doubtId = pendingDeleteDoubtId;
       closeConfirmModal();
 
-      try {
-        const success = await DB.deleteDoubt(doubtId);
-        if (success) {
-          showToast("Question deleted. Refunding bounty...", "success");
-          setTimeout(() => {
-            window.location.href = "student-dashboard.html";
-          }, 1500);
-        } else {
-          showToast("Failed to delete question.", "error");
-        }
-      } catch (err) {
-        showToast("Error deleting question.", "error");
+      // OPTIMISTIC UPDATE: Remove from local doubts immediately & redirect
+      const doubts = DB.getDoubts();
+      const idx = doubts.findIndex(d => String(d.id) === String(doubtId));
+      if (idx !== -1) {
+        doubts.splice(idx, 1);
+        DB.saveDoubts(doubts);
       }
+      showToast("Question deleted. Refunding bounty...", "success");
+      setTimeout(() => {
+        window.location.href = "student-dashboard.html";
+      }, 300); // Redirect almost instantly!
+
+      // Sync with database in the background (no awaiting!)
+      DB.deleteDoubt(doubtId).then(success => {
+        if (!success) {
+          console.error("Failed to sync question deletion to DB.");
+        }
+      }).catch(err => {
+        console.error("Background sync error:", err);
+      });
     };
 
     function showPointsInfo() {
