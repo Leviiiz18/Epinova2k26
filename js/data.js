@@ -442,14 +442,14 @@ const DB = {
     return resources.filter(r => r.metadata.concept.toLowerCase() === conceptName.toLowerCase() || r.metadata.concept.toLowerCase().includes(conceptName.toLowerCase()));
   },
 
-  addDoubt(newDoubt) {
+  async addDoubt(newDoubt) {
     const doubts = this.getDoubts();
     doubts.unshift(newDoubt);
     this.saveDoubts(doubts);
     return doubts;
   },
 
-  resolveDoubt(doubtId, answerData) {
+  async resolveDoubt(doubtId, answerData) {
     const doubts = this.getDoubts();
     const doubt = doubts.find(d => d.id === doubtId);
     if (doubt) {
@@ -458,25 +458,70 @@ const DB = {
       doubt.answers.push(answerData);
       this.saveDoubts(doubts);
     }
+    
+    try {
+      const email = answerData.authorName.includes("Alex") ? "alex.morgan@studybuddy.edu" :
+                    answerData.authorName.includes("Rahul") ? "rahul.sharma@studybuddy.edu" :
+                    answerData.authorName.includes("Elena") ? "elena.vance@studybuddy.edu" :
+                    answerData.authorName.includes("Priya") ? "priya.patel@studybuddy.edu" : "jordan.hayes@studybuddy.edu";
+                    
+      const response = await fetch(`http://localhost:8000/api/doubts/${doubtId}/answers`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: answerData.content,
+          authorEmail: email
+        })
+      });
+      if (response.ok) {
+        await this.syncDoubts();
+      }
+    } catch (e) {
+      console.warn("Offline resolveDoubt fallback:", e);
+    }
     return doubts;
   },
 
-  setAnswerAiVerified(doubtId, answerIdx, isVerified) {
+  async setAnswerAiVerified(doubtId, answerIdx, isVerified) {
     const doubts = this.getDoubts();
     const doubt = doubts.find(d => d.id === doubtId);
     if (doubt && doubt.answers && doubt.answers[answerIdx]) {
       doubt.answers[answerIdx].isAiVerified = isVerified;
       this.saveDoubts(doubts);
+      
+      const answer = doubt.answers[answerIdx];
+      if (answer.id) {
+        try {
+          await fetch(`http://localhost:8000/api/answers/${answer.id}/verify_ai`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ verified: isVerified })
+          });
+        } catch (e) {
+          console.warn("AI verification sync failed:", e);
+        }
+      }
     }
     return doubts;
   },
 
-  setAnswerFacultyVerified(doubtId, answerIdx, isVerified) {
+  async setAnswerFacultyVerified(doubtId, answerIdx, isVerified) {
     const doubts = this.getDoubts();
     const doubt = doubts.find(d => d.id === doubtId);
     if (doubt && doubt.answers && doubt.answers[answerIdx]) {
       doubt.answers[answerIdx].isFacultyVerified = isVerified;
       this.saveDoubts(doubts);
+      
+      const answer = doubt.answers[answerIdx];
+      if (answer.id) {
+        try {
+          await fetch(`http://localhost:8000/api/answers/${answer.id}/verify`, {
+            method: "POST"
+          });
+        } catch (e) {
+          console.warn("Faculty verification sync failed:", e);
+        }
+      }
     }
     return doubts;
   },
@@ -507,12 +552,27 @@ const DB = {
     localStorage.setItem("studybuddy_current_user", JSON.stringify(user));
   },
 
-  updateUserPoints(diff) {
+  async updateUserPoints(diff) {
     const user = this.getCurrentUser();
-    user.points = (user.points || 0) + diff;
+    user.points = Math.max(0, (user.points || 0) + diff);
     this.setCurrentUser(user);
     if (window.onPointsUpdate) {
       window.onPointsUpdate(user.points, diff);
+    }
+    
+    try {
+      const response = await fetch(`http://localhost:8000/api/user/${user.email}/points`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ diff: diff })
+      });
+      if (response.ok) {
+        const resData = await response.json();
+        user.points = resData.points;
+        this.setCurrentUser(user);
+      }
+    } catch (e) {
+      console.warn("Points sync with DB failed:", e);
     }
     return user.points;
   }
