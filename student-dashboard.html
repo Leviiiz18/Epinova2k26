@@ -210,14 +210,14 @@
     const YEARS = ["1st Year", "2nd Year", "3rd Year", "4th Year"];
     const SUBJECTS = ["General", ...STUDY_BUDDY_DATA.taxonomy.map(t => t.subjectName)];
     const YEAR_SUBJECTS = {
-      "1st Year": ["General", "C Programming", "Leadership & Relationship Management Skills"],
-      "2nd Year": ["General", "C# Programming", "Machine Learning"],
-      "3rd Year": ["General", "Artificial Intelligence", "Digital Image Processing"],
-      "4th Year": ["General", "Advanced Web Technologies", "Soft Computing"]
+      "1st Year": ["C Programming", "Leadership & Relationship Management Skills"],
+      "2nd Year": ["C# Programming", "Machine Learning"],
+      "3rd Year": ["Artificial Intelligence", "Digital Image Processing"],
+      "4th Year": ["Advanced Web Technologies", "Soft Computing"]
     };
     
     let state = {
-      activeYear: "",
+      activeYear: "Global",
       activeSubject: "General",
       user: null,
       userYearValue: 1, // 1 to 4
@@ -226,7 +226,7 @@
     };
 
     function parseYearValue(yearStr) {
-      if (!yearStr) return 1;
+      if (!yearStr || yearStr === "Global") return 1;
       const str = String(yearStr).toLowerCase();
       if (str.includes("1st") || str.includes("first") || str.includes("1")) return 1;
       if (str.includes("2nd") || str.includes("second") || str.includes("2")) return 2;
@@ -246,14 +246,14 @@
         // Setup base year value
         state.userYearValue = parseYearValue(state.user.year || state.user.yearName);
         state.activeYearValue = state.userYearValue;
-        state.activeYear = YEARS[state.activeYearValue - 1] || "1st Year";
+        // activeYear and activeSubject are already set to Global / General
       } catch (e) {
         console.error("Error during init:", e);
         // Fallback for demo purposes if DB crashes
         state.user = { name: "Guest", year: "1st Year", points: 100, role: "student" };
         state.userYearValue = 1;
         state.activeYearValue = 1;
-        state.activeYear = "1st Year";
+        state.activeYear = "Global";
       }
 
       // Setup UI from user data
@@ -283,17 +283,38 @@
     function renderSidebar() {
       const buildSidebarHTML = () => {
         let html = "";
-        YEARS.forEach((yr, yIdx) => {
-          const yVal = yIdx + 1;
-          // Students only see their year and below. Faculty see all.
-          if (state.user.role !== "faculty" && yVal > state.userYearValue) {
-            return;
-          }
-          
+        
+        // 1. GLOBAL CHANNELS
+        const isGenActive = state.activeYear === "Global" && state.activeSubject === "General";
+        html += `
+          <div class="mb-5">
+            <div class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1.5 px-4 flex items-center gap-1.5">
+              <i data-lucide="globe" class="w-3.5 h-3.5"></i> GLOBAL CHANNELS
+            </div>
+            <div class="space-y-0.5 px-2">
+              <button onclick="switchChannel('Global', 'General')" class="w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${isGenActive ? 'channel-active border border-indigo-200/50 shadow-sm' : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-900 border border-transparent'}">
+                <i data-lucide="message-square" class="w-3.5 h-3.5 ${isGenActive ? 'text-indigo-600' : 'text-slate-400'}"></i>
+                <span class="truncate">General Discussion</span>
+              </button>
+            </div>
+          </div>
+        `;
+
+        // 2. YEAR SPECIFIC CHANNELS
+        let targetYear = state.user.year || state.user.yearName || "1st Year";
+        if (state.user.role === "faculty") {
+          // If faculty, they might see all years? The user said "all the same shit" for student dashboard. 
+          // Let's just show all years for faculty or keep it to targetYear if it's assigned.
+          // Wait, if faculty needs to see all, we can loop over YEARS.
+        }
+        
+        const yearsToRender = state.user.role === "faculty" ? YEARS : [targetYear];
+
+        yearsToRender.forEach((yr) => {
           html += `
             <div class="mb-5">
               <div class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1.5 px-4 flex items-center gap-1.5">
-                <i data-lucide="folder-open" class="w-3.5 h-3.5"></i> ${yr}
+                <i data-lucide="folder-open" class="w-3.5 h-3.5"></i> ${yr.toUpperCase()} SUBJECTS
               </div>
               <div class="space-y-0.5 px-2">
           `;
@@ -303,24 +324,16 @@
               ? "channel-active border border-indigo-200/50 shadow-sm" 
               : "text-slate-600 hover:bg-slate-200/50 hover:text-slate-900 border border-transparent";
             
-            // Icon logic
-            let icon = "hash";
-            if (sub === "General") icon = "message-square";
-            else if (sub === "AI & ML" || sub === "DSA") icon = "cpu";
-            else if (sub === "Web & Mobile Dev") icon = "smartphone";
-            else if (sub === "Cloud & Systems") icon = "cloud";
-            else if (sub === "Mathematics & Statistics") icon = "bar-chart";
-            else if (sub === "Cyber Security") icon = "shield";
-            
             html += `
               <button onclick="switchChannel('${yr}', '${sub}')" class="w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${activeClass}">
-                <i data-lucide="${icon}" class="w-3.5 h-3.5 ${isActive ? 'text-indigo-600' : 'text-slate-400'}"></i>
+                <i data-lucide="hash" class="w-3.5 h-3.5 ${isActive ? 'text-indigo-600' : 'text-slate-400'}"></i>
                 <span class="truncate">${sub}</span>
               </button>
             `;
           });
           html += `</div></div>`;
         });
+
         return html;
       };
 
@@ -341,8 +354,8 @@
       const warningBox = document.getElementById("no-post-warning");
       const warningText = document.getElementById("no-post-warning-text");
       
-      // Faculty can post anywhere. Students only in their own year.
-      if (state.user.role === "faculty" || state.activeYearValue === state.userYearValue) {
+      // Faculty can post anywhere. Students only in their own year, or Global.
+      if (state.user.role === "faculty" || state.activeYearValue === state.userYearValue || state.activeYear === "Global") {
         composeBox.classList.remove("hidden");
         warningBox.classList.add("hidden");
       } else {
