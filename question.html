@@ -432,8 +432,8 @@
                   <span class="text-slate-400 font-medium mr-1">Rate:</span>
                   <div class="flex items-center text-amber-400 gap-0.5">
                     ${[1,2,3,4,5].map(star => {
-                      const avg = a.rating || 5.0;
-                      const isFilled = star <= Math.round(avg);
+                      const hasRating = (a.rating !== null && a.rating !== undefined && a.ratingCount > 0);
+                      const isFilled = hasRating && star <= Math.round(a.rating);
                       return `
                         <button onclick="executeRateAnswer('${a.id}', ${star})" class="hover:scale-125 transition-transform" title="Rate ${star} Stars">
                           <i data-lucide="star" class="w-3.5 h-3.5 ${isFilled ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}"></i>
@@ -441,7 +441,9 @@
                       `;
                     }).join("")}
                   </div>
-                  <span class="text-slate-400 font-semibold ml-1">(${parseFloat(a.rating || 5.0).toFixed(1)} / 5)</span>
+                  <span class="text-slate-400 font-semibold ml-1">
+                    ${(a.rating !== null && a.rating !== undefined && a.ratingCount > 0) ? `(${parseFloat(a.rating).toFixed(1)} / 5)` : '(No ratings yet)'}
+                  </span>
                 </div>
               </div>
 
@@ -1061,10 +1063,15 @@
         if (d.answers) {
           const ans = d.answers.find(a => String(a.id) === String(answerId));
           if (ans) {
-            const currRating = ans.rating || 5.0;
-            const currCount = ans.ratingCount || 1;
-            ans.ratingCount = currCount + 1;
-            ans.rating = ((currRating * currCount) + rating) / ans.ratingCount;
+            const currRating = ans.rating;
+            const currCount = ans.ratingCount || 0;
+            if (currRating === null || currRating === undefined || currCount === 0) {
+              ans.rating = rating;
+              ans.ratingCount = 1;
+            } else {
+              ans.ratingCount = currCount + 1;
+              ans.rating = ((currRating * currCount) + rating) / ans.ratingCount;
+            }
             found = true;
           }
         }

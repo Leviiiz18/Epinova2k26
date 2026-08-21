@@ -500,8 +500,9 @@ def init_database():
             cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS is_faculty_verified BOOLEAN DEFAULT FALSE;")
             cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS verification_state VARCHAR(50) DEFAULT 'Reviewing';")
             cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS helpfulness_upvotes INT DEFAULT 0;")
-            cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS rating DECIMAL(3,2) DEFAULT 5.00;")
-            cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS rating_count INT DEFAULT 1;")
+            cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS rating DECIMAL(3,2) DEFAULT NULL;")
+            cur.execute("ALTER TABLE answers ADD COLUMN IF NOT EXISTS rating_count INT DEFAULT 0;")
+            cur.execute("UPDATE answers SET rating = NULL, rating_count = 0 WHERE rating = 5.00 AND rating_count = 1;")
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS answer_replies (
                     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -819,8 +820,8 @@ def get_doubts(subject: str = "All"):
                 'isFacultyVerified', a.is_faculty_verified,
                 'verificationState', a.verification_state,
                 'helpfulnessUpvotes', COALESCE(a.helpfulness_upvotes, 0),
-                'rating', COALESCE(a.rating, 5.00),
-                'ratingCount', COALESCE(a.rating_count, 1),
+                'rating', a.rating,
+                'ratingCount', COALESCE(a.rating_count, 0),
                 'authorName', au.full_name,
                 'authorAvatar', au.avatar_url,
                 'replies', COALESCE((
@@ -1400,11 +1401,15 @@ def rate_answer(answer_id: str, request: RateRequest):
     if not row:
         raise HTTPException(status_code=404, detail="Answer not found")
     
-    curr_rating = float(row['rating']) if row['rating'] is not None else 5.00
-    curr_count = row['rating_count'] if row['rating_count'] is not None else 1
+    curr_rating = float(row['rating']) if row['rating'] is not None else None
+    curr_count = row['rating_count'] if row['rating_count'] is not None else 0
     
-    new_count = curr_count + 1
-    new_rating = ((curr_rating * curr_count) + request.rating) / new_count
+    if curr_rating is None or curr_count == 0:
+        new_rating = request.rating
+        new_count = 1
+    else:
+        new_count = curr_count + 1
+        new_rating = ((curr_rating * curr_count) + request.rating) / new_count
     
     run_query("UPDATE answers SET rating = %s, rating_count = %s WHERE id = %s;", [new_rating, new_count, answer_id], commit=True)
     return {"success": True, "rating": new_rating, "ratingCount": new_count}
