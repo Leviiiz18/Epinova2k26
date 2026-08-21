@@ -1,0 +1,557 @@
+[
+  {
+    "id": "a14527c4-4188-4fd4-904b-299610c42da5",
+    "facultyId": "33333333-0000-0000-0000-000000000001",
+    "conceptId": "018231b1-9e9b-58d9-bfb8-01361bb97f48",
+    "title": "Unit 1",
+    "resourceType": "Slides",
+    "url": "data/1st year/C/U1/Unit_1.pptx",
+    "metadata": {
+      "subject": "C Programming",
+      "topic": "U1",
+      "concept": "C Variables & Data Types",
+      "difficulty": "Beginner",
+      "slideCount": 10,
+      "keyConcepts": [
+        "Variables",
+        "Data Types",
+        "Memory Allocation",
+        "Syntax"
+      ],
+      "prerequisites": [
+        "Algorithms Introduction"
+      ],
+      "fileSize": "1.1MB",
+      "format": "PPTX",
+      "description": "Introduction to C syntax, structure, basic data types, and variable declarations."
+    }
+  },
+  {
+    "id": "11597c2a-f811-43dd-9e04-cf3b21e58de4",
+    "facultyId": "33333333-0000-0000-0000-000000000002",
+    "conceptId": "3df7eac1-174e-5045-94a7-335d83ed5367",
+    "title": "Unit 2 C",
+    "resourceType": "Slides",
+    "url": "data/1st year/C/U2/Unit_2_C.pptx",
+    "metadata": {
+      "subject": "C Programming",
+      "topic": "U2",
+      "concept": "Control Flow & Conditionals",
+      "difficulty": "Beginner",
+      "slideCount": 10,
+      "keyConcepts": [
+        "If-Else",
+        "Switch-Case",
+        "Loops",
+        "Iterators"
+      ],
+      "prerequisites": [
+        "C Variables & Data Types"
+      ],
+      "fileSize": "137KB",
+      "format": "PPTX",
+      "description": "Explores program control structures in C, branching logic, loop constructs, and scope."
+    }
+  },
+  {
+    "id": "faa37a1b-ddfb-42e4-bb4f-f4362d39a0ef",
+    "facultyId": "33333333-0000-0000-0000-000000000001",
+    "conceptId": "8e63204e-a51c-5e6f-93d8-dbc135a279ba",
+    "title": "Part 1  M1 Leadership Skills Vs",
+    "resourceType": "Slides",
+    "url": "data/1st year/LRMS/U1/Part 1- M1 Leadership Skills vs.pptx",
+    "metadata": {
+      "subject": "Leadership & Relationship Management Skills",
+      "topic": "U1",
+      "concept": "Leadership Foundations",
+      "difficulty": "Beginner",
+      "slideCount": 60,
+      "keyConcepts": [
+        "Leadership",
+        "Management",
+        "Skills",
+        "Team dynamics"
+      ],
+      "prerequisites": [
+        "Communication Foundations"
+      ],
+      "fileSize": "22.6MB",
+      "format": "PPTX",
+      "description": "Foundational topics in leadership styles, team behavior, and conflict resolution."
+    }
+  },
+  {
+    "id": "c39e039b-2334-4298-ac2d-14e3e674ad43",
+    "facultyId": "33333333-0000-0000-0000-000000000002",
+    "conceptId": "a16490c4-0e5a-5412-b9a6-7c8579d5a144",
+    "title": "Part 2 M1 Leadership Skills Cont",
+    "resourceType": "Slides",
+    "url": "data/1st year/LRMS/U2/Part 2-M1 Leadership Skills cont.pptx",
+    "metadata": {
+      "subject": "Leadership & Relationship Management Skills",
+      "topic": "U2",
+      "concept": "Emotional Intelligence",
+      "difficulty": "Beginner",
+      "slideCount": 48,
+      "keyConcepts": [
+        "Emotional Intelligence",
+        "Empathy",
+        "Self-awareness",
+        "Relationships"
+      ],
+      "prerequisites": [
+        "Leadership Foundations"
+      ],
+      "fileSize": "9.3MB",
+      "format": "PPTX",
+      "description": "Advanced relationship management, active listening, and building emotional intelligence."
+    }
+  },
+  {
+    "id": "3b731c63-464a-4150-91f8-9a90d63a827e",
+    "facultyId": "33333333-0000-0000-0000-000000000001",
+    "conceptId": "2e5a5dce-c092-5be4-8da8-f748f8d24364",
+    "title": "Module 1",
+    "resourceType": "Slides",
+    "url": "data/2nd year/c#/U1/Module 1.pptx",
+    "metadata": {
+      "subject": "C# Programming",
+      "topic": "U1",
+      "concept": "C# Object Oriented Programming",
+      "difficulty": "Intermediate",
+      "slideCount": 10,
+      "keyConcepts": [
+        "Classes",
+        "Objects",
+        "Inheritance",
+        "Polymorphism",
+        "Encapsulation"
+      ],
+      "prerequisites": [
+        "C Programming"
+      ],
+      "fileSize": "186KB",
+      "format": "PPTX",
+      "description": "Object-oriented principles in C#, class definitions, namespace utilization, and garbage collection."
+    }
+  },
+  {
+    "id": "1560b6c6-47a6-4523-b828-6dd3f17285f7",
+    "facultyId": "33333333-0000-0000-0000-000000000002",
+    "conceptId": "b5b7b968-e601-51e6-9dce-2720024c1600",
+    "title": "Machine Learning 126 132",
+    "resourceType": "Document",
+    "url": "data/2nd year/ml/U1/machine learning-126-132.pdf",
+    "metadata": {
+      "subject": "Machine Learning",
+      "topic": "U1",
+      "concept": "Supervised Learning",
+      "difficulty": "Intermediate",
+      "slideCount": 8,
+      "keyConcepts": [
+        "Regression",
+        "Classification",
+        "Training set",
+        "Features",
+        "Loss minimization"
+      ],
+      "prerequisites": [
+        "Linear Algebra",
+        "Calculus"
+      ],
+      "fileSize": "128KB",
+      "format": "PDF",
+      "description": "Covers linear regression, classification algorithms, gradient descent, and cross validation."
+    }
+  },
+  {
+    "id": "4dd73e8e-3af3-42ad-8d6d-f2334b2e7970",
+    "facultyId": "33333333-0000-0000-0000-000000000001",
+    "conceptId": "37443cd3-691d-5ce2-99ba-0f984617d6dd",
+    "title": "Genetic Algorithm",
+    "resourceType": "Document",
+    "url": "data/3rd year/Ai/U1/genetic algorithm.pdf",
+    "metadata": {
+      "subject": "Artificial Intelligence",
+      "topic": "U1",
+      "concept": "Genetic Algorithms",
+      "difficulty": "Intermediate",
+      "slideCount": 41,
+      "keyConcepts": [
+        "Genetic Algorithm",
+        "Selection",
+        "Crossover",
+        "Mutation",
+        "Fitness Function"
+      ],
+      "prerequisites": [
+        "Probability & Statistics"
+      ],
+      "fileSize": "1.6MB",
+      "format": "PDF",
+      "description": "Introduction to heuristic search, evolutionary computing, genetic representation, and fitness optimization."
+    }
+  },
+  {
+    "id": "0d5d85e0-413d-457f-8253-545b5e745a37",
+    "facultyId": "33333333-0000-0000-0000-000000000002",
+    "conceptId": "6918507f-2ccb-5086-81eb-332756f1987c",
+    "title": "Heuristic Search",
+    "resourceType": "Document",
+    "url": "data/3rd year/Ai/U2/Heuristic search.pdf",
+    "metadata": {
+      "subject": "Artificial Intelligence",
+      "topic": "U2",
+      "concept": "Heuristic Search",
+      "difficulty": "Intermediate",
+      "slideCount": 69,
+      "keyConcepts": [
+        "Heuristic",
+        "A* Search",
+        "Greedy Search",
+        "State Space",
+        "Backtracking"
+      ],
+      "prerequisites": [
+        "Graph Traversals"
+      ],
+      "fileSize": "2.6MB",
+      "format": "PDF",
+      "description": "In-depth look at state-space representation, path search, heuristic valuation, and A* algorithm."
+    }
+  },
+  {
+    "id": "6ba04c1b-65e8-4170-b85a-4aa4b6a84bc6",
+    "facultyId": "33333333-0000-0000-0000-000000000001",
+    "conceptId": "b2a40fa2-0bea-5cf2-acb7-f1d9c7aef9c5",
+    "title": "Dip Unit 1 Funamentalsteps",
+    "resourceType": "Document",
+    "url": "data/3rd year/Dip/U1/DIP_Unit_1_FunamentalSteps.pdf",
+    "metadata": {
+      "subject": "Digital Image Processing",
+      "topic": "U1",
+      "concept": "Digital Image Processing Basics",
+      "difficulty": "Intermediate",
+      "slideCount": 8,
+      "keyConcepts": [
+        "Pixel",
+        "Image Acquisition",
+        "Sampling",
+        "Quantization",
+        "Digital System"
+      ],
+      "prerequisites": [
+        "Signal Processing"
+      ],
+      "fileSize": "172KB",
+      "format": "PDF",
+      "description": "Fundamentals of digital image representation, pixel relationships, sampling frequencies, and quantization levels."
+    }
+  },
+  {
+    "id": "bbf13630-aae3-48b6-bb96-631f6a067fac",
+    "facultyId": "33333333-0000-0000-0000-000000000002",
+    "conceptId": "b2a40fa2-0bea-5cf2-acb7-f1d9c7aef9c5",
+    "title": "Dip Unit 1 Imageacquisition",
+    "resourceType": "Document",
+    "url": "data/3rd year/Dip/U1/DIP_Unit_1_ImageAcquisition.pdf",
+    "metadata": {
+      "subject": "Digital Image Processing",
+      "topic": "U1",
+      "concept": "Digital Image Processing Basics",
+      "difficulty": "Intermediate",
+      "slideCount": 8,
+      "keyConcepts": [
+        "Pixel",
+        "Image Acquisition",
+        "Sampling",
+        "Quantization",
+        "Digital System"
+      ],
+      "prerequisites": [
+        "Signal Processing"
+      ],
+      "fileSize": "293KB",
+      "format": "PDF",
+      "description": "Fundamentals of digital image representation, pixel relationships, sampling frequencies, and quantization levels."
+    }
+  },
+  {
+    "id": "201a4ffc-e87a-496e-b5ce-d89e08d3bcd1",
+    "facultyId": "33333333-0000-0000-0000-000000000001",
+    "conceptId": "b2a40fa2-0bea-5cf2-acb7-f1d9c7aef9c5",
+    "title": "Dip Unit 1 Imagesystem",
+    "resourceType": "Document",
+    "url": "data/3rd year/Dip/U1/DIP_Unit_1_ImageSystem.pdf",
+    "metadata": {
+      "subject": "Digital Image Processing",
+      "topic": "U1",
+      "concept": "Digital Image Processing Basics",
+      "difficulty": "Intermediate",
+      "slideCount": 8,
+      "keyConcepts": [
+        "Pixel",
+        "Image Acquisition",
+        "Sampling",
+        "Quantization",
+        "Digital System"
+      ],
+      "prerequisites": [
+        "Signal Processing"
+      ],
+      "fileSize": "145KB",
+      "format": "PDF",
+      "description": "Fundamentals of digital image representation, pixel relationships, sampling frequencies, and quantization levels."
+    }
+  },
+  {
+    "id": "2fca2665-58c7-49f5-b3f0-00e96bd84d61",
+    "facultyId": "33333333-0000-0000-0000-000000000002",
+    "conceptId": "b2a40fa2-0bea-5cf2-acb7-f1d9c7aef9c5",
+    "title": "Dip Unit 1 Introduction",
+    "resourceType": "Document",
+    "url": "data/3rd year/Dip/U1/DIP_Unit_1_Introduction.pdf",
+    "metadata": {
+      "subject": "Digital Image Processing",
+      "topic": "U1",
+      "concept": "Digital Image Processing Basics",
+      "difficulty": "Intermediate",
+      "slideCount": 18,
+      "keyConcepts": [
+        "Pixel",
+        "Image Acquisition",
+        "Sampling",
+        "Quantization",
+        "Digital System"
+      ],
+      "prerequisites": [
+        "Signal Processing"
+      ],
+      "fileSize": "713KB",
+      "format": "PDF",
+      "description": "Fundamentals of digital image representation, pixel relationships, sampling frequencies, and quantization levels."
+    }
+  },
+  {
+    "id": "4ce1adb8-bac5-4bf3-80ff-42e8dbc2948f",
+    "facultyId": "33333333-0000-0000-0000-000000000001",
+    "conceptId": "b2a40fa2-0bea-5cf2-acb7-f1d9c7aef9c5",
+    "title": "Dip Unit 1 Pixelrelationships",
+    "resourceType": "Document",
+    "url": "data/3rd year/Dip/U1/DIP_Unit_1_PixelRelationships.pdf",
+    "metadata": {
+      "subject": "Digital Image Processing",
+      "topic": "U1",
+      "concept": "Digital Image Processing Basics",
+      "difficulty": "Intermediate",
+      "slideCount": 8,
+      "keyConcepts": [
+        "Pixel",
+        "Image Acquisition",
+        "Sampling",
+        "Quantization",
+        "Digital System"
+      ],
+      "prerequisites": [
+        "Signal Processing"
+      ],
+      "fileSize": "257KB",
+      "format": "PDF",
+      "description": "Fundamentals of digital image representation, pixel relationships, sampling frequencies, and quantization levels."
+    }
+  },
+  {
+    "id": "cd7384e3-ca32-4f3a-8d7c-2c05426a42e0",
+    "facultyId": "33333333-0000-0000-0000-000000000002",
+    "conceptId": "b2a40fa2-0bea-5cf2-acb7-f1d9c7aef9c5",
+    "title": "Dip Unit 1 Samplingquantization",
+    "resourceType": "Document",
+    "url": "data/3rd year/Dip/U1/DIP_Unit_1_SamplingQuantization.pdf",
+    "metadata": {
+      "subject": "Digital Image Processing",
+      "topic": "U1",
+      "concept": "Digital Image Processing Basics",
+      "difficulty": "Intermediate",
+      "slideCount": 8,
+      "keyConcepts": [
+        "Pixel",
+        "Image Acquisition",
+        "Sampling",
+        "Quantization",
+        "Digital System"
+      ],
+      "prerequisites": [
+        "Signal Processing"
+      ],
+      "fileSize": "341KB",
+      "format": "PDF",
+      "description": "Fundamentals of digital image representation, pixel relationships, sampling frequencies, and quantization levels."
+    }
+  },
+  {
+    "id": "bd61d4ec-ac20-4461-a71f-373b40233904",
+    "facultyId": "33333333-0000-0000-0000-000000000001",
+    "conceptId": "89872b05-75aa-5dd6-95d8-6d6c8a785b84",
+    "title": "Dip Unit 2  Part2",
+    "resourceType": "Document",
+    "url": "data/3rd year/Dip/U2/DIP_Unit-2 _Part2.pdf",
+    "metadata": {
+      "subject": "Digital Image Processing",
+      "topic": "U2",
+      "concept": "Image Enhancement",
+      "difficulty": "Intermediate",
+      "slideCount": 28,
+      "keyConcepts": [
+        "Histogram Equalization",
+        "Filtering",
+        "Spatial Domain",
+        "Contrast Stretch"
+      ],
+      "prerequisites": [
+        "Digital Image Processing Basics"
+      ],
+      "fileSize": "1.1MB",
+      "format": "PDF",
+      "description": "Techniques for spatial filtering, noise removal, histogram transformations, and edge detection."
+    }
+  },
+  {
+    "id": "c8a8634b-ea4c-42f5-9065-7fba37c54b54",
+    "facultyId": "33333333-0000-0000-0000-000000000002",
+    "conceptId": "e57b2af7-c3a7-54a4-be25-ecfc6db72a6f",
+    "title": "Unit 1  Notes",
+    "resourceType": "Document",
+    "url": "data/4th year/Awt/Unit 1- Notes.pdf",
+    "metadata": {
+      "subject": "Advanced Web Technologies",
+      "topic": "U1",
+      "concept": "Advanced Web Architectures",
+      "difficulty": "Advanced",
+      "slideCount": 8,
+      "keyConcepts": [
+        "HTTP",
+        "REST API",
+        "MVC Pattern",
+        "Security",
+        "Web sockets"
+      ],
+      "prerequisites": [
+        "Web Technologies Basics"
+      ],
+      "fileSize": "316KB",
+      "format": "PDF",
+      "description": "Detailed lecture notes covering web protocol specs, server architectures, and API patterns."
+    }
+  },
+  {
+    "id": "e40f6c07-c597-4e95-8d8c-bc9df5077c60",
+    "facultyId": "33333333-0000-0000-0000-000000000001",
+    "conceptId": "586d7258-e844-57ea-bf12-126182cc19db",
+    "title": "Unit 2  Notes",
+    "resourceType": "Document",
+    "url": "data/4th year/Awt/Unit 2- Notes.pdf",
+    "metadata": {
+      "subject": "Advanced Web Technologies",
+      "topic": "U2",
+      "concept": "Client-Server State Management",
+      "difficulty": "Advanced",
+      "slideCount": 8,
+      "keyConcepts": [
+        "Sessions",
+        "Cookies",
+        "Web Storage",
+        "JWT",
+        "Authentication"
+      ],
+      "prerequisites": [
+        "Advanced Web Architectures"
+      ],
+      "fileSize": "338KB",
+      "format": "PDF",
+      "description": "Concepts of state persistence, user session security, token authorization, and state machines."
+    }
+  },
+  {
+    "id": "d711966f-9790-4796-8912-64148553059a",
+    "facultyId": "33333333-0000-0000-0000-000000000002",
+    "conceptId": "4094f7cb-0ddc-5668-8142-7dcfe3849ae2",
+    "title": "Unit 1",
+    "resourceType": "Slides",
+    "url": "data/4th year/Sc/Unit 1.pptx",
+    "metadata": {
+      "subject": "Soft Computing",
+      "topic": "U1",
+      "concept": "Soft Computing Fundamentals",
+      "difficulty": "Advanced",
+      "slideCount": 10,
+      "keyConcepts": [
+        "Fuzzy Logic",
+        "Neural Networks",
+        "Rough Sets",
+        "Evolutionary Search"
+      ],
+      "prerequisites": [
+        "Probability"
+      ],
+      "fileSize": "173KB",
+      "format": "PPTX",
+      "description": "Covers soft computing definitions, contrasting deterministic algorithms with approximate reasoning systems."
+    }
+  },
+  {
+    "id": "6ec640f0-fd15-4782-8ab7-280b5b44eb5a",
+    "facultyId": "33333333-0000-0000-0000-000000000001",
+    "conceptId": "2b8bbf67-9c76-5222-a233-c2bec352eeaf",
+    "title": "Unit 3",
+    "resourceType": "Slides",
+    "url": "data/4th year/Sc/Unit 3.pptx",
+    "metadata": {
+      "subject": "Soft Computing",
+      "topic": "U3",
+      "concept": "Fuzzy Inference Systems",
+      "difficulty": "Advanced",
+      "slideCount": 10,
+      "keyConcepts": [
+        "Fuzzy Sets",
+        "Membership Function",
+        "Defuzzification",
+        "Mamdani",
+        "FIS"
+      ],
+      "prerequisites": [
+        "Soft Computing Fundamentals"
+      ],
+      "fileSize": "148KB",
+      "format": "PPTX",
+      "description": "Deals with fuzzy rules formulation, logic intersection models, and defuzzification algorithms."
+    }
+  },
+  {
+    "id": "a623da69-456f-4b68-bb94-9ba69b9aae63",
+    "facultyId": "33333333-0000-0000-0000-000000000002",
+    "conceptId": "5f401ac5-5199-5b54-be5c-bd6633aa9a28",
+    "title": "Unit 4",
+    "resourceType": "Slides",
+    "url": "data/4th year/Sc/Unit 4.pptx",
+    "metadata": {
+      "subject": "Soft Computing",
+      "topic": "U4",
+      "concept": "Neuro-Fuzzy Hybridization",
+      "difficulty": "Advanced",
+      "slideCount": 10,
+      "keyConcepts": [
+        "ANFIS",
+        "Neural adaptation",
+        "Rule training",
+        "Backprop fuzzy"
+      ],
+      "prerequisites": [
+        "Fuzzy Inference Systems",
+        "Backpropagation"
+      ],
+      "fileSize": "133KB",
+      "format": "PPTX",
+      "description": "Integrating neural learning capabilities with fuzzy logic representations for adaptive control."
+    }
+  }
+]

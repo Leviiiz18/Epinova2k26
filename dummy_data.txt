@@ -1,0 +1,149 @@
+================================================================================
+STUDYBUDDY — DUMMY SEED DATA FOR NEON POSTGRESQL (PS-01 SPECIFICATION)
+================================================================================
+
+Below is the complete dataset formatted both in readable structured tables and as ready-to-run SQL INSERT statements for your Neon PostgreSQL database.
+
+--------------------------------------------------------------------------------
+TABLE 1: roles
+--------------------------------------------------------------------------------
+ID | NAME         | DESCRIPTION
+1  | student      | Asks doubts, receives explanations, completes verification
+2  | peer_mentor  | Senior student answering doubts and explaining concepts
+3  | faculty      | Provides resources, validates knowledge, monitors gap analytics
+4  | admin        | Manages system taxonomy, moderation and health
+
+SQL Insert:
+INSERT INTO roles (id, name, description) VALUES
+(1, 'student', 'Asks doubts, receives explanations, completes verification'),
+(2, 'peer_mentor', 'Senior student answering doubts and explaining concepts'),
+(3, 'faculty', 'Provides resources, validates knowledge, monitors gap analytics'),
+(4, 'admin', 'Manages system taxonomy, moderation and health')
+ON CONFLICT (id) DO NOTHING;
+
+--------------------------------------------------------------------------------
+TABLE 2: users
+--------------------------------------------------------------------------------
+ID                                   | EMAIL                          | FULL_NAME           | ROLE_ID | ACADEMIC_YEAR | DEPARTMENT
+u1111111-0000-0000-0000-000000000001 | alex.morgan@studybuddy.edu     | Alex Morgan         | 1       | 3rd Year      | Computer Science
+u1111111-0000-0000-0000-000000000002 | priya.patel@studybuddy.edu     | Priya Patel         | 1       | 3rd Year      | Computer Science
+u1111111-0000-0000-0000-000000000003 | jordan.hayes@studybuddy.edu    | Jordan Hayes        | 1       | 2nd Year      | Computer Science
+u2222222-0000-0000-0000-000000000001 | rahul.sharma@studybuddy.edu    | Rahul Sharma (Peer) | 2       | 4th Year      | Computer Science
+u2222222-0000-0000-0000-000000000002 | elena.v@studybuddy.edu         | Elena Vance (Peer)  | 2       | 4th Year      | Computer Science
+u3333333-0000-0000-0000-000000000001 | s.jenkins@studybuddy.edu       | Dr. Sarah Jenkins   | 3       | Faculty       | Computer Science (AI/ML)
+u3333333-0000-0000-0000-000000000002 | d.kumar@studybuddy.edu         | Prof. David Kumar   | 3       | Faculty       | Computer Science (DSA)
+
+SQL Insert:
+INSERT INTO users (id, email, password_hash, full_name, role_id, avatar_url, academic_year, department) VALUES
+('11111111-0000-0000-0000-000000000001', 'alex.morgan@studybuddy.edu', '$2b$12$e8Y..dummyhash', 'Alex Morgan', 1, 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150', '3rd Year', 'Computer Science & Engineering'),
+('11111111-0000-0000-0000-000000000002', 'priya.patel@studybuddy.edu', '$2b$12$e8Y..dummyhash', 'Priya Patel', 1, 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150', '3rd Year', 'Computer Science & Engineering'),
+('11111111-0000-0000-0000-000000000003', 'jordan.hayes@studybuddy.edu', '$2b$12$e8Y..dummyhash', 'Jordan Hayes', 1, 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=150', '2nd Year', 'Computer Science & Engineering'),
+('22222222-0000-0000-0000-000000000001', 'rahul.sharma@studybuddy.edu', '$2b$12$e8Y..dummyhash', 'Rahul Sharma', 2, 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150', '4th Year (Senior Peer)', 'Computer Science & Engineering'),
+('22222222-0000-0000-0000-000000000002', 'elena.v@studybuddy.edu', '$2b$12$e8Y..dummyhash', 'Elena Vance', 2, 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=150', '4th Year (Senior Peer)', 'Computer Science & Engineering'),
+('33333333-0000-0000-0000-000000000001', 's.jenkins@studybuddy.edu', '$2b$12$e8Y..dummyhash', 'Dr. Sarah Jenkins', 3, 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250', 'Faculty Lead', 'Artificial Intelligence & ML'),
+('33333333-0000-0000-0000-000000000002', 'd.kumar@studybuddy.edu', '$2b$12$e8Y..dummyhash', 'Prof. David Kumar', 3, 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250', 'Faculty Lead', 'Data Structures & Algorithms');
+
+--------------------------------------------------------------------------------
+TABLE 3: subjects
+--------------------------------------------------------------------------------
+ID                                   | CODE   | NAME
+s1111111-0000-0000-0000-000000000001 | CS101  | Computer Science
+s1111111-0000-0000-0000-000000000002 | MATH10 | Mathematics & Statistics
+s1111111-0000-0000-0000-000000000003 | CS301  | Artificial Intelligence & ML
+
+SQL Insert:
+INSERT INTO subjects (id, code, name, description) VALUES
+('aaaaaaaa-0000-0000-0000-000000000001', 'CS101', 'Computer Science', 'Core computer science, data structures, algorithms and systems'),
+('aaaaaaaa-0000-0000-0000-000000000002', 'MATH10', 'Mathematics & Statistics', 'Calculus, Linear algebra, probability and graph theory'),
+('aaaaaaaa-0000-0000-0000-000000000003', 'CS301', 'Artificial Intelligence & ML', 'Deep learning, neural networks, and supervised learning algorithms');
+
+--------------------------------------------------------------------------------
+TABLE 4: topics
+--------------------------------------------------------------------------------
+ID                                   | SUBJECT_ID                           | NAME
+t1111111-0000-0000-0000-000000000001 | aaaaaaaa-0000-0000-0000-000000000001 | Algorithms
+t1111111-0000-0000-0000-000000000002 | aaaaaaaa-0000-0000-0000-000000000001 | Data Structures
+t1111111-0000-0000-0000-000000000003 | aaaaaaaa-0000-0000-0000-000000000003 | Neural Networks & Optimization
+
+SQL Insert:
+INSERT INTO topics (id, subject_id, name, description) VALUES
+('bbbbbbbb-0000-0000-0000-000000000001', 'aaaaaaaa-0000-0000-0000-000000000001', 'Algorithms', 'Search, Sort, Graph traversals and Dynamic Programming'),
+('bbbbbbbb-0000-0000-0000-000000000002', 'aaaaaaaa-0000-0000-0000-000000000001', 'Data Structures', 'Arrays, Linked Lists, Trees, Graphs and Heaps'),
+('bbbbbbbb-0000-0000-0000-000000000003', 'aaaaaaaa-0000-0000-0000-000000000003', 'Neural Networks & Optimization', 'Backpropagation, Loss functions, Gradient descent and Attention');
+
+--------------------------------------------------------------------------------
+TABLE 5: concepts (KAG Knowledge Graph Canonical Concepts)
+--------------------------------------------------------------------------------
+ID                                   | TOPIC_ID                             | NAME          | SUB_CONCEPT               | DIFFICULTY   | COMMON_MISCONCEPTION
+c1111111-0000-0000-0000-000000000001 | bbbbbbbb-0000-0000-0000-000000000001 | Binary Search | Sorted Array Requirement  | Beginner     | Binary search works on unsorted data
+c1111111-0000-0000-0000-000000000002 | bbbbbbbb-0000-0000-0000-000000000001 | Recursion     | Base Case & Call Stack    | Beginner     | Every recursive function executes infinitely
+c1111111-0000-0000-0000-000000000003 | bbbbbbbb-0000-0000-0000-000000000001 | DFS           | Graph Traversal with Call | Intermediate | DFS only works on trees, not cyclic graphs
+c1111111-0000-0000-0000-000000000004 | bbbbbbbb-0000-0000-0000-000000000003 | Backprop      | Softmax & Cross-Entropy   | Advanced     | Softmax gradients require calculating full Jacobian matrices
+
+SQL Insert:
+INSERT INTO concepts (id, topic_id, name, sub_concept, difficulty_level, canonical_summary, common_misconception) VALUES
+('cccccccc-0000-0000-0000-000000000001', 'bbbbbbbb-0000-0000-0000-000000000001', 'Binary Search', 'Sorted Array Requirement', 'Beginner', 'Divide and conquer algorithm searching sorted arrays in O(log N) time.', 'Binary search works on unsorted data'),
+('cccccccc-0000-0000-0000-000000000002', 'bbbbbbbb-0000-0000-0000-000000000001', 'Recursion', 'Base Case & Call Stack', 'Beginner', 'Self-calling function requiring a stopping base case to avoid stack overflow.', 'Recursion has no stopping condition and executes forever'),
+('cccccccc-0000-0000-0000-000000000003', 'bbbbbbbb-0000-0000-0000-000000000001', 'DFS', 'Graph Traversal with Call Stack', 'Intermediate', 'Depth-First Search traverses tree/graph paths to maximum depth before backtracking.', 'DFS can only be written recursively and fails on cyclic graphs'),
+('cccccccc-0000-0000-0000-000000000004', 'bbbbbbbb-0000-0000-0000-000000000003', 'Backpropagation', 'Softmax & Cross-Entropy Gradient', 'Advanced', 'Chain rule computation of loss gradients with respect to neural network weights.', 'Softmax derivative with Cross-Entropy requires calculating independent Jacobian matrices');
+
+--------------------------------------------------------------------------------
+TABLE 6: concept_relationships (KAG Graph Edges)
+--------------------------------------------------------------------------------
+CONCEPT: DFS (c3) -> REQUIRES -> Recursion (c2)
+CONCEPT: Binary Search (c1) -> REQUIRES -> Arrays / Ordering (c2)
+
+SQL Insert:
+INSERT INTO concept_relationships (concept_id, required_prerequisite_id, relationship_type, notes) VALUES
+('cccccccc-0000-0000-0000-000000000003', 'cccccccc-0000-0000-0000-000000000002', 'REQUIRES', 'DFS relies on recursive function call frames or an explicit LIFO stack'),
+('cccccccc-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000002', 'REQUIRES', 'Binary search requires monotonic ordering index access');
+
+--------------------------------------------------------------------------------
+TABLE 7: peer_profiles (Peer Matching Engine Data)
+--------------------------------------------------------------------------------
+SQL Insert:
+INSERT INTO peer_profiles (id, user_id, concept_id, expertise_score, helpfulness_rating, availability_status, total_sessions_completed) VALUES
+('dddddddd-0000-0000-0000-000000000001', '22222222-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 0.95, 4.92, 'Available', 28),
+('dddddddd-0000-0000-0000-000000000002', '22222222-0000-0000-0000-000000000002', 'cccccccc-0000-0000-0000-000000000004', 0.92, 4.88, 'Available', 19);
+
+--------------------------------------------------------------------------------
+TABLE 8: doubts (With Auto-Sort AI Classification Outputs)
+--------------------------------------------------------------------------------
+SQL Insert:
+INSERT INTO doubts (id, student_id, subject_id, topic_id, concept_id, title, raw_query, difficulty, intent, detected_misconception, auto_sort_confidence, status) VALUES
+('eeeeeeee-0000-0000-0000-000000000001', '11111111-0000-0000-0000-000000000001', 'aaaaaaaa-0000-0000-0000-000000000001', 'bbbbbbbb-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 'Why does DFS need recursion?', 'Why do we have to use recursion for depth first search? What happens if we don''t use it?', 'Intermediate', 'Conceptual', 'DFS can only work with recursive call stack', '{"topic": 0.96, "concept": 0.98}'::jsonb, 'Resolved'),
+('eeeeeeee-0000-0000-0000-000000000002', '11111111-0000-0000-0000-000000000002', 'aaaaaaaa-0000-0000-0000-000000000003', 'bbbbbbbb-0000-0000-0000-000000000003', 'cccccccc-0000-0000-0000-000000000004', 'Clarification on Softmax Backpropagation gradient calculation', 'How does the Kronecker delta cancel out to leave (y_hat - y) in Cross-Entropy Loss?', 'Advanced', 'Problem Solving', 'Softmax derivatives require individual matrix transformations', '{"topic": 0.94, "concept": 0.97}'::jsonb, 'Resolved'),
+('eeeeeeee-0000-0000-0000-000000000003', '11111111-0000-0000-0000-000000000003', 'aaaaaaaa-0000-0000-0000-000000000001', 'bbbbbbbb-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000001', 'Why doesn''t binary search work on my random array?', 'I tried running binary search on [5, 2, 8, 1, 9] but it returns incorrect index or fails.', 'Beginner', 'Debugging', 'Binary search works on unsorted data', '{"topic": 0.98, "concept": 0.99}'::jsonb, 'Open');
+
+--------------------------------------------------------------------------------
+TABLE 9: answers (Peer & Faculty Verified Explanations)
+--------------------------------------------------------------------------------
+SQL Insert:
+INSERT INTO answers (id, doubt_id, author_id, content, explanation_style, is_faculty_validated, helpfulness_upvotes) VALUES
+('ffffffff-0000-0000-0000-000000000001', 'eeeeeeee-0000-0000-0000-000000000001', '22222222-0000-0000-0000-000000000001', 'DFS does NOT strictly require recursion! Recursion simply uses the computer''s internal Call Stack to remember the path. You can write DFS iteratively using an explicit Stack (LIFO data structure) with while (!stack.isEmpty()).', 'Step-by-step', TRUE, 14),
+('ffffffff-0000-0000-0000-000000000002', 'eeeeeeee-0000-0000-0000-000000000002', '33333333-0000-0000-0000-000000000001', 'Because the loss L = -sum(y_k * log(y_hat_k)), differentiating with respect to logit z_i gives: sum_k (y_k / y_hat_k) * (dy_hat_k / dz_i). When k=i, dy_hat_i/dz_i is y_hat_i(1 - y_hat_i); when k!=i, it is -y_hat_k * y_hat_i. The terms cancel cleanly to yield (y_hat_i - y_i).', 'Technical', TRUE, 22);
+
+--------------------------------------------------------------------------------
+TABLE 10: understanding_checks (Verification Micro-Questions)
+--------------------------------------------------------------------------------
+SQL Insert:
+INSERT INTO understanding_checks (id, concept_id, micro_question, options, correct_option_index, explanation) VALUES
+('gggggggg-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 'Which data structure can be used to convert a recursive DFS into an iterative algorithm?', '["Queue (FIFO)", "Stack (LIFO)", "Binary Heap", "Hash Table"]'::jsonb, 1, 'The function call stack in recursion operates as a Last-In First-Out (LIFO) stack.'),
+('gggggggg-0000-0000-0000-000000000002', 'cccccccc-0000-0000-0000-000000000001', 'What is the mandatory prerequisite condition for Binary Search to guarantee correct results?', '["Elements must be unique", "Data must be stored in a linked list", "Array must be monotonically sorted", "Array size must be a power of 2"]'::jsonb, 2, 'Binary search divides the search space in half based on sorted order comparison.');
+
+--------------------------------------------------------------------------------
+TABLE 11: learning_progress (Student Mastery Model)
+--------------------------------------------------------------------------------
+SQL Insert:
+INSERT INTO learning_progress (student_id, concept_id, mastery_score, evidence_count, misconception_status) VALUES
+('11111111-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 0.88, 3, 'Resolved'),
+('11111111-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000001', 0.35, 1, 'Identified');
+
+--------------------------------------------------------------------------------
+TABLE 12: resources (Faculty Learning & PPT Materials with Metadata)
+--------------------------------------------------------------------------------
+SQL Insert:
+INSERT INTO resources (id, faculty_id, concept_id, title, resource_type, url, metadata) VALUES
+('rrrrrrrr-0000-0000-0000-000000000001', '33333333-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000003', 'Lecture 8: Advanced Graph Traversals & Call Stack Mechanics', 'Slides', '/materials/dfs_slides.pptx', '{"subject": "Computer Science", "topic": "Algorithms", "concept": "Depth-First Search (DFS)", "difficulty": "Intermediate", "slideCount": 24, "keyConcepts": ["DFS", "Recursion", "Backtracking", "Call Stack"], "prerequisites": ["Recursion", "Stack Data Structure"], "fileSize": "4.2MB", "format": "PPTX", "description": "Comprehensive guide on DFS traversal, stack simulation, and complexity analysis."}'::jsonb),
+('rrrrrrrr-0000-0000-0000-000000000002', '33333333-0000-0000-0000-000000000002', 'cccccccc-0000-0000-0000-000000000001', 'Lecture 3: Divide and Conquer — Binary Search & Sorted Assertions', 'Slides', '/materials/binary_search_slides.pptx', '{"subject": "Computer Science", "topic": "Algorithms", "concept": "Binary Search", "difficulty": "Beginner", "slideCount": 18, "keyConcepts": ["Binary Search", "Divide & Conquer", "Sorted Order", "Logarithmic Time"], "prerequisites": ["Arrays"], "fileSize": "3.1MB", "format": "PPTX", "description": "Introduction to binary search logic, implementation, and explaining the sorted array prerequisite."}'::jsonb),
+('rrrrrrrr-0000-0000-0000-000000000003', '33333333-0000-0000-0000-000000000001', 'cccccccc-0000-0000-0000-000000000004', 'Lecture 12: Neural Network Gradients & Softmax-Cross-Entropy Optimization', 'Slides', '/materials/backpropagation_math.pptx', '{"subject": "Computer Science", "topic": "Neural Networks & Optimization", "concept": "Backpropagation", "difficulty": "Advanced", "slideCount": 32, "keyConcepts": ["Backpropagation", "Softmax", "Cross-Entropy", "Gradient Descent", "Chain Rule"], "prerequisites": ["Multivariate Calculus", "Linear Algebra"], "fileSize": "8.5MB", "format": "PPTX", "description": "Mathematical derivation of the Softmax and Cross-Entropy loss derivative, simplified via Kronecker delta cancellation."}'::jsonb);
