@@ -355,7 +355,8 @@ const STUDY_BUDDY_DATA = {
           authorName: "Rahul Sharma (Peer Mentor)",
           authorAvatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150",
           style: "Step-by-step",
-          isFacultyValidated: true,
+          isAiVerified: true,
+          isFacultyVerified: true,
           content: "DFS does NOT strictly require recursion! Recursion simply utilizes the CPU's internal Call Stack to store backtracking points. You can implement DFS iteratively using an explicit Stack (LIFO data structure) with `while (!stack.isEmpty())`. Recursion is just syntax sugar for a stack!"
         }
       ],
@@ -392,7 +393,8 @@ const STUDY_BUDDY_DATA = {
           authorName: "Dr. Sarah Jenkins (Faculty Lead)",
           authorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250",
           style: "Technical",
-          isFacultyValidated: true,
+          isAiVerified: true,
+          isFacultyVerified: true,
           content: "When deriving ∂L/∂z_i = ∑_j (∂L/∂y_hat_j) * (∂y_hat_j/∂z_i), the summation over the Kronecker delta (δ_ij) causes cross-terms to cancel out, leaving the elegant and efficient result: (y_hat_i - y_i)."
         }
       ],
@@ -659,6 +661,26 @@ const DB = {
       doubt.status = "Resolved";
       if (!doubt.answers) doubt.answers = [];
       doubt.answers.push(answerData);
+      this.saveDoubts(doubts);
+    }
+    return doubts;
+  },
+
+  setAnswerAiVerified(doubtId, answerIdx, isVerified) {
+    const doubts = this.getDoubts();
+    const doubt = doubts.find(d => d.id === doubtId);
+    if (doubt && doubt.answers && doubt.answers[answerIdx]) {
+      doubt.answers[answerIdx].isAiVerified = isVerified;
+      this.saveDoubts(doubts);
+    }
+    return doubts;
+  },
+
+  setAnswerFacultyVerified(doubtId, answerIdx, isVerified) {
+    const doubts = this.getDoubts();
+    const doubt = doubts.find(d => d.id === doubtId);
+    if (doubt && doubt.answers && doubt.answers[answerIdx]) {
+      doubt.answers[answerIdx].isFacultyVerified = isVerified;
       this.saveDoubts(doubts);
     }
     return doubts;

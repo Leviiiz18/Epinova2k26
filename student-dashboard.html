@@ -820,20 +820,53 @@
         authorName: `${currentUser.name} (Peer Mentor)`,
         authorAvatar: currentUser.avatar,
         style: "Technical",
-        isFacultyValidated: false,
+        isAiVerified: false,
+        isFacultyVerified: false,
         content: content
       };
 
       DB.resolveDoubt(doubtId, answerData);
       
-      // Award points
+      // Award base points immediately
       const pointsWon = doubt.points || 25;
       DB.updateUserPoints(pointsWon);
 
       closeAnswerModal();
       renderDoubtsFeed();
       renderLeaderboard();
-      showToast(`Answer posted! Claimed +${pointsWon} BrainPoints!`, "success");
+      showToast(`Answer posted! Claimed +${pointsWon} base BrainPoints. Evaluating...`, "warning");
+
+      // 1. AI Agent Verification (1.5s delay)
+      setTimeout(() => {
+        const activeDoubts = DB.getDoubts();
+        const curDoubt = activeDoubts.find(d => d.id === doubtId);
+        if (curDoubt && curDoubt.answers) {
+          const ansIdx = curDoubt.answers.findIndex(a => a.authorName.includes(currentUser.name));
+          if (ansIdx !== -1) {
+            DB.setAnswerAiVerified(doubtId, ansIdx, true);
+            DB.updateUserPoints(10); // +10 points for AI verify
+            renderDoubtsFeed();
+            renderLeaderboard();
+            showToast("🤖 AI Agent verified your answer! +10 pts awarded.", "success");
+          }
+        }
+      }, 1500);
+
+      // 2. Faculty Verification (4.5s delay)
+      setTimeout(() => {
+        const activeDoubts = DB.getDoubts();
+        const curDoubt = activeDoubts.find(d => d.id === doubtId);
+        if (curDoubt && curDoubt.answers) {
+          const ansIdx = curDoubt.answers.findIndex(a => a.authorName.includes(currentUser.name));
+          if (ansIdx !== -1) {
+            DB.setAnswerFacultyVerified(doubtId, ansIdx, true);
+            DB.updateUserPoints(15); // +15 points for Faculty verify
+            renderDoubtsFeed();
+            renderLeaderboard();
+            showToast("🎓 Prof. Sarah Jenkins verified your answer! +15 pts awarded.", "success");
+          }
+        }
+      }, 4500);
     }
 
     function renderLeaderboard() {
@@ -908,21 +941,45 @@
         const isResolved = d.status === "Resolved";
         let answerBlock = "";
         if (d.answers && d.answers.length > 0) {
-          answerBlock = d.answers.map(a => `
-            <div class="mt-3 p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs">
-              <div class="flex items-center justify-between mb-1">
-                <div class="flex items-center gap-1.5">
-                  <img src="${a.authorAvatar}" class="w-5 h-5 rounded-full border border-slate-200 object-cover">
-                  <span class="font-bold text-slate-900">${a.authorName}</span>
+          answerBlock = d.answers.map(a => {
+            const aiBadge = a.isAiVerified ? `
+              <span class="badge-clean-purple text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 shadow-sm" title="Verified by AI Agent for technical accuracy">
+                <i data-lucide="bot" class="w-3 h-3 text-purple-600"></i>
+                <span>AI Verified</span>
+              </span>
+            ` : '';
+            
+            const facultyBadge = a.isFacultyVerified ? `
+              <span class="badge-clean-emerald text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5 shadow-sm" title="Verified by Course Faculty Lead">
+                <i data-lucide="award" class="w-3 h-3 text-emerald-600"></i>
+                <span>Faculty Verified</span>
+              </span>
+            ` : '';
+
+            let pendingIndicator = (!a.isAiVerified && !a.isFacultyVerified) ? `
+              <span class="bg-slate-100 text-slate-400 text-[9px] font-semibold px-1.5 py-0.5 rounded flex items-center gap-0.5" title="Review in progress">
+                <i data-lucide="clock" class="w-3 h-3"></i>
+                <span>Reviewing...</span>
+              </span>
+            ` : '';
+
+            return `
+              <div class="mt-3 p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs transition-all duration-300">
+                <div class="flex items-center justify-between mb-1.5">
+                  <div class="flex items-center gap-1.5">
+                    <img src="${a.authorAvatar}" class="w-5 h-5 rounded-full border border-slate-200 object-cover">
+                    <span class="font-bold text-slate-900">${a.authorName}</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    ${aiBadge}
+                    ${facultyBadge}
+                    ${pendingIndicator}
+                  </div>
                 </div>
-                <span class="badge-clean-emerald text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                  <i data-lucide="check" class="w-3 h-3"></i>
-                  <span>Verified Solution</span>
-                </span>
+                <p class="text-slate-700 leading-relaxed pl-6">${a.content}</p>
               </div>
-              <p class="text-slate-700 leading-relaxed pl-6">${a.content}</p>
-            </div>
-          `).join("");
+            `;
+          }).join("");
         }
 
         // Brainly-Style Action bar: Answering rewards
