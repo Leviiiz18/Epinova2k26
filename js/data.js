@@ -350,7 +350,7 @@ const DB = {
       const response = await fetch("http://localhost:8000/api/doubts");
       if (response.ok) {
         const backendDoubts = await response.json();
-        if (backendDoubts && backendDoubts.length > 0) {
+        if (backendDoubts) {
           backendDoubts.forEach(d => {
             if (d.subject && d.topic && typeof STUDY_BUDDY_DATA !== 'undefined') {
               const taxonomyMatch = STUDY_BUDDY_DATA.taxonomy.find(t => t.subjectName === d.subject);
