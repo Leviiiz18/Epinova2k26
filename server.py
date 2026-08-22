@@ -65,7 +65,7 @@ def read_html(filename: str):
         return FileResponse(file_path)
     raise HTTPException(status_code=404, detail="Page not found")
 
-DB_URL = os.getenv("DATABASE_URL")
+DB_URL = os.getenv("DATABASE_URL", "postgresql://neondb_owner:npg_4kJdAGM2lpfb@ep-plain-mode-axgl4ae7-pooler.c-4.us-east-2.aws.neon.tech/neondb?sslmode=require")
 CONNECTION_STRING = DB_URL.replace("postgresql://", "postgresql+psycopg://") if DB_URL else ""
 
 # Vector store & LLM Setup

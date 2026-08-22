@@ -685,7 +685,7 @@
       e.currentTarget.dataset.upvoting = "1";
 
       try {
-        const res = await fetch(`http://localhost:8000/api/doubts/${doubtId}/upvote`, { method: 'POST' });
+        const res = await fetch(`${getApiBaseUrl()}/api/doubts/${doubtId}/upvote`, { method: 'POST' });
         if (res.ok) {
           const data = await res.json();
           upvotedDoubts.push(String(doubtId));
@@ -922,7 +922,7 @@
       DB.deleteAnswer(answerId).then(success => {
         if (success) {
           const email = (state.user && state.user.email) ? state.user.email : "alex.morgan@studybuddy.edu";
-          fetch(`http://localhost:8000/api/user/${email}`)
+          fetch(`${getApiBaseUrl()}/api/user/${email}`)
             .then(res => {
               if (res.ok) return res.json();
             })

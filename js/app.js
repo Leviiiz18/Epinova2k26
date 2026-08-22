@@ -130,7 +130,7 @@ async function fetchNotifications() {
   if (!user) return;
   
   try {
-    const res = await fetch(`http://localhost:8000/api/notifications?email=${encodeURIComponent(user.email)}`);
+    const res = await fetch(`${getApiBaseUrl()}/api/notifications?email=${encodeURIComponent(user.email)}`);
     if (!res.ok) return;
     const data = await res.json();
     latestNotifications = data.notifications || [];
@@ -188,7 +188,7 @@ function renderNotifications() {
 
 async function markNotificationRead(id) {
   try {
-    await fetch(`http://localhost:8000/api/notifications/${id}/read`, { method: "POST" });
+    await fetch(`${getApiBaseUrl()}/api/notifications/${id}/read`, { method: "POST" });
     fetchNotifications();
   } catch (e) {
     console.warn("Failed to mark read", e);

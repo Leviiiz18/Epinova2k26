@@ -2,6 +2,16 @@
  * StudyBuddy — Core Data Engine (Aligned with NeonDB PostgreSQL Schema & PS-01 Spec)
  */
 
+function getApiBaseUrl() {
+  if (window.API_BASE_URL) return window.API_BASE_URL.replace(/\/$/, "");
+  const stored = localStorage.getItem("studybuddy_api_url");
+  if (stored) return stored.replace(/\/$/, "");
+  if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    return "http://localhost:8000";
+  }
+  return window.location.origin;
+}
+
 const STUDY_BUDDY_DATA = {
   // Taxonomy Hierarchy (Subject -> Topic -> Concept -> Sub-concept)
   taxonomy: [
@@ -347,7 +357,7 @@ const DB = {
 
   async syncDoubts() {
     try {
-      const response = await fetch("http://localhost:8000/api/doubts");
+      const response = await fetch(`${getApiBaseUrl()}/api/doubts`);
       if (response.ok) {
         const backendDoubts = await response.json();
         if (backendDoubts) {
@@ -398,7 +408,7 @@ const DB = {
                     (newDoubt.studentName || "").includes("Elena") ? "elena.vance@studybuddy.edu" :
                     (newDoubt.studentName || "").includes("Priya") ? "priya.patel@studybuddy.edu" : "jordan.hayes@studybuddy.edu";
                     
-      const response = await fetch(`http://localhost:8000/api/doubts`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/doubts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -441,7 +451,7 @@ const DB = {
                     answerData.authorName.includes("Elena") ? "elena.vance@studybuddy.edu" :
                     answerData.authorName.includes("Priya") ? "priya.patel@studybuddy.edu" : "jordan.hayes@studybuddy.edu");
                     
-      const response = await fetch(`http://localhost:8000/api/doubts/${doubtId}/answers`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/doubts/${doubtId}/answers`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -460,7 +470,7 @@ const DB = {
 
   async deleteAnswer(answerId) {
     try {
-      const response = await fetch(`http://localhost:8000/api/answers/${answerId}`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/answers/${answerId}`, {
         method: "DELETE"
       });
       if (response.ok) {
@@ -475,7 +485,7 @@ const DB = {
 
   async updateAnswer(answerId, content) {
     try {
-      const response = await fetch(`http://localhost:8000/api/answers/${answerId}`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/answers/${answerId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content })
@@ -492,7 +502,7 @@ const DB = {
 
   async deleteDoubt(doubtId) {
     try {
-      const response = await fetch(`http://localhost:8000/api/doubts/${doubtId}`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/doubts/${doubtId}`, {
         method: "DELETE"
       });
       if (response.ok) {
@@ -507,7 +517,7 @@ const DB = {
 
   async updateDoubt(doubtId, title, rawQuery) {
     try {
-      const response = await fetch(`http://localhost:8000/api/doubts/${doubtId}`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/doubts/${doubtId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, raw_query: rawQuery })
@@ -524,7 +534,7 @@ const DB = {
 
   async likeAnswer(answerId) {
     try {
-      const response = await fetch(`http://localhost:8000/api/answers/${answerId}/like`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/answers/${answerId}/like`, {
         method: "POST"
       });
       if (response.ok) {
@@ -539,7 +549,7 @@ const DB = {
 
   async rateAnswer(answerId, rating, userEmail) {
     try {
-      const response = await fetch(`http://localhost:8000/api/answers/${answerId}/rate`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/answers/${answerId}/rate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rating, userEmail })
@@ -556,7 +566,7 @@ const DB = {
 
   async addReply(answerId, authorName, authorAvatar, content) {
     try {
-      const response = await fetch(`http://localhost:8000/api/answers/${answerId}/replies`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/answers/${answerId}/replies`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ authorName, authorAvatar, content })
@@ -582,7 +592,7 @@ const DB = {
       const answer = doubt.answers[answerIdx];
       if (answer.id) {
         try {
-          await fetch(`http://localhost:8000/api/answers/${answer.id}/verify_ai`, {
+          await fetch(`${getApiBaseUrl()}/api/answers/${answer.id}/verify_ai`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ verified: isVerified })
@@ -605,7 +615,7 @@ const DB = {
       const answer = doubt.answers[answerIdx];
       if (answer.id) {
         try {
-          await fetch(`http://localhost:8000/api/answers/${answer.id}/verify`, {
+          await fetch(`${getApiBaseUrl()}/api/answers/${answer.id}/verify`, {
             method: "POST"
           });
         } catch (e) {
@@ -651,7 +661,7 @@ const DB = {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/user/${user.email}/points`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/user/${user.email}/points`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ diff: diff })

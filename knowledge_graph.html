@@ -1156,7 +1156,7 @@
       panel.classList.add('hidden');
 
       try {
-        const res = await fetch('http://localhost:8000/api/kg_rag', {
+        const res = await fetch(`${getApiBaseUrl()}/api/kg_rag`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ concept: topic, question: `Explain ${topic}`, exam_mode: examMode })
