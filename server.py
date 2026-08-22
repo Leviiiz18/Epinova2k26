@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import urllib.request
 import psycopg
 from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
@@ -28,6 +29,37 @@ dotenv_path = os.path.join(BASE_DIR, '.env')
 if not os.path.exists(dotenv_path):
     dotenv_path = os.path.join(BASE_DIR, 'env')
 load_dotenv(dotenv_path=dotenv_path)
+
+def call_openrouter_llm(prompt_text, system_instruction=None, max_tokens=700):
+    api_key = os.getenv("OPENROUTER_API_KEY")
+    if not api_key:
+        return None
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://studybuddy.edu",
+        "X-Title": "StudyBuddy AI"
+    }
+    messages = []
+    if system_instruction:
+        messages.append({"role": "system", "content": system_instruction})
+    messages.append({"role": "user", "content": prompt_text})
+
+    payload = {
+        "model": "google/gemini-2.5-flash",
+        "messages": messages,
+        "max_tokens": max_tokens
+    }
+    try:
+        req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), headers=headers, method="POST")
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+            if "choices" in data and len(data["choices"]) > 0:
+                return data["choices"][0]["message"]["content"]
+    except Exception as e:
+        print(f"OpenRouter direct HTTP call error: {e}")
+    return None
 
 app = FastAPI(title="StudyBuddy All-in-One Server", version="2.0")
 
@@ -695,6 +727,14 @@ def kg_rag(request: KgRagRequest):
             except Exception as e:
                 print(f"kg_rag chain error: {e}")
 
+    # Direct OpenRouter AI call for serverless environments (Vercel)
+    ai_answer = call_openrouter_llm(
+        prompt_text=f"Explain the concept '{concept}' for a university engineering student. Question: {question}",
+        system_instruction="You are an expert university professor and AI teaching assistant. Provide structured, accurate academic explanations."
+    )
+    if ai_answer:
+        return {"success": True, "answer": ai_answer, "source": "rag", "concept": concept}
+
     # Fallback: pull the concept record from the taxonomy table
     concept_row = run_query("""
         SELECT c.name, c.canonical_summary, c.misconception, c.prerequisites,
@@ -1068,16 +1108,23 @@ def ask_doubt(request: DoubtRequest):
                 answer_text = active_chain.invoke(full_text)
             except Exception as e:
                 print(f"LLM chain invoke warning: {e}")
+        
+        if not answer_text:
+            # Serverless / OpenRouter Direct Fallback
+            ai_resp = call_openrouter_llm(
+                prompt_text=f"Explain '{concept['conceptName']}' for question: {full_text}",
+                system_instruction="You are an expert academic tutor. Provide clear, structured explanations."
+            )
+            if ai_resp:
+                answer_text = ai_resp
+                if exam_mode != "none":
+                    answer_text = format_exam_answer(concept, exam_mode, answer_text)
+            else:
                 exps = generate_explanations(concept["conceptName"])
-                answer_text = f"**{concept['conceptName']} Overview:**\n{exps['Step-by-step']}\n\n*Note: AI LLM is operating in fallback mode using cached course materials.*"
                 if exam_mode != "none":
                     answer_text = format_exam_answer(concept, exam_mode, exps['Step-by-step'])
-        else:
-            exps = generate_explanations(concept["conceptName"])
-            if exam_mode != "none":
-                answer_text = format_exam_answer(concept, exam_mode, exps['Step-by-step'])
-            else:
-                answer_text = f"**{concept['conceptName']} Overview:**\n{exps['Step-by-step']}"
+                else:
+                    answer_text = f"**{concept['conceptName']} Overview:**\n{exps['Step-by-step']}"
 
     insert_query = """
         INSERT INTO doubts (student_id, subject_id, topic_id, concept_id, title, raw_query, difficulty, intent, detected_misconception, auto_sort_confidence, status, points, embedding)
