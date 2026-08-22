@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>What's that? — Academic Doubt Resolution Platform</title>
-  <meta name="description" content="What's that? connects students directly with subject faculty for 24/7 academic doubt resolution and year-wise course management.">
+  <title>What's that? — Modern Academic Doubt Resolution & Learning Engine</title>
+  <meta name="description" content="What's that? connects students directly with subject faculty and AI RAG pipelines for 24/7 academic doubt resolution and peer learning.">
 
   <!-- Tailwind CSS CDN & Config -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -47,31 +47,33 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-[#F5F7FC] text-[#20263D] min-h-screen flex flex-col justify-between font-sans">
+<body class="bg-[#F5F7FC] text-[#20263D] min-h-screen flex flex-col justify-between font-sans selection:bg-[#4B46FF] selection:text-white">
 
   <!-- Navigation Bar -->
-  <header class="sticky top-0 z-50 crisp-nav bg-white/95 border-b border-[#E9EDFF]">
+  <header class="sticky top-0 z-50 crisp-nav bg-white/90 backdrop-blur-md border-b border-[#E9EDFF]/80 transition-all">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
 
       <!-- Brand Logo -->
-      <a href="index.html" class="flex items-center py-1">
-        <img src="assets/logo.png" alt="Logo" class="h-16 sm:h-20 w-auto object-contain hover:scale-105 transition-transform">
+      <a href="index.html" class="flex items-center gap-3 py-1 group">
+        <div class="relative">
+          <img src="assets/logo.png" alt="Logo" class="h-14 sm:h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-300">
+        </div>
       </a>
 
       <!-- Center Links -->
-      <nav class="hidden md:flex items-center gap-7 text-sm font-semibold text-[#737B94]">
-        <a href="#purpose" class="hover:text-[#4B46FF] transition-colors">Purpose</a>
-        <a href="#dashboard-preview" class="hover:text-[#4B46FF] transition-colors">Dashboard Preview</a>
-        <a href="#start-now" class="hover:text-[#4B46FF] transition-colors">Portals</a>
+      <nav class="hidden md:flex items-center gap-1 bg-[#F5F7FC] p-1.5 rounded-full border border-[#E9EDFF] text-xs font-semibold text-[#737B94]">
+        <a href="#purpose" class="px-4 py-2 rounded-full hover:text-[#4B46FF] hover:bg-white transition-all">Overview</a>
+        <a href="#dashboard-preview" class="px-4 py-2 rounded-full hover:text-[#4B46FF] hover:bg-white transition-all">Dashboard Showcase</a>
+        <a href="#start-now" class="px-4 py-2 rounded-full hover:text-[#4B46FF] hover:bg-white transition-all">Access Portals</a>
       </nav>
 
       <!-- Top Right Actions -->
       <div class="flex items-center gap-3">
-        <a href="login.html" class="px-4 py-2 text-sm font-semibold text-[#0B1230] hover:text-[#4B46FF] rounded-xl hover:bg-[#F7F9FF] transition-colors">
+        <a href="login.html" class="px-4 py-2.5 text-xs font-bold text-[#0B1230] hover:text-[#4B46FF] rounded-xl hover:bg-[#F7F9FF] transition-all">
           Log In
         </a>
-        <a href="login.html?tab=signup" class="btn-electric px-5 py-2.5 text-sm font-semibold">
-          Sign Up
+        <a href="login.html?tab=signup" class="btn-electric px-5 py-2.5 text-xs font-bold shadow-lg shadow-[#4B46FF]/25 hover:shadow-xl hover:shadow-[#4B46FF]/35 transition-all">
+          Sign Up Free
         </a>
       </div>
 
@@ -83,69 +85,100 @@
     <!-- ========================================== -->
     <!-- SECTION 1: PURPOSE & DOUBT RESOLUTION HERO -->
     <!-- ========================================== -->
-    <section id="purpose" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 border-b border-[#E9EDFF] bg-white relative overflow-hidden">
-      <!-- Background subtle glow -->
-      <div class="absolute -top-40 -left-40 w-96 h-96 bg-[#4B46FF]/5 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-[#6C8CFF]/5 rounded-full blur-3xl pointer-events-none"></div>
+    <section id="purpose" class="py-20 sm:py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white via-[#F7F9FF] to-[#F5F7FC] relative overflow-hidden border-b border-[#E9EDFF]">
+      <!-- Background Ambient Glows & Mesh Dots -->
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-tr from-[#4B46FF]/10 via-[#6C8CFF]/15 to-[#35C98A]/10 blur-[120px] rounded-full pointer-events-none -z-0"></div>
+      <div class="absolute top-20 right-10 w-72 h-72 bg-[#4B46FF]/5 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute bottom-10 left-10 w-80 h-80 bg-[#35C98A]/5 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div class="max-w-5xl mx-auto text-center relative z-10">
+      <div class="max-w-6xl mx-auto text-center relative z-10">
 
         <!-- Top pill indicator -->
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E9EDFF]/60 border border-[#4B46FF]/20 text-[#4B46FF] text-xs font-bold uppercase tracking-wider mb-6">
-          <span class="w-2 h-2 rounded-full bg-[#35C98A] animate-pulse"></span>
-          <span>Section 1 • Purpose</span>
+        <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/80 border border-[#4B46FF]/20 text-[#4B46FF] text-xs font-extrabold uppercase tracking-wider mb-8 shadow-sm backdrop-blur-md">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#35C98A] animate-pulse"></span>
+          <span>Next-Gen Academic Engine</span>
+          <span class="text-gray-300">|</span>
+          <span class="text-[#737B94] font-medium">AI RAG & Peer-to-Peer</span>
         </div>
 
-        <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-[#0B1230] max-w-3xl mx-auto leading-tight mb-6">
-          The Gamified Peer-to-Peer Academic Learning Community.
+        <!-- Hero Headline -->
+        <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-[#0B1230] max-w-4xl mx-auto leading-[1.1] mb-8">
+          Instant Doubt Resolution, <br class="hidden sm:inline">
+          <span class="bg-gradient-to-r from-[#4B46FF] via-[#6C8CFF] to-[#35C98A] bg-clip-text text-transparent">
+            Supercharged by AI & Faculty
+          </span>
         </h1>
 
-        <p class="text-lg text-[#737B94] max-w-2xl mx-auto leading-relaxed mb-10 font-medium">
-          Clear your doubts instantly with AI-powered auto-sorting, learn together with peer mentors, and claim reward points by answering community questions.
+        <!-- Subheading -->
+        <p class="text-base sm:text-lg text-[#737B94] max-w-2xl mx-auto leading-relaxed mb-10 font-medium">
+          Connect directly with verified subject faculty and continuous RAG-clearing pipelines. Solve queries instantly, earn reward points, and learn smarter together.
         </p>
 
         <!-- CTA Buttons -->
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-          <a href="#start-now" class="w-full sm:w-auto btn-electric px-7 py-3.5 text-sm flex items-center justify-center gap-2">
-            <span>Get Started</span>
-            <i data-lucide="arrow-down" class="w-4 h-4"></i>
+          <a href="#start-now" class="w-full sm:w-auto btn-electric px-8 py-4 text-sm font-bold flex items-center justify-center gap-2.5 shadow-xl shadow-[#4B46FF]/25 hover:scale-[1.02] transition-all">
+            <span>Explore Portals</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
           </a>
-          <a href="#dashboard-preview" class="w-full sm:w-auto btn-cloud px-7 py-3.5 text-sm flex items-center justify-center gap-2">
-            <i data-lucide="layout" class="w-4 h-4 text-[#4B46FF]"></i>
-            <span>View Dashboard Showcase</span>
+          <a href="#dashboard-preview" class="w-full sm:w-auto btn-cloud px-8 py-4 text-sm font-bold flex items-center justify-center gap-2.5 border border-[#E9EDFF] hover:border-[#4B46FF]/30 hover:scale-[1.02] transition-all">
+            <i data-lucide="sparkles" class="w-4 h-4 text-[#4B46FF]"></i>
+            <span>View Live Dashboard Showcase</span>
           </a>
         </div>
 
-        <!-- 3 Structured Feature Columns -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left pt-4">
+        <!-- Live Platform Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-16">
+          <div class="p-4 rounded-2xl bg-white/70 border border-[#E9EDFF] shadow-sm backdrop-blur-sm">
+            <div class="text-2xl font-extrabold text-[#0B1230]">24 / 7</div>
+            <div class="text-xs font-semibold text-[#737B94] mt-0.5">AI RAG Auto-Resolver</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-white/70 border border-[#E9EDFF] shadow-sm backdrop-blur-sm">
+            <div class="text-2xl font-extrabold text-[#4B46FF]">100%</div>
+            <div class="text-xs font-semibold text-[#737B94] mt-0.5">Verified Faculty Roster</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-white/70 border border-[#E9EDFF] shadow-sm backdrop-blur-sm">
+            <div class="text-2xl font-extrabold text-[#35C98A]">&lt; 15 min</div>
+            <div class="text-xs font-semibold text-[#737B94] mt-0.5">Average Turnaround</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-white/70 border border-[#E9EDFF] shadow-sm backdrop-blur-sm">
+            <div class="text-2xl font-extrabold text-[#0B1230]">Gamified</div>
+            <div class="text-xs font-semibold text-[#737B94] mt-0.5">Peer Reputation Points</div>
+          </div>
+        </div>
 
-          <div class="card-modern p-6 bg-[#F7F9FF]/60">
-            <div class="w-11 h-11 rounded-xl bg-[#4B46FF]/10 border border-[#4B46FF]/20 flex items-center justify-center text-[#4B46FF] mb-4">
-              <i data-lucide="git-branch" class="w-5 h-5"></i>
+        <!-- 3 Modern Feature Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left pt-2">
+
+          <div class="card-modern p-7 bg-white relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-[#4B46FF]/5 rounded-bl-full transition-all group-hover:scale-110"></div>
+            <div class="w-12 h-12 rounded-2xl bg-[#4B46FF]/10 border border-[#4B46FF]/20 flex items-center justify-center text-[#4B46FF] mb-5 group-hover:scale-110 transition-transform">
+              <i data-lucide="git-branch" class="w-6 h-6"></i>
             </div>
-            <h3 class="text-base font-bold text-[#0B1230] mb-1.5">Direct Subject Routing</h3>
+            <h3 class="text-lg font-extrabold text-[#0B1230] mb-2">Direct Domain Routing</h3>
             <p class="text-xs text-[#737B94] leading-relaxed font-medium">
-              Every inquiry is routed solely to faculty qualified in that domain, preventing delays and mismatched answers.
+              Every question is automatically categorized and routed directly to accredited subject faculty, ensuring accurate academic solutions.
             </p>
           </div>
 
-          <div class="card-modern p-6 bg-[#F7F9FF]/60">
-            <div class="w-11 h-11 rounded-xl bg-[#4B46FF]/10 border border-[#4B46FF]/20 flex items-center justify-center text-[#4B46FF] mb-4">
-              <i data-lucide="layers" class="w-5 h-5"></i>
+          <div class="card-modern p-7 bg-white relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-[#35C98A]/5 rounded-bl-full transition-all group-hover:scale-110"></div>
+            <div class="w-12 h-12 rounded-2xl bg-[#35C98A]/10 border border-[#35C98A]/20 flex items-center justify-center text-[#35C98A] mb-5 group-hover:scale-110 transition-transform">
+              <i data-lucide="layers" class="w-6 h-6"></i>
             </div>
-            <h3 class="text-base font-bold text-[#0B1230] mb-1.5">Year-Wise Organization</h3>
+            <h3 class="text-lg font-extrabold text-[#0B1230] mb-2">Year-Wise Organization</h3>
             <p class="text-xs text-[#737B94] leading-relaxed font-medium">
-              Quickly switch between 1st, 2nd, 3rd, and 4th year common semester subjects with designated faculty rosters.
+              Seamlessly toggle between 1st, 2nd, 3rd, and 4th-year engineering common core subjects with specialized student & faculty channels.
             </p>
           </div>
 
-          <div class="card-modern p-6 bg-[#F7F9FF]/60">
-            <div class="w-11 h-11 rounded-xl bg-[#4B46FF]/10 border border-[#4B46FF]/20 flex items-center justify-center text-[#4B46FF] mb-4">
-              <i data-lucide="clock-4" class="w-5 h-5"></i>
+          <div class="card-modern p-7 bg-white relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-[#6C8CFF]/5 rounded-bl-full transition-all group-hover:scale-110"></div>
+            <div class="w-12 h-12 rounded-2xl bg-[#6C8CFF]/10 border border-[#6C8CFF]/20 flex items-center justify-center text-[#6C8CFF] mb-5 group-hover:scale-110 transition-transform">
+              <i data-lucide="bot" class="w-6 h-6"></i>
             </div>
-            <h3 class="text-base font-bold text-[#0B1230] mb-1.5">24/7 Availability</h3>
+            <h3 class="text-lg font-extrabold text-[#0B1230] mb-2">Instant RAG AI Assistance</h3>
             <p class="text-xs text-[#737B94] leading-relaxed font-medium">
-              Submit questions at any hour. Track pending and resolved progress with real-time faculty solution notes.
+              After-hours AI retrieval augmented generation provides instant explanations grounded directly in course syllabus materials.
             </p>
           </div>
 
@@ -155,104 +188,146 @@
     </section>
 
     <!-- ============================================== -->
-    <!-- SECTION 2: PICTURE OF DASHBOARD (CUSTOM DROP)  -->
+    <!-- SECTION 2: INTERACTIVE DASHBOARD SHOWCASE      -->
     <!-- ============================================== -->
-    <section id="dashboard-preview" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 border-b border-[#E9EDFF] bg-[#F5F7FC]">
+    <section id="dashboard-preview" class="py-20 sm:py-32 px-4 sm:px-6 lg:px-8 border-b border-[#E9EDFF] bg-[#F5F7FC] relative">
       <div class="max-w-6xl mx-auto">
 
-        <div class="text-center max-w-2xl mx-auto mb-12">
-          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#E9EDFF] text-[#4B46FF] text-xs font-bold uppercase tracking-wider mb-4 shadow-sm">
-            <i data-lucide="image" class="w-3.5 h-3.5"></i>
-            <span>Section 2 • Dashboard Preview</span>
+        <div class="text-center max-w-2xl mx-auto mb-14">
+          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#E9EDFF] text-[#4B46FF] text-xs font-extrabold uppercase tracking-wider mb-4 shadow-sm">
+            <i data-lucide="layout" class="w-3.5 h-3.5"></i>
+            <span>Interactive Interface Showcase</span>
           </div>
-          <h2 class="text-3xl sm:text-4xl font-extrabold text-[#0B1230] tracking-tight mb-3">
-            Dashboard Interface Preview
+          <h2 class="text-3xl sm:text-5xl font-extrabold text-[#0B1230] tracking-tight mb-4">
+            Designed for Academic Focus
           </h2>
-          <p class="text-sm text-[#737B94] font-medium">
-            A clean, high-contrast interface designed for academic focus and swift doubt turnaround.
+          <p class="text-sm text-[#737B94] font-medium leading-relaxed">
+            Experience a streamlined, high-contrast dashboard equipped with live resolution feeds, verified faculty answers, and instant RAG synthesis.
           </p>
         </div>
 
-        <!-- Dashboard Picture Container Frame -->
-        <div class="card-modern p-4 sm:p-5 bg-white shadow-lg overflow-hidden">
+        <!-- Dashboard Picture / Interactive Live Frame -->
+        <div class="card-modern p-3 sm:p-5 bg-white shadow-2xl shadow-[#0B1230]/10 border border-[#E9EDFF] overflow-hidden rounded-3xl">
           
-          <!-- Mock Browser Bar -->
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-[#E9EDFF] text-xs text-[#737B94]">
+          <!-- Mock Browser Navigation Bar -->
+          <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-[#E9EDFF] text-xs text-[#737B94] px-2">
             <div class="flex items-center gap-2">
               <span class="w-3 h-3 rounded-full bg-[#FF5C70]"></span>
               <span class="w-3 h-3 rounded-full bg-[#FFC857]"></span>
               <span class="w-3 h-3 rounded-full bg-[#35C98A]"></span>
-              <span class="ml-3 font-mono text-[11px] text-[#20263D] font-medium">whatsthat.edu/student-dashboard</span>
+              <div class="ml-3 px-3 py-1 bg-[#F5F7FC] rounded-lg font-mono text-[11px] text-[#0B1230] font-semibold flex items-center gap-2 border border-[#E9EDFF]">
+                <i data-lucide="lock" class="w-3 h-3 text-[#35C98A]"></i>
+                <span>whatsthat.edu/student-dashboard</span>
+              </div>
             </div>
-            <span class="badge-clean-purple px-3 py-1 rounded-lg text-[11px] font-bold">Dashboard Showcase</span>
+            <div class="flex items-center gap-2">
+              <span class="badge-clean-purple px-3 py-1 rounded-full text-[11px] font-extrabold flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#4B46FF] animate-pulse"></span>
+                <span>Live Feed Sync</span>
+              </span>
+            </div>
           </div>
 
-          <!-- Screenshot Picture Slot with clean fallback -->
-          <div class="rounded-xl overflow-hidden border border-[#E9EDFF] bg-[#F7F9FF] min-h-[380px] flex flex-col justify-center items-center relative">
-            <img id="custom-dashboard-img" 
-                 src="assets/dashboard-preview.png" 
-                 alt="What's that? Dashboard Picture" 
-                 class="w-full h-auto object-cover"
-                 onerror="if(this.src.endsWith('.png')){ this.src='assets/dashboard-preview.svg'; } else { this.style.display='none'; document.getElementById('dashboard-fallback-mockup').style.display='block'; }">
-
-            <!-- Clean Structured Interactive Fallback -->
-            <div id="dashboard-fallback-mockup" class="w-full p-6 text-left bg-white" style="display: none;">
-              <div class="flex items-center justify-between pb-4 border-b border-[#E9EDFF]">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-xl bg-gradient-to-r from-[#4B46FF] to-[#6C8CFF] text-white font-bold text-sm flex items-center justify-center shadow-sm">AM</div>
-                  <div>
-                    <h4 class="font-bold text-[#0B1230] text-sm">Alex Morgan</h4>
-                    <p class="text-xs text-[#737B94]">3rd Year Student • Computer Science &amp; Engineering</p>
-                  </div>
+          <!-- Structured High-Fidelity Showcase Frame -->
+          <div class="rounded-2xl overflow-hidden border border-[#E9EDFF] bg-[#F7F9FF] p-4 sm:p-6 text-left relative">
+            
+            <!-- Header Bar -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-[#E9EDFF]">
+              <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#4B46FF] to-[#6C8CFF] text-white font-bold text-base flex items-center justify-center shadow-md shadow-[#4B46FF]/30">
+                  AM
                 </div>
-                <div class="flex items-center gap-2">
-                  <span class="badge-clean-purple px-2.5 py-1 rounded-lg text-xs font-semibold">AI &amp; ML Routing Online</span>
-                  <span class="badge-clean-emerald px-2.5 py-1 rounded-lg text-xs font-semibold">12 Solved</span>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h4 class="font-extrabold text-[#0B1230] text-base">Alex Morgan</h4>
+                    <span class="px-2 py-0.5 bg-[#4B46FF]/10 text-[#4B46FF] font-bold text-[10px] rounded-md">3rd Year</span>
+                  </div>
+                  <p class="text-xs text-[#737B94] font-medium">Computer Science & Engineering • ID: #CSE-2026-89</p>
+                </div>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="badge-clean-purple px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                  <i data-lucide="cpu" class="w-3.5 h-3.5"></i>
+                  AI RAG Pipeline Active
+                </span>
+                <span class="badge-clean-emerald px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
+                  14 Doubts Resolved
+                </span>
+              </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
+              
+              <!-- Left Sidebar Column: Subject Quick Switcher -->
+              <div class="p-4 rounded-xl bg-white border border-[#E9EDFF] shadow-sm">
+                <div class="text-xs font-extrabold uppercase text-[#737B94] tracking-wider mb-3 flex items-center justify-between">
+                  <span>Enrolled Subjects</span>
+                  <span class="text-[10px] text-[#4B46FF]">3 Active</span>
+                </div>
+                <div class="space-y-2 text-xs">
+                  <div class="p-3 rounded-xl bg-[#F7F9FF] border border-[#4B46FF]/30 flex justify-between items-center font-bold text-[#4B46FF]">
+                    <div class="flex items-center gap-2">
+                      <i data-lucide="brain" class="w-4 h-4 text-[#4B46FF]"></i>
+                      <span>AI & Machine Learning</span>
+                    </div>
+                    <span class="w-2 h-2 rounded-full bg-[#35C98A]"></span>
+                  </div>
+                  <div class="p-3 rounded-xl bg-white hover:bg-[#F7F9FF] border border-[#E9EDFF] flex justify-between items-center font-semibold text-[#0B1230] transition-colors">
+                    <div class="flex items-center gap-2">
+                      <i data-lucide="network" class="w-4 h-4 text-[#737B94]"></i>
+                      <span>Computer Networks</span>
+                    </div>
+                    <span class="w-2 h-2 rounded-full bg-[#FFC857]"></span>
+                  </div>
+                  <div class="p-3 rounded-xl bg-white hover:bg-[#F7F9FF] border border-[#E9EDFF] flex justify-between items-center font-semibold text-[#0B1230] transition-colors">
+                    <div class="flex items-center gap-2">
+                      <i data-lucide="code-2" class="w-4 h-4 text-[#737B94]"></i>
+                      <span>Full-Stack Web Dev</span>
+                    </div>
+                    <span class="w-2 h-2 rounded-full bg-[#35C98A]"></span>
+                  </div>
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
-                <div class="p-4 rounded-xl bg-[#F7F9FF] border border-[#E9EDFF]">
-                  <div class="text-xs font-bold uppercase text-[#737B94] mb-3">Enrolled Common Courses</div>
-                  <div class="space-y-2 text-xs">
-                    <div class="p-2.5 rounded-lg bg-white border border-[#E9EDFF] flex justify-between items-center">
-                      <span class="font-semibold text-[#0B1230]">AI &amp; Machine Learning</span>
-                      <span class="w-2 h-2 rounded-full bg-[#35C98A]"></span>
-                    </div>
-                    <div class="p-2.5 rounded-lg bg-white border border-[#E9EDFF] flex justify-between items-center">
-                      <span class="font-semibold text-[#0B1230]">Computer Networks</span>
-                      <span class="w-2 h-2 rounded-full bg-[#FFC857]"></span>
-                    </div>
-                    <div class="p-2.5 rounded-lg bg-white border border-[#E9EDFF] flex justify-between items-center">
-                      <span class="font-semibold text-[#0B1230]">Full-Stack Web Dev</span>
-                      <span class="w-2 h-2 rounded-full bg-[#35C98A]"></span>
-                    </div>
+              <!-- Main Showcase Feed Item -->
+              <div class="md:col-span-2 p-5 rounded-xl bg-white border border-[#E9EDFF] shadow-sm flex flex-col justify-between">
+                <div>
+                  <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                    <span class="badge-clean-purple px-2.5 py-1 rounded-lg text-[11px] font-bold">
+                      Artificial Intelligence & Machine Learning
+                    </span>
+                    <span class="badge-clean-emerald px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1">
+                      <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                      Verified by Dr. Sarah Jenkins
+                    </span>
                   </div>
-                </div>
 
-                <div class="md:col-span-2 p-4 rounded-xl bg-[#F7F9FF] border border-[#E9EDFF]">
-                  <div class="flex justify-between items-center mb-2">
-                    <span class="badge-clean-purple px-2 py-0.5 rounded text-[11px] font-bold">Artificial Intelligence &amp; ML</span>
-                    <span class="badge-clean-emerald px-2 py-0.5 rounded text-[11px] font-bold">✓ Solved by Dr. Sarah Jenkins</span>
-                  </div>
-                  <h5 class="text-sm font-bold text-[#0B1230] mb-1">
-                    "Clarification on Backpropagation gradient calculation for Softmax with Cross-Entropy Loss"
+                  <h5 class="text-base font-extrabold text-[#0B1230] mb-2 leading-snug">
+                    "How does backpropagation gradient calculation work for Softmax with Cross-Entropy Loss?"
                   </h5>
-                  <div class="p-3 rounded-lg bg-white border border-[#E9EDFF] text-xs text-[#20263D] my-2">
-                    <strong class="text-[#0B1230] block mb-1">Faculty Resolution:</strong>
-                    "The Kronecker delta simplifies the summation since ∂y_i/∂z_j is y_i(1 - y_i) when i=j and -y_i*y_j when i≠j, leaving purely (y_hat - y)."
+
+                  <div class="p-4 rounded-xl bg-[#F7F9FF] border border-[#E9EDFF] text-xs text-[#20263D] my-3 leading-relaxed">
+                    <div class="flex items-center gap-2 text-[#4B46FF] font-bold mb-1.5">
+                      <i data-lucide="check-circle" class="w-4 h-4"></i>
+                      <span>Verified Solution:</span>
+                    </div>
+                    "The derivative of Cross-Entropy loss with respect to logit z_i simplifies directly to <strong>(y_hat_i - y_i)</strong> due to terms canceling out during softmax Jacobian matrix multiplication."
                   </div>
-                  <div class="text-[11px] text-[#737B94] flex justify-between font-medium">
-                    <span>Submitted by Priya Patel (3rd Year)</span>
-                    <span>Response time: 24 mins</span>
-                  </div>
+                </div>
+
+                <div class="text-[11px] text-[#737B94] flex items-center justify-between font-semibold pt-2 border-t border-[#E9EDFF]">
+                  <span class="flex items-center gap-1.5">
+                    <i data-lucide="clock" class="w-3.5 h-3.5 text-[#35C98A]"></i>
+                    Resolved in 18 minutes
+                  </span>
+                  <span class="text-[#4B46FF] font-bold flex items-center gap-1">
+                    <span>+25 Reputation Points Earned</span>
+                  </span>
                 </div>
               </div>
 
-              <!-- Picture upload guidance note -->
-              <div class="mt-4 p-3 rounded-xl bg-[#F5F7FC] border border-dashed border-[#6C8CFF]/40 text-center text-xs text-[#737B94]">
-                <strong>Section 2 Picture Slot:</strong> Place your dashboard screenshot at <code class="font-mono bg-white px-2 py-0.5 rounded border border-[#E9EDFF] text-[#4B46FF]">assets/dashboard-preview.png</code> to display it directly.
-              </div>
             </div>
 
           </div>
@@ -263,106 +338,124 @@
     </section>
 
     <!-- ============================================ -->
-    <!-- SECTION 3: START NOW & ROLE LOG IN SELECTION -->
+    <!-- SECTION 3: START NOW & PORTAL SELECTION      -->
     <!-- ============================================ -->
-    <section id="start-now" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-white">
-      <div class="max-w-4xl mx-auto text-center">
+    <section id="start-now" class="py-20 sm:py-32 px-4 sm:px-6 lg:px-8 bg-white relative overflow-hidden">
+      <div class="max-w-5xl mx-auto text-center">
 
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E9EDFF] text-[#4B46FF] text-xs font-bold uppercase tracking-wider mb-4">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E9EDFF] text-[#4B46FF] text-xs font-extrabold uppercase tracking-wider mb-4">
           <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
-          <span>Section 3 • Start Now</span>
+          <span>Choose Your Entrance</span>
         </div>
 
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-[#0B1230] tracking-tight mb-3">
-          Select Your Portal
+        <h2 class="text-3xl sm:text-5xl font-extrabold text-[#0B1230] tracking-tight mb-4">
+          Select Your Academic Portal
         </h2>
-        <p class="text-sm text-[#737B94] max-w-xl mx-auto mb-12 font-medium">
-          Choose whether you are entering as a student to solve doubts or as a faculty member to manage your subject queue.
+        <p class="text-sm sm:text-base text-[#737B94] max-w-xl mx-auto mb-14 font-medium leading-relaxed">
+          Access specialized portals configured for student peer learning or faculty doubt queue management.
         </p>
 
         <!-- Dual Gateway Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
 
           <!-- Student Card -->
-          <div class="card-modern p-8 border-[#E9EDFF] flex flex-col justify-between hover:border-[#4B46FF]/40 bg-white">
+          <div class="card-modern p-8 border-[#E9EDFF] flex flex-col justify-between hover:border-[#4B46FF] bg-white relative overflow-hidden group shadow-lg hover:shadow-2xl hover:shadow-[#4B46FF]/10 transition-all duration-300">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#4B46FF]/10 to-transparent rounded-bl-full pointer-events-none"></div>
+
             <div>
-              <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-[#4B46FF] to-[#6C8CFF] text-white flex items-center justify-center mb-5 shadow-md shadow-[#4B46FF]/20">
-                <i data-lucide="book-open" class="w-6 h-6"></i>
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#4B46FF] to-[#6C8CFF] text-white flex items-center justify-center mb-6 shadow-md shadow-[#4B46FF]/30 group-hover:scale-105 transition-transform">
+                <i data-lucide="book-open" class="w-7 h-7"></i>
               </div>
 
-              <div class="badge-clean-purple inline-block px-3 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider mb-2">
+              <div class="badge-clean-purple inline-block px-3 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wider mb-3">
                 Students
               </div>
-              <h3 class="text-xl font-extrabold text-[#0B1230] mb-2">Student Portal</h3>
-              <p class="text-xs text-[#737B94] leading-relaxed mb-6 font-medium">
-                Post academic questions, explore 1st to 4th year common subjects, and track faculty resolutions.
+              <h3 class="text-2xl font-extrabold text-[#0B1230] mb-2">Student Portal</h3>
+              <p class="text-xs sm:text-sm text-[#737B94] leading-relaxed mb-6 font-medium">
+                Post academic queries, access common course feeds across all 4 years, and earn reputation points.
               </p>
 
-              <ul class="space-y-2.5 text-xs text-[#20263D] mb-8 font-medium">
-                <li class="flex items-center gap-2">
-                  <i data-lucide="check-circle-2" class="w-4 h-4 text-[#35C98A] flex-shrink-0"></i>
-                  <span>Year-wise syllabus &amp; common subject feeds</span>
+              <ul class="space-y-3 text-xs sm:text-sm text-[#20263D] mb-8 font-semibold">
+                <li class="flex items-center gap-2.5">
+                  <div class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                  </div>
+                  <span>Year-wise course feeds & common subjects</span>
                 </li>
-                <li class="flex items-center gap-2">
-                  <i data-lucide="check-circle-2" class="w-4 h-4 text-[#35C98A] flex-shrink-0"></i>
-                  <span>Strict automatic routing to domain faculty</span>
+                <li class="flex items-center gap-2.5">
+                  <div class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                  </div>
+                  <span>Direct faculty auto-routing</span>
                 </li>
-                <li class="flex items-center gap-2">
-                  <i data-lucide="check-circle-2" class="w-4 h-4 text-[#35C98A] flex-shrink-0"></i>
-                  <span>Real-time pending &amp; resolved status tracker</span>
+                <li class="flex items-center gap-2.5">
+                  <div class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                  </div>
+                  <span>AI RAG Instant Assistant</span>
                 </li>
               </ul>
             </div>
 
-            <div class="space-y-3">
-              <a href="login.html?role=student" class="w-full btn-electric py-3 px-4 text-xs font-bold flex items-center justify-center gap-2">
+            <div class="space-y-3 pt-4 border-t border-[#E9EDFF]">
+              <a href="login.html?role=student" class="w-full btn-electric py-3.5 px-4 text-xs font-extrabold flex items-center justify-center gap-2 shadow-lg shadow-[#4B46FF]/20">
                 <span>Enter Student Portal</span>
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
               </a>
-              <button type="button" onclick="loginAsDemo('student')" class="w-full btn-cloud py-2.5 px-3 text-xs text-[#737B94] hover:text-[#4B46FF]">
-                Demo Student (Alex • 3rd Year)
+              <button type="button" onclick="loginAsDemo('student')" class="w-full btn-cloud py-2.5 px-3 text-xs text-[#737B94] hover:text-[#4B46FF] font-semibold border border-[#E9EDFF] flex items-center justify-center gap-2">
+                <i data-lucide="user" class="w-3.5 h-3.5 text-[#4B46FF]"></i>
+                <span>Quick Demo: Alex Morgan (3rd Year)</span>
               </button>
             </div>
           </div>
 
           <!-- Faculty Card -->
-          <div class="card-modern p-8 border-[#E9EDFF] flex flex-col justify-between hover:border-[#4B46FF]/40 bg-white">
+          <div class="card-modern p-8 border-[#E9EDFF] flex flex-col justify-between hover:border-[#0B1230] bg-white relative overflow-hidden group shadow-lg hover:shadow-2xl hover:shadow-[#0B1230]/10 transition-all duration-300">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#0B1230]/10 to-transparent rounded-bl-full pointer-events-none"></div>
+
             <div>
-              <div class="w-12 h-12 rounded-xl bg-[#0B1230] text-white flex items-center justify-center mb-5 shadow-md">
-                <i data-lucide="user-check" class="w-6 h-6"></i>
+              <div class="w-14 h-14 rounded-2xl bg-[#0B1230] text-white flex items-center justify-center mb-6 shadow-md group-hover:scale-105 transition-transform">
+                <i data-lucide="user-check" class="w-7 h-7"></i>
               </div>
 
-              <div class="badge-clean-neutral inline-block px-3 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider mb-2">
-                Faculty
+              <div class="badge-clean-neutral inline-block px-3 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wider mb-3">
+                Faculty & Mentors
               </div>
-              <h3 class="text-xl font-extrabold text-[#0B1230] mb-2">Faculty Portal</h3>
-              <p class="text-xs text-[#737B94] leading-relaxed mb-6 font-medium">
-                Receive and resolve doubts specifically assigned to your subject specialization.
+              <h3 class="text-2xl font-extrabold text-[#0B1230] mb-2">Faculty Portal</h3>
+              <p class="text-xs sm:text-sm text-[#737B94] leading-relaxed mb-6 font-medium">
+                Review incoming doubts, verify AI syntheses, and manage your domain-specific queue.
               </p>
 
-              <ul class="space-y-2.5 text-xs text-[#20263D] mb-8 font-medium">
-                <li class="flex items-center gap-2">
-                  <i data-lucide="check-circle-2" class="w-4 h-4 text-[#35C98A] flex-shrink-0"></i>
-                  <span>Specialized queue filtered strictly by your domain</span>
+              <ul class="space-y-3 text-xs sm:text-sm text-[#20263D] mb-8 font-semibold">
+                <li class="flex items-center gap-2.5">
+                  <div class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                  </div>
+                  <span>Specialized queue filtered by subject domain</span>
                 </li>
-                <li class="flex items-center gap-2">
-                  <i data-lucide="check-circle-2" class="w-4 h-4 text-[#35C98A] flex-shrink-0"></i>
-                  <span>Structured solution builder with formulas &amp; code</span>
+                <li class="flex items-center gap-2.5">
+                  <div class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                  </div>
+                  <span>Rich solution editor with LaTeX & Code snippet support</span>
                 </li>
-                <li class="flex items-center gap-2">
-                  <i data-lucide="check-circle-2" class="w-4 h-4 text-[#35C98A] flex-shrink-0"></i>
-                  <span>Manage online availability &amp; track response stats</span>
+                <li class="flex items-center gap-2.5">
+                  <div class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                  </div>
+                  <span>One-click AI RAG answer verification</span>
                 </li>
               </ul>
             </div>
 
-            <div class="space-y-3">
-              <a href="login.html?role=faculty" class="w-full btn-electric py-3 px-4 text-xs font-bold flex items-center justify-center gap-2">
+            <div class="space-y-3 pt-4 border-t border-[#E9EDFF]">
+              <a href="login.html?role=faculty" class="w-full bg-[#0B1230] text-white hover:bg-[#151D42] py-3.5 px-4 text-xs font-extrabold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-[#0B1230]/20 transition-all">
                 <span>Enter Faculty Portal</span>
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
               </a>
-              <button type="button" onclick="loginAsDemo('faculty', 'fac-ai-01')" class="w-full btn-cloud py-2.5 px-3 text-xs text-[#737B94] hover:text-[#4B46FF]">
-                Demo Faculty (Dr. Sarah • AI Lead)
+              <button type="button" onclick="loginAsDemo('faculty', 'fac-ai-01')" class="w-full btn-cloud py-2.5 px-3 text-xs text-[#737B94] hover:text-[#0B1230] font-semibold border border-[#E9EDFF] flex items-center justify-center gap-2">
+                <i data-lucide="award" class="w-3.5 h-3.5 text-[#0B1230]"></i>
+                <span>Quick Demo: Dr. Sarah Jenkins (AI Lead)</span>
               </button>
             </div>
           </div>
@@ -375,12 +468,13 @@
   </main>
 
   <!-- Footer -->
-  <footer class="border-t border-[#E9EDFF] bg-white py-6 px-4 text-center text-xs text-[#737B94]">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center">
-        <img src="assets/logo.png" alt="Logo" class="h-14 w-auto object-contain">
+  <footer class="border-t border-[#E9EDFF] bg-white py-8 px-4 text-xs text-[#737B94]">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+        <img src="assets/logo.png" alt="Logo" class="h-12 w-auto object-contain">
+        <span class="text-[#737B94] font-medium border-l border-[#E9EDFF] pl-3">© 2026 What's that? Academic Platform</span>
       </div>
-      <div class="flex items-center gap-6 text-[#737B94] font-medium">
+      <div class="flex flex-wrap items-center gap-6 text-[#737B94] font-semibold">
         <a href="login.html" class="hover:text-[#4B46FF] transition-colors">Sign In</a>
         <a href="student-dashboard.html" class="hover:text-[#4B46FF] transition-colors">Student Dashboard</a>
         <a href="faculty-dashboard.html" class="hover:text-[#4B46FF] transition-colors">Faculty Dashboard</a>
