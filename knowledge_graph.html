@@ -24,6 +24,9 @@
     }
   </script>
 
+  <!-- Data & API Utils -->
+  <script src="js/data.js"></script>
+
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -39,7 +42,7 @@
 
       <!-- Brand Logo & Context -->
       <div class="flex items-center gap-3">
-        <a href="index.html" class="flex items-center gap-2.5">
+        <a href="student-dashboard.html" class="flex items-center gap-2.5">
           <img src="assets/logo.png" alt="Logo" class="h-16 w-auto object-contain">
           <span class="badge-clean-purple text-[10px] font-semibold px-2 py-0.5 rounded">Knowledge Graph</span>
         </a>
@@ -1156,7 +1159,8 @@
       panel.classList.add('hidden');
 
       try {
-        const res = await fetch(`${getApiBaseUrl()}/api/kg_rag`, {
+        const baseUrl = (typeof getApiBaseUrl === 'function') ? getApiBaseUrl() : (window.location.hostname === 'localhost' ? 'http://localhost:8000' : window.location.origin);
+        const res = await fetch(`${baseUrl}/api/kg_rag`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ concept: topic, question: `Explain ${topic}`, exam_mode: examMode })
