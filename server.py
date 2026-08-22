@@ -51,6 +51,20 @@ if os.path.exists(os.path.join(BASE_DIR, "assets")):
 if os.path.exists(os.path.join(BASE_DIR, "data")):
     app.mount("/data", StaticFiles(directory=os.path.join(BASE_DIR, "data")), name="data")
 
+@app.get("/")
+def read_root():
+    index_path = os.path.join(BASE_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"message": "StudyBuddy Server Active"}
+
+@app.get("/{filename:path}.html")
+def read_html(filename: str):
+    file_path = os.path.join(BASE_DIR, f"{filename}.html")
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
+    raise HTTPException(status_code=404, detail="Page not found")
+
 DB_URL = os.getenv("DATABASE_URL")
 CONNECTION_STRING = DB_URL.replace("postgresql://", "postgresql+psycopg://") if DB_URL else ""
 
