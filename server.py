@@ -107,19 +107,28 @@ retriever = None
 rag_chain = None
 rag_chains_by_mode = {}
 
-if LANGCHAIN_AVAILABLE and DB_URL:
-    try:
-        embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-        vectorstore = PGVector(
-            embeddings=embeddings,
-            collection_name="modules_collection",
-            connection=CONNECTION_STRING,
-            use_jsonb=True,
-        )
-        retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-    except Exception as e:
-        print(f"Error initializing PGVector: {e}")
+def get_retriever():
+    global embeddings, vectorstore, retriever
+    if retriever is not None:
+        return retriever
+    if LANGCHAIN_AVAILABLE and DB_URL:
+        try:
+            if embeddings is None:
+                embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+            if vectorstore is None:
+                vectorstore = PGVector(
+                    embeddings=embeddings,
+                    collection_name="modules_collection",
+                    connection=CONNECTION_STRING,
+                    use_jsonb=True,
+                )
+            retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+            return retriever
+        except Exception as e:
+            print(f"Lazy PGVector init error: {e}")
+    return None
 
+if LANGCHAIN_AVAILABLE and DB_URL:
     api_key = os.getenv("OPENROUTER_API_KEY")
     if api_key:
         try:
@@ -193,9 +202,10 @@ if LANGCHAIN_AVAILABLE and DB_URL:
 
                 def invoke(self, query):
                     docs = []
-                    if retriever:
+                    active_retriever = get_retriever()
+                    if active_retriever:
                         try:
-                            docs = retriever.invoke(query)
+                            docs = active_retriever.invoke(query)
                         except Exception as e:
                             print(f"Retrieval error: {e}")
                     if not docs:
@@ -206,13 +216,12 @@ if LANGCHAIN_AVAILABLE and DB_URL:
                         return NOT_IN_SYLLABUS_MSG
                     return answer
 
-            if retriever:
-                rag_chain = GroundedRagChain("none")
-                rag_chains_by_mode = {
-                    "none": rag_chain,
-                    "5m": GroundedRagChain("5m"),
-                    "10m": GroundedRagChain("10m"),
-                }
+            rag_chain = GroundedRagChain("none")
+            rag_chains_by_mode = {
+                "none": rag_chain,
+                "5m": GroundedRagChain("5m"),
+                "10m": GroundedRagChain("10m"),
+            }
         except Exception as e:
             print(f"LLM chain init error: {e}")
 
@@ -526,6 +535,17 @@ def init_database():
     try:
         conn = get_db_connection()
         with conn.cursor() as cur:
+            # Fast check: If concepts table exists and has rows, DB is already seeded!
+            cur.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'concepts');")
+            concepts_table_exists = cur.fetchone()[0]
+            if concepts_table_exists:
+                cur.execute("SELECT COUNT(*) FROM concepts;")
+                concept_count = cur.fetchone()[0]
+                if concept_count > 0:
+                    print("⚡ Neon PostgreSQL Database is already initialized & seeded. Skipping startup taxonomy loop.")
+                    conn.close()
+                    return
+
             # Quick check if tables already exist
             cur.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'users');")
             tables_exist = cur.fetchone()[0]
