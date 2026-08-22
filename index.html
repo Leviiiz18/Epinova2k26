@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>What's that? — Modern Academic Doubt Resolution & Learning Engine</title>
-  <meta name="description" content="What's that? connects students directly with subject faculty and AI RAG pipelines for 24/7 academic doubt resolution and peer learning.">
+  <meta name="description"
+    content="What's that? connects students directly with subject faculty and AI RAG pipelines for 24/7 academic doubt resolution and peer learning.">
 
   <!-- Tailwind CSS CDN & Config -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -13,7 +15,8 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif']
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace']
           },
           colors: {
             brand: {
@@ -44,10 +47,165 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
+  <!-- Monospace face for the "engineering notebook" texture -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+
   <!-- Custom CSS -->
   <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    /* ---------- Page-specific signature styling (index.html only) ---------- */
+
+    .noise-veil {
+      background-image: radial-gradient(circle at 1px 1px, rgba(11, 18, 48, 0.05) 1px, transparent 0);
+      background-size: 22px 22px;
+    }
+
+    /* Floating notebook snippets drifting behind the hero */
+    .snippet-chip {
+      position: absolute;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: #4B46FF;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(75, 70, 255, 0.16);
+      padding: 6px 10px;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px -8px rgba(11, 18, 48, 0.12);
+      backdrop-filter: blur(6px);
+      animation: drift 9s ease-in-out infinite;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    @keyframes drift {
+
+      0%,
+      100% {
+        transform: translateY(0) rotate(var(--rot, -3deg));
+      }
+
+      50% {
+        transform: translateY(-10px) rotate(var(--rot, -3deg));
+      }
+    }
+
+    /* Reveal-on-scroll */
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Auto-Sort simulator widget */
+    .autosort-card {
+      background: linear-gradient(180deg, #0B1230 0%, #10193d 100%);
+      border-radius: 22px;
+      box-shadow: 0 30px 70px -20px rgba(11, 18, 48, 0.45), 0 0 0 1px rgba(108, 140, 255, 0.15);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .autosort-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(600px circle at 85% -10%, rgba(108, 140, 255, 0.25), transparent 60%);
+      pointer-events: none;
+    }
+
+    .caret {
+      display: inline-block;
+      width: 2px;
+      background: #6C8CFF;
+      margin-left: 2px;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    .tag-chip {
+      opacity: 0;
+      transform: translateY(6px) scale(0.96);
+      animation: tagIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes tagIn {
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .route-fade {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .route-fade.show {
+      opacity: 1;
+    }
+
+    .route-dash {
+      stroke-dasharray: 4 6;
+      animation: dashMove 1.2s linear infinite;
+    }
+
+    @keyframes dashMove {
+      to {
+        stroke-dashoffset: -20;
+      }
+    }
+
+    /* Pipeline strip */
+    .pipeline-track::before {
+      content: "";
+      position: absolute;
+      top: 22px;
+      left: 5%;
+      right: 5%;
+      height: 1px;
+      background-image: linear-gradient(90deg, #C7CDF7 0, #C7CDF7 6px, transparent 6px, transparent 12px);
+      background-size: 12px 1px;
+      z-index: 0;
+    }
+
+    @media (max-width: 767px) {
+      .pipeline-track::before {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .snippet-chip,
+      .caret {
+        animation: none !important;
+      }
+
+      .reveal {
+        transition: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    }
+  </style>
 </head>
-<body class="bg-[#F5F7FC] text-[#20263D] min-h-screen flex flex-col justify-between font-sans selection:bg-[#4B46FF] selection:text-white">
+
+<body
+  class="bg-[#F5F7FC] text-[#20263D] min-h-screen flex flex-col justify-between font-sans selection:bg-[#4B46FF] selection:text-white">
 
   <!-- Navigation Bar -->
   <header class="sticky top-0 z-50 crisp-nav bg-white/90 backdrop-blur-md border-b border-[#E9EDFF]/80 transition-all">
@@ -56,23 +214,32 @@
       <!-- Brand Logo -->
       <a href="index.html" class="flex items-center gap-3 py-1 group">
         <div class="relative">
-          <img src="assets/logo.png" alt="Logo" class="h-14 sm:h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-300">
+          <img src="assets/logo.png" alt="Logo"
+            class="h-14 sm:h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-300">
         </div>
       </a>
 
       <!-- Center Links -->
-      <nav class="hidden md:flex items-center gap-1 bg-[#F5F7FC] p-1.5 rounded-full border border-[#E9EDFF] text-xs font-semibold text-[#737B94]">
-        <a href="#purpose" class="px-4 py-2 rounded-full hover:text-[#4B46FF] hover:bg-white transition-all">Overview</a>
-        <a href="#dashboard-preview" class="px-4 py-2 rounded-full hover:text-[#4B46FF] hover:bg-white transition-all">Dashboard Showcase</a>
-        <a href="#start-now" class="px-4 py-2 rounded-full hover:text-[#4B46FF] hover:bg-white transition-all">Access Portals</a>
+      <nav
+        class="hidden md:flex items-center gap-1 bg-[#F5F7FC] p-1.5 rounded-full border border-[#E9EDFF] text-xs font-semibold text-[#737B94]">
+        <a href="#purpose"
+          class="px-4 py-2 rounded-full hover:text-[#4B46FF] hover:bg-white transition-all">Overview</a>
+        <a href="#how-it-works" class="px-4 py-2 rounded-full hover:text-[#4B46FF] hover:bg-white transition-all">How It
+          Works</a>
+        <a href="#dashboard-preview"
+          class="px-4 py-2 rounded-full hover:text-[#4B46FF] hover:bg-white transition-all">Dashboard Showcase</a>
+        <a href="#start-now" class="px-4 py-2 rounded-full hover:text-[#4B46FF] hover:bg-white transition-all">Access
+          Portals</a>
       </nav>
 
       <!-- Top Right Actions -->
       <div class="flex items-center gap-3">
-        <a href="login.html" class="px-4 py-2.5 text-xs font-bold text-[#0B1230] hover:text-[#4B46FF] rounded-xl hover:bg-[#F7F9FF] transition-all">
+        <a href="login.html"
+          class="px-4 py-2.5 text-xs font-bold text-[#0B1230] hover:text-[#4B46FF] rounded-xl hover:bg-[#F7F9FF] transition-all">
           Log In
         </a>
-        <a href="login.html?tab=signup" class="btn-electric px-5 py-2.5 text-xs font-bold shadow-lg shadow-[#4B46FF]/25 hover:shadow-xl hover:shadow-[#4B46FF]/35 transition-all">
+        <a href="login.html?tab=signup"
+          class="btn-electric px-5 py-2.5 text-xs font-bold shadow-lg shadow-[#4B46FF]/25 hover:shadow-xl hover:shadow-[#4B46FF]/35 transition-all">
           Sign Up Free
         </a>
       </div>
@@ -85,101 +252,115 @@
     <!-- ========================================== -->
     <!-- SECTION 1: PURPOSE & DOUBT RESOLUTION HERO -->
     <!-- ========================================== -->
-    <section id="purpose" class="py-20 sm:py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white via-[#F7F9FF] to-[#F5F7FC] relative overflow-hidden border-b border-[#E9EDFF]">
+    <section id="purpose"
+      class="pt-16 pb-20 sm:pt-24 sm:pb-28 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white via-[#F7F9FF] to-[#F5F7FC] relative overflow-hidden border-b border-[#E9EDFF]">
       <!-- Background Ambient Glows & Mesh Dots -->
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-tr from-[#4B46FF]/10 via-[#6C8CFF]/15 to-[#35C98A]/10 blur-[120px] rounded-full pointer-events-none -z-0"></div>
+      <div
+        class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-tr from-[#4B46FF]/10 via-[#6C8CFF]/15 to-[#35C98A]/10 blur-[120px] rounded-full pointer-events-none -z-0">
+      </div>
       <div class="absolute top-20 right-10 w-72 h-72 bg-[#4B46FF]/5 rounded-full blur-3xl pointer-events-none"></div>
       <div class="absolute bottom-10 left-10 w-80 h-80 bg-[#35C98A]/5 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute inset-0 noise-veil opacity-50 pointer-events-none"></div>
 
-      <div class="max-w-6xl mx-auto text-center relative z-10">
+      <!-- Drifting notebook snippets (hidden on small screens to avoid clutter) -->
+      <div class="hidden lg:block">
+        <span class="snippet-chip" style="top:14%; left:4%; --rot:-4deg; animation-delay:0s;">∂L/∂zᵢ = ŷᵢ − yᵢ</span>
+        <span class="snippet-chip" style="top:60%; left:2%; --rot:3deg; animation-delay:1.2s;">O(log n) &bull;
+          sorted[]</span>
+        <span class="snippet-chip" style="top:32%; right:3%; --rot:4deg; animation-delay:0.6s;">IF x IS warm THEN
+          y</span>
+        <span class="snippet-chip" style="top:74%; right:5%; --rot:-3deg; animation-delay:1.8s;">JWT ≠ encrypted</span>
+      </div>
 
-        <!-- Top pill indicator -->
-        <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/80 border border-[#4B46FF]/20 text-[#4B46FF] text-xs font-extrabold uppercase tracking-wider mb-8 shadow-sm backdrop-blur-md">
-          <span class="w-2.5 h-2.5 rounded-full bg-[#35C98A] animate-pulse"></span>
-          <span>Next-Gen Academic Engine</span>
-          <span class="text-gray-300">|</span>
-          <span class="text-[#737B94] font-medium">AI RAG & Peer-to-Peer</span>
-        </div>
+      <div class="max-w-7xl mx-auto relative z-10">
 
-        <!-- Hero Headline -->
-        <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-[#0B1230] max-w-4xl mx-auto leading-[1.1] mb-8">
-          Instant Doubt Resolution, <br class="hidden sm:inline">
-          <span class="bg-gradient-to-r from-[#4B46FF] via-[#6C8CFF] to-[#35C98A] bg-clip-text text-transparent">
-            Supercharged by AI & Faculty
-          </span>
-        </h1>
+        <div class="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-14 items-center">
 
-        <!-- Subheading -->
-        <p class="text-base sm:text-lg text-[#737B94] max-w-2xl mx-auto leading-relaxed mb-10 font-medium">
-          Connect directly with verified subject faculty and continuous RAG-clearing pipelines. Solve queries instantly, earn reward points, and learn smarter together.
-        </p>
-
-        <!-- CTA Buttons -->
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-          <a href="#start-now" class="w-full sm:w-auto btn-electric px-8 py-4 text-sm font-bold flex items-center justify-center gap-2.5 shadow-xl shadow-[#4B46FF]/25 hover:scale-[1.02] transition-all">
-            <span>Explore Portals</span>
-            <i data-lucide="arrow-right" class="w-4 h-4"></i>
-          </a>
-          <a href="#dashboard-preview" class="w-full sm:w-auto btn-cloud px-8 py-4 text-sm font-bold flex items-center justify-center gap-2.5 border border-[#E9EDFF] hover:border-[#4B46FF]/30 hover:scale-[1.02] transition-all">
-            <i data-lucide="sparkles" class="w-4 h-4 text-[#4B46FF]"></i>
-            <span>View Live Dashboard Showcase</span>
-          </a>
-        </div>
-
-        <!-- Live Platform Stats Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-16">
-          <div class="p-4 rounded-2xl bg-white/70 border border-[#E9EDFF] shadow-sm backdrop-blur-sm">
-            <div class="text-2xl font-extrabold text-[#0B1230]">24 / 7</div>
-            <div class="text-xs font-semibold text-[#737B94] mt-0.5">AI RAG Auto-Resolver</div>
-          </div>
-          <div class="p-4 rounded-2xl bg-white/70 border border-[#E9EDFF] shadow-sm backdrop-blur-sm">
-            <div class="text-2xl font-extrabold text-[#4B46FF]">100%</div>
-            <div class="text-xs font-semibold text-[#737B94] mt-0.5">Verified Faculty Roster</div>
-          </div>
-          <div class="p-4 rounded-2xl bg-white/70 border border-[#E9EDFF] shadow-sm backdrop-blur-sm">
-            <div class="text-2xl font-extrabold text-[#35C98A]">&lt; 15 min</div>
-            <div class="text-xs font-semibold text-[#737B94] mt-0.5">Average Turnaround</div>
-          </div>
-          <div class="p-4 rounded-2xl bg-white/70 border border-[#E9EDFF] shadow-sm backdrop-blur-sm">
-            <div class="text-2xl font-extrabold text-[#0B1230]">Gamified</div>
-            <div class="text-xs font-semibold text-[#737B94] mt-0.5">Peer Reputation Points</div>
-          </div>
-        </div>
-
-        <!-- 3 Modern Feature Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left pt-2">
-
-          <div class="card-modern p-7 bg-white relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
-            <div class="absolute top-0 right-0 w-24 h-24 bg-[#4B46FF]/5 rounded-bl-full transition-all group-hover:scale-110"></div>
-            <div class="w-12 h-12 rounded-2xl bg-[#4B46FF]/10 border border-[#4B46FF]/20 flex items-center justify-center text-[#4B46FF] mb-5 group-hover:scale-110 transition-transform">
-              <i data-lucide="git-branch" class="w-6 h-6"></i>
+          <!-- Left: Copy -->
+          <div class="text-center lg:text-left">
+            <div
+              class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/80 border border-[#4B46FF]/20 text-[#4B46FF] text-xs font-extrabold uppercase tracking-wider mb-8 shadow-sm backdrop-blur-md">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#35C98A] animate-pulse"></span>
+              <span>Next-Gen Academic Engine</span>
+              <span class="text-gray-300">|</span>
+              <span class="text-[#737B94] font-medium">AI RAG &amp; Peer-to-Peer</span>
             </div>
-            <h3 class="text-lg font-extrabold text-[#0B1230] mb-2">Direct Domain Routing</h3>
-            <p class="text-xs text-[#737B94] leading-relaxed font-medium">
-              Every question is automatically categorized and routed directly to accredited subject faculty, ensuring accurate academic solutions.
+
+            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-[#0B1230] leading-[1.08] mb-7">
+              Every doubt gets<br class="hidden sm:inline">
+              <span class="bg-gradient-to-r from-[#4B46FF] via-[#6C8CFF] to-[#35C98A] bg-clip-text text-transparent">
+                read, routed, and resolved
+              </span>
+            </h1>
+
+            <p class="text-base sm:text-lg text-[#737B94] max-w-xl mx-auto lg:mx-0 leading-relaxed mb-10 font-medium">
+              Type your question the way you'd ask a senior. Our Auto-Sort engine tags the subject, topic and difficulty
+              in real time, then routes it to a syllabus-grounded RAG answer or the right faculty inbox — whichever gets
+              you unstuck faster.
             </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-14">
+              <a href="#start-now"
+                class="w-full sm:w-auto btn-electric px-8 py-4 text-sm font-bold flex items-center justify-center gap-2.5 shadow-xl shadow-[#4B46FF]/25 hover:scale-[1.02] transition-all">
+                <span>Explore Portals</span>
+                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+              </a>
+              <a href="#how-it-works"
+                class="w-full sm:w-auto btn-cloud px-8 py-4 text-sm font-bold flex items-center justify-center gap-2.5 border border-[#E9EDFF] hover:border-[#4B46FF]/30 hover:scale-[1.02] transition-all">
+                <i data-lucide="split" class="w-4 h-4 text-[#4B46FF]"></i>
+                <span>See the Auto-Sort Pipeline</span>
+              </a>
+            </div>
+
+            <!-- Live Platform Stats Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto lg:mx-0">
+              <div class="p-4 rounded-2xl bg-white/70 border border-[#E9EDFF] shadow-sm backdrop-blur-sm">
+                <div class="text-2xl font-extrabold text-[#0B1230]">24 / 7</div>
+                <div class="text-xs font-semibold text-[#737B94] mt-0.5">AI RAG Auto-Resolver</div>
+              </div>
+              <div class="p-4 rounded-2xl bg-white/70 border border-[#E9EDFF] shadow-sm backdrop-blur-sm">
+                <div class="text-2xl font-extrabold text-[#4B46FF]">100%</div>
+                <div class="text-xs font-semibold text-[#737B94] mt-0.5">Verified Faculty Roster</div>
+              </div>
+              <div class="p-4 rounded-2xl bg-white/70 border border-[#E9EDFF] shadow-sm backdrop-blur-sm">
+                <div class="text-2xl font-extrabold text-[#35C98A]">&lt; 15 min</div>
+                <div class="text-xs font-semibold text-[#737B94] mt-0.5">Average Turnaround</div>
+              </div>
+              <div class="p-4 rounded-2xl bg-white/70 border border-[#E9EDFF] shadow-sm backdrop-blur-sm">
+                <div class="text-2xl font-extrabold text-[#0B1230]">Gamified</div>
+                <div class="text-xs font-semibold text-[#737B94] mt-0.5">Peer Reputation Points</div>
+              </div>
+            </div>
           </div>
 
-          <div class="card-modern p-7 bg-white relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
-            <div class="absolute top-0 right-0 w-24 h-24 bg-[#35C98A]/5 rounded-bl-full transition-all group-hover:scale-110"></div>
-            <div class="w-12 h-12 rounded-2xl bg-[#35C98A]/10 border border-[#35C98A]/20 flex items-center justify-center text-[#35C98A] mb-5 group-hover:scale-110 transition-transform">
-              <i data-lucide="layers" class="w-6 h-6"></i>
+          <!-- Right: Signature element — Live Auto-Sort Simulator -->
+          <div class="autosort-card p-5 sm:p-7 max-w-md mx-auto w-full">
+            <div class="flex items-center justify-between mb-5 relative z-10">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#FF5C70]/80"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-[#FFC857]/80"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-[#35C98A]/80"></span>
+              </div>
+              <span class="font-mono text-[10px] text-[#8B93C7] tracking-wide">auto_sort.engine — live</span>
             </div>
-            <h3 class="text-lg font-extrabold text-[#0B1230] mb-2">Year-Wise Organization</h3>
-            <p class="text-xs text-[#737B94] leading-relaxed font-medium">
-              Seamlessly toggle between 1st, 2nd, 3rd, and 4th-year engineering common core subjects with specialized student & faculty channels.
-            </p>
-          </div>
 
-          <div class="card-modern p-7 bg-white relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
-            <div class="absolute top-0 right-0 w-24 h-24 bg-[#6C8CFF]/5 rounded-bl-full transition-all group-hover:scale-110"></div>
-            <div class="w-12 h-12 rounded-2xl bg-[#6C8CFF]/10 border border-[#6C8CFF]/20 flex items-center justify-center text-[#6C8CFF] mb-5 group-hover:scale-110 transition-transform">
-              <i data-lucide="bot" class="w-6 h-6"></i>
+            <div class="relative z-10 font-mono text-xs sm:text-[13px] leading-relaxed">
+              <div class="text-[#6C8CFF] mb-1.5">$ student.ask &rarr;</div>
+              <div class="min-h-[2.6rem] text-[#E9EDFF]">
+                <span id="typedQuery"></span><span class="caret">&nbsp;</span>
+              </div>
             </div>
-            <h3 class="text-lg font-extrabold text-[#0B1230] mb-2">Instant RAG AI Assistance</h3>
-            <p class="text-xs text-[#737B94] leading-relaxed font-medium">
-              After-hours AI retrieval augmented generation provides instant explanations grounded directly in course syllabus materials.
-            </p>
+
+            <div id="tagRow" class="relative z-10 flex flex-wrap gap-1.5 mt-4 min-h-[28px]"></div>
+
+            <div id="routeSection" class="route-fade relative z-10 mt-5 pt-4 border-t border-white/10">
+              <div class="flex items-center gap-2 mb-2">
+                <i data-lucide="route" class="w-3.5 h-3.5 text-[#6C8CFF]"></i>
+                <span class="font-mono text-[10px] uppercase tracking-wider text-[#8B93C7]">Routed to</span>
+              </div>
+              <div id="routeTarget" class="flex items-center gap-2.5 text-white text-sm font-bold"></div>
+              <div id="routeStatus" class="mt-2 font-mono text-[11px] text-[#35C98A]"></div>
+            </div>
           </div>
 
         </div>
@@ -187,14 +368,94 @@
       </div>
     </section>
 
+    <!-- ========================================== -->
+    <!-- SECTION 1.5: HOW IT WORKS — PIPELINE STRIP -->
+    <!-- ========================================== -->
+    <section id="how-it-works" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-white border-b border-[#E9EDFF]">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center max-w-2xl mx-auto mb-14 reveal">
+          <div
+            class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#F7F9FF] border border-[#E9EDFF] text-[#4B46FF] text-xs font-extrabold uppercase tracking-wider mb-4 shadow-sm">
+            <i data-lucide="workflow" class="w-3.5 h-3.5"></i>
+            <span>The Actual Pipeline</span>
+          </div>
+          <h2 class="text-3xl sm:text-5xl font-extrabold text-[#0B1230] tracking-tight mb-4">
+            One doubt, six real steps
+          </h2>
+          <p class="text-sm text-[#737B94] font-medium leading-relaxed">
+            This is not marketing shorthand — it's the literal path every question takes through the system, from the
+            moment you hit send to the moment your Concept Mastery Model updates.
+          </p>
+        </div>
+
+        <div class="pipeline-track relative grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-8">
+          <div class="reveal relative z-10 flex flex-col items-center text-center gap-3">
+            <div
+              class="w-11 h-11 rounded-2xl bg-white border-2 border-[#4B46FF] text-[#4B46FF] flex items-center justify-center font-mono font-bold text-xs shadow-sm">
+              01</div>
+            <i data-lucide="message-square-plus" class="w-5 h-5 text-[#4B46FF]"></i>
+            <h4 class="text-xs font-extrabold text-[#0B1230]">Ask</h4>
+            <p class="text-[11px] text-[#737B94] leading-snug px-1">Type the doubt in your own words, code and all.</p>
+          </div>
+          <div class="reveal relative z-10 flex flex-col items-center text-center gap-3">
+            <div
+              class="w-11 h-11 rounded-2xl bg-white border-2 border-[#4B46FF] text-[#4B46FF] flex items-center justify-center font-mono font-bold text-xs shadow-sm">
+              02</div>
+            <i data-lucide="split" class="w-5 h-5 text-[#4B46FF]"></i>
+            <h4 class="text-xs font-extrabold text-[#0B1230]">Auto-Sort</h4>
+            <p class="text-[11px] text-[#737B94] leading-snug px-1">Subject, concept, difficulty and intent tagged
+              instantly.</p>
+          </div>
+          <div class="reveal relative z-10 flex flex-col items-center text-center gap-3">
+            <div
+              class="w-11 h-11 rounded-2xl bg-white border-2 border-[#4B46FF] text-[#4B46FF] flex items-center justify-center font-mono font-bold text-xs shadow-sm">
+              03</div>
+            <i data-lucide="search" class="w-5 h-5 text-[#4B46FF]"></i>
+            <h4 class="text-xs font-extrabold text-[#0B1230]">Semantic Search</h4>
+            <p class="text-[11px] text-[#737B94] leading-snug px-1">Matched against solved doubts and ranked
+              explanations.</p>
+          </div>
+          <div class="reveal relative z-10 flex flex-col items-center text-center gap-3">
+            <div
+              class="w-11 h-11 rounded-2xl bg-white border-2 border-[#4B46FF] text-[#4B46FF] flex items-center justify-center font-mono font-bold text-xs shadow-sm">
+              04</div>
+            <i data-lucide="network" class="w-5 h-5 text-[#4B46FF]"></i>
+            <h4 class="text-xs font-extrabold text-[#0B1230]">KAG Reasoning</h4>
+            <p class="text-[11px] text-[#737B94] leading-snug px-1">2-hop graph traversal surfaces the prerequisite
+              you're missing.</p>
+          </div>
+          <div class="reveal relative z-10 flex flex-col items-center text-center gap-3">
+            <div
+              class="w-11 h-11 rounded-2xl bg-white border-2 border-[#4B46FF] text-[#4B46FF] flex items-center justify-center font-mono font-bold text-xs shadow-sm">
+              05</div>
+            <i data-lucide="user-check" class="w-5 h-5 text-[#4B46FF]"></i>
+            <h4 class="text-xs font-extrabold text-[#0B1230]">Peer / Faculty Match</h4>
+            <p class="text-[11px] text-[#737B94] leading-snug px-1">Ranked by expertise score, rating and who's online
+              now.</p>
+          </div>
+          <div class="reveal relative z-10 flex flex-col items-center text-center gap-3">
+            <div
+              class="w-11 h-11 rounded-2xl bg-white border-2 border-[#35C98A] text-[#35C98A] flex items-center justify-center font-mono font-bold text-xs shadow-sm">
+              06</div>
+            <i data-lucide="badge-check" class="w-5 h-5 text-[#35C98A]"></i>
+            <h4 class="text-xs font-extrabold text-[#0B1230]">Verify &amp; Learn</h4>
+            <p class="text-[11px] text-[#737B94] leading-snug px-1">A micro-quiz confirms it landed, and your mastery
+              map updates.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ============================================== -->
     <!-- SECTION 2: INTERACTIVE DASHBOARD SHOWCASE      -->
     <!-- ============================================== -->
-    <section id="dashboard-preview" class="py-20 sm:py-32 px-4 sm:px-6 lg:px-8 border-b border-[#E9EDFF] bg-[#F5F7FC] relative">
+    <section id="dashboard-preview"
+      class="py-20 sm:py-32 px-4 sm:px-6 lg:px-8 border-b border-[#E9EDFF] bg-[#F5F7FC] relative">
       <div class="max-w-6xl mx-auto">
 
-        <div class="text-center max-w-2xl mx-auto mb-14">
-          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#E9EDFF] text-[#4B46FF] text-xs font-extrabold uppercase tracking-wider mb-4 shadow-sm">
+        <div class="text-center max-w-2xl mx-auto mb-14 reveal">
+          <div
+            class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#E9EDFF] text-[#4B46FF] text-xs font-extrabold uppercase tracking-wider mb-4 shadow-sm">
             <i data-lucide="layout" class="w-3.5 h-3.5"></i>
             <span>Interactive Interface Showcase</span>
           </div>
@@ -202,26 +463,31 @@
             Designed for Academic Focus
           </h2>
           <p class="text-sm text-[#737B94] font-medium leading-relaxed">
-            Experience a streamlined, high-contrast dashboard equipped with live resolution feeds, verified faculty answers, and instant RAG synthesis.
+            Experience a streamlined, high-contrast dashboard equipped with live resolution feeds, verified faculty
+            answers, and instant RAG synthesis.
           </p>
         </div>
 
         <!-- Dashboard Picture / Interactive Live Frame -->
-        <div class="card-modern p-3 sm:p-5 bg-white shadow-2xl shadow-[#0B1230]/10 border border-[#E9EDFF] overflow-hidden rounded-3xl">
-          
+        <div
+          class="reveal card-modern p-3 sm:p-5 bg-white shadow-2xl shadow-[#0B1230]/10 border border-[#E9EDFF] overflow-hidden rounded-3xl">
+
           <!-- Mock Browser Navigation Bar -->
-          <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-[#E9EDFF] text-xs text-[#737B94] px-2">
+          <div
+            class="flex items-center justify-between pb-3.5 mb-4 border-b border-[#E9EDFF] text-xs text-[#737B94] px-2">
             <div class="flex items-center gap-2">
               <span class="w-3 h-3 rounded-full bg-[#FF5C70]"></span>
               <span class="w-3 h-3 rounded-full bg-[#FFC857]"></span>
               <span class="w-3 h-3 rounded-full bg-[#35C98A]"></span>
-              <div class="ml-3 px-3 py-1 bg-[#F5F7FC] rounded-lg font-mono text-[11px] text-[#0B1230] font-semibold flex items-center gap-2 border border-[#E9EDFF]">
+              <div
+                class="ml-3 px-3 py-1 bg-[#F5F7FC] rounded-lg font-mono text-[11px] text-[#0B1230] font-semibold flex items-center gap-2 border border-[#E9EDFF]">
                 <i data-lucide="lock" class="w-3 h-3 text-[#35C98A]"></i>
                 <span>whatsthat.edu/student-dashboard</span>
               </div>
             </div>
             <div class="flex items-center gap-2">
-              <span class="badge-clean-purple px-3 py-1 rounded-full text-[11px] font-extrabold flex items-center gap-1.5">
+              <span
+                class="badge-clean-purple px-3 py-1 rounded-full text-[11px] font-extrabold flex items-center gap-1.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-[#4B46FF] animate-pulse"></span>
                 <span>Live Feed Sync</span>
               </span>
@@ -230,17 +496,20 @@
 
           <!-- Structured High-Fidelity Showcase Frame -->
           <div class="rounded-2xl overflow-hidden border border-[#E9EDFF] bg-[#F7F9FF] p-4 sm:p-6 text-left relative">
-            
+
             <!-- Header Bar -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-[#E9EDFF]">
+            <div
+              class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-5 border-b border-[#E9EDFF]">
               <div class="flex items-center gap-3.5">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#4B46FF] to-[#6C8CFF] text-white font-bold text-base flex items-center justify-center shadow-md shadow-[#4B46FF]/30">
+                <div
+                  class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#4B46FF] to-[#6C8CFF] text-white font-bold text-base flex items-center justify-center shadow-md shadow-[#4B46FF]/30">
                   AM
                 </div>
                 <div>
                   <div class="flex items-center gap-2">
                     <h4 class="font-extrabold text-[#0B1230] text-base">Alex Morgan</h4>
-                    <span class="px-2 py-0.5 bg-[#4B46FF]/10 text-[#4B46FF] font-bold text-[10px] rounded-md">3rd Year</span>
+                    <span class="px-2 py-0.5 bg-[#4B46FF]/10 text-[#4B46FF] font-bold text-[10px] rounded-md">3rd
+                      Year</span>
                   </div>
                   <p class="text-xs text-[#737B94] font-medium">Computer Science & Engineering • ID: #CSE-2026-89</p>
                 </div>
@@ -259,29 +528,33 @@
 
             <!-- Content Grid -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
-              
+
               <!-- Left Sidebar Column: Subject Quick Switcher -->
               <div class="p-4 rounded-xl bg-white border border-[#E9EDFF] shadow-sm">
-                <div class="text-xs font-extrabold uppercase text-[#737B94] tracking-wider mb-3 flex items-center justify-between">
+                <div
+                  class="text-xs font-extrabold uppercase text-[#737B94] tracking-wider mb-3 flex items-center justify-between">
                   <span>Enrolled Subjects</span>
                   <span class="text-[10px] text-[#4B46FF]">3 Active</span>
                 </div>
                 <div class="space-y-2 text-xs">
-                  <div class="p-3 rounded-xl bg-[#F7F9FF] border border-[#4B46FF]/30 flex justify-between items-center font-bold text-[#4B46FF]">
+                  <div
+                    class="p-3 rounded-xl bg-[#F7F9FF] border border-[#4B46FF]/30 flex justify-between items-center font-bold text-[#4B46FF]">
                     <div class="flex items-center gap-2">
                       <i data-lucide="brain" class="w-4 h-4 text-[#4B46FF]"></i>
                       <span>AI & Machine Learning</span>
                     </div>
                     <span class="w-2 h-2 rounded-full bg-[#35C98A]"></span>
                   </div>
-                  <div class="p-3 rounded-xl bg-white hover:bg-[#F7F9FF] border border-[#E9EDFF] flex justify-between items-center font-semibold text-[#0B1230] transition-colors">
+                  <div
+                    class="p-3 rounded-xl bg-white hover:bg-[#F7F9FF] border border-[#E9EDFF] flex justify-between items-center font-semibold text-[#0B1230] transition-colors">
                     <div class="flex items-center gap-2">
                       <i data-lucide="network" class="w-4 h-4 text-[#737B94]"></i>
                       <span>Computer Networks</span>
                     </div>
                     <span class="w-2 h-2 rounded-full bg-[#FFC857]"></span>
                   </div>
-                  <div class="p-3 rounded-xl bg-white hover:bg-[#F7F9FF] border border-[#E9EDFF] flex justify-between items-center font-semibold text-[#0B1230] transition-colors">
+                  <div
+                    class="p-3 rounded-xl bg-white hover:bg-[#F7F9FF] border border-[#E9EDFF] flex justify-between items-center font-semibold text-[#0B1230] transition-colors">
                     <div class="flex items-center gap-2">
                       <i data-lucide="code-2" class="w-4 h-4 text-[#737B94]"></i>
                       <span>Full-Stack Web Dev</span>
@@ -292,13 +565,15 @@
               </div>
 
               <!-- Main Showcase Feed Item -->
-              <div class="md:col-span-2 p-5 rounded-xl bg-white border border-[#E9EDFF] shadow-sm flex flex-col justify-between">
+              <div
+                class="md:col-span-2 p-5 rounded-xl bg-white border border-[#E9EDFF] shadow-sm flex flex-col justify-between">
                 <div>
                   <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                     <span class="badge-clean-purple px-2.5 py-1 rounded-lg text-[11px] font-bold">
                       Artificial Intelligence & Machine Learning
                     </span>
-                    <span class="badge-clean-emerald px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1">
+                    <span
+                      class="badge-clean-emerald px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1">
                       <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
                       Verified by Dr. Sarah Jenkins
                     </span>
@@ -308,16 +583,20 @@
                     "How does backpropagation gradient calculation work for Softmax with Cross-Entropy Loss?"
                   </h5>
 
-                  <div class="p-4 rounded-xl bg-[#F7F9FF] border border-[#E9EDFF] text-xs text-[#20263D] my-3 leading-relaxed">
+                  <div
+                    class="p-4 rounded-xl bg-[#F7F9FF] border border-[#E9EDFF] text-xs text-[#20263D] my-3 leading-relaxed">
                     <div class="flex items-center gap-2 text-[#4B46FF] font-bold mb-1.5">
                       <i data-lucide="check-circle" class="w-4 h-4"></i>
                       <span>Verified Solution:</span>
                     </div>
-                    "The derivative of Cross-Entropy loss with respect to logit z_i simplifies directly to <strong>(y_hat_i - y_i)</strong> due to terms canceling out during softmax Jacobian matrix multiplication."
+                    "The derivative of Cross-Entropy loss with respect to logit z_i simplifies directly to
+                    <strong>(y_hat_i - y_i)</strong> due to terms canceling out during softmax Jacobian matrix
+                    multiplication."
                   </div>
                 </div>
 
-                <div class="text-[11px] text-[#737B94] flex items-center justify-between font-semibold pt-2 border-t border-[#E9EDFF]">
+                <div
+                  class="text-[11px] text-[#737B94] flex items-center justify-between font-semibold pt-2 border-t border-[#E9EDFF]">
                   <span class="flex items-center gap-1.5">
                     <i data-lucide="clock" class="w-3.5 h-3.5 text-[#35C98A]"></i>
                     Resolved in 18 minutes
@@ -343,15 +622,16 @@
     <section id="start-now" class="py-20 sm:py-32 px-4 sm:px-6 lg:px-8 bg-white relative overflow-hidden">
       <div class="max-w-5xl mx-auto text-center">
 
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E9EDFF] text-[#4B46FF] text-xs font-extrabold uppercase tracking-wider mb-4">
+        <div
+          class="reveal inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E9EDFF] text-[#4B46FF] text-xs font-extrabold uppercase tracking-wider mb-4">
           <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
           <span>Choose Your Entrance</span>
         </div>
 
-        <h2 class="text-3xl sm:text-5xl font-extrabold text-[#0B1230] tracking-tight mb-4">
+        <h2 class="reveal text-3xl sm:text-5xl font-extrabold text-[#0B1230] tracking-tight mb-4">
           Select Your Academic Portal
         </h2>
-        <p class="text-sm sm:text-base text-[#737B94] max-w-xl mx-auto mb-14 font-medium leading-relaxed">
+        <p class="reveal text-sm sm:text-base text-[#737B94] max-w-xl mx-auto mb-14 font-medium leading-relaxed">
           Access specialized portals configured for student peer learning or faculty doubt queue management.
         </p>
 
@@ -359,15 +639,23 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
 
           <!-- Student Card -->
-          <div class="card-modern p-8 border-[#E9EDFF] flex flex-col justify-between hover:border-[#4B46FF] bg-white relative overflow-hidden group shadow-lg hover:shadow-2xl hover:shadow-[#4B46FF]/10 transition-all duration-300">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#4B46FF]/10 to-transparent rounded-bl-full pointer-events-none"></div>
+          <div
+            class="reveal card-modern p-8 border-[#E9EDFF] flex flex-col justify-between hover:border-[#4B46FF] bg-white relative overflow-hidden group shadow-lg hover:shadow-2xl hover:shadow-[#4B46FF]/10 transition-all duration-300">
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#4B46FF]/10 to-transparent rounded-bl-full pointer-events-none">
+            </div>
 
             <div>
-              <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#4B46FF] to-[#6C8CFF] text-white flex items-center justify-center mb-6 shadow-md shadow-[#4B46FF]/30 group-hover:scale-105 transition-transform">
-                <i data-lucide="book-open" class="w-7 h-7"></i>
+              <div class="flex items-center justify-between mb-6">
+                <div
+                  class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#4B46FF] to-[#6C8CFF] text-white flex items-center justify-center shadow-md shadow-[#4B46FF]/30 group-hover:scale-105 transition-transform">
+                  <i data-lucide="book-open" class="w-7 h-7"></i>
+                </div>
+                <span class="font-mono text-[10px] text-[#737B94]">$ role --set student</span>
               </div>
 
-              <div class="badge-clean-purple inline-block px-3 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wider mb-3">
+              <div
+                class="badge-clean-purple inline-block px-3 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wider mb-3">
                 Students
               </div>
               <h3 class="text-2xl font-extrabold text-[#0B1230] mb-2">Student Portal</h3>
@@ -377,19 +665,22 @@
 
               <ul class="space-y-3 text-xs sm:text-sm text-[#20263D] mb-8 font-semibold">
                 <li class="flex items-center gap-2.5">
-                  <div class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
+                  <div
+                    class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
                     <i data-lucide="check" class="w-3.5 h-3.5"></i>
                   </div>
                   <span>Year-wise course feeds & common subjects</span>
                 </li>
                 <li class="flex items-center gap-2.5">
-                  <div class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
+                  <div
+                    class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
                     <i data-lucide="check" class="w-3.5 h-3.5"></i>
                   </div>
                   <span>Direct faculty auto-routing</span>
                 </li>
                 <li class="flex items-center gap-2.5">
-                  <div class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
+                  <div
+                    class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
                     <i data-lucide="check" class="w-3.5 h-3.5"></i>
                   </div>
                   <span>AI RAG Instant Assistant</span>
@@ -398,11 +689,13 @@
             </div>
 
             <div class="space-y-3 pt-4 border-t border-[#E9EDFF]">
-              <a href="login.html?role=student" class="w-full btn-electric py-3.5 px-4 text-xs font-extrabold flex items-center justify-center gap-2 shadow-lg shadow-[#4B46FF]/20">
+              <a href="login.html?role=student"
+                class="w-full btn-electric py-3.5 px-4 text-xs font-extrabold flex items-center justify-center gap-2 shadow-lg shadow-[#4B46FF]/20">
                 <span>Enter Student Portal</span>
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
               </a>
-              <button type="button" onclick="loginAsDemo('student')" class="w-full btn-cloud py-2.5 px-3 text-xs text-[#737B94] hover:text-[#4B46FF] font-semibold border border-[#E9EDFF] flex items-center justify-center gap-2">
+              <button type="button" onclick="loginAsDemo('student')"
+                class="w-full btn-cloud py-2.5 px-3 text-xs text-[#737B94] hover:text-[#4B46FF] font-semibold border border-[#E9EDFF] flex items-center justify-center gap-2">
                 <i data-lucide="user" class="w-3.5 h-3.5 text-[#4B46FF]"></i>
                 <span>Quick Demo: Alex Morgan (3rd Year)</span>
               </button>
@@ -410,15 +703,23 @@
           </div>
 
           <!-- Faculty Card -->
-          <div class="card-modern p-8 border-[#E9EDFF] flex flex-col justify-between hover:border-[#0B1230] bg-white relative overflow-hidden group shadow-lg hover:shadow-2xl hover:shadow-[#0B1230]/10 transition-all duration-300">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#0B1230]/10 to-transparent rounded-bl-full pointer-events-none"></div>
+          <div
+            class="reveal card-modern p-8 border-[#E9EDFF] flex flex-col justify-between hover:border-[#0B1230] bg-white relative overflow-hidden group shadow-lg hover:shadow-2xl hover:shadow-[#0B1230]/10 transition-all duration-300">
+            <div
+              class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#0B1230]/10 to-transparent rounded-bl-full pointer-events-none">
+            </div>
 
             <div>
-              <div class="w-14 h-14 rounded-2xl bg-[#0B1230] text-white flex items-center justify-center mb-6 shadow-md group-hover:scale-105 transition-transform">
-                <i data-lucide="user-check" class="w-7 h-7"></i>
+              <div class="flex items-center justify-between mb-6">
+                <div
+                  class="w-14 h-14 rounded-2xl bg-[#0B1230] text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform">
+                  <i data-lucide="user-check" class="w-7 h-7"></i>
+                </div>
+                <span class="font-mono text-[10px] text-[#737B94]">$ role --set faculty</span>
               </div>
 
-              <div class="badge-clean-neutral inline-block px-3 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wider mb-3">
+              <div
+                class="badge-clean-neutral inline-block px-3 py-1 rounded-lg text-[11px] font-extrabold uppercase tracking-wider mb-3">
                 Faculty & Mentors
               </div>
               <h3 class="text-2xl font-extrabold text-[#0B1230] mb-2">Faculty Portal</h3>
@@ -428,19 +729,22 @@
 
               <ul class="space-y-3 text-xs sm:text-sm text-[#20263D] mb-8 font-semibold">
                 <li class="flex items-center gap-2.5">
-                  <div class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
+                  <div
+                    class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
                     <i data-lucide="check" class="w-3.5 h-3.5"></i>
                   </div>
                   <span>Specialized queue filtered by subject domain</span>
                 </li>
                 <li class="flex items-center gap-2.5">
-                  <div class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
+                  <div
+                    class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
                     <i data-lucide="check" class="w-3.5 h-3.5"></i>
                   </div>
                   <span>Rich solution editor with LaTeX & Code snippet support</span>
                 </li>
                 <li class="flex items-center gap-2.5">
-                  <div class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
+                  <div
+                    class="w-5 h-5 rounded-full bg-[#35C98A]/15 text-[#35C98A] flex items-center justify-center flex-shrink-0">
                     <i data-lucide="check" class="w-3.5 h-3.5"></i>
                   </div>
                   <span>One-click AI RAG answer verification</span>
@@ -449,11 +753,13 @@
             </div>
 
             <div class="space-y-3 pt-4 border-t border-[#E9EDFF]">
-              <a href="login.html?role=faculty" class="w-full bg-[#0B1230] text-white hover:bg-[#151D42] py-3.5 px-4 text-xs font-extrabold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-[#0B1230]/20 transition-all">
+              <a href="login.html?role=faculty"
+                class="w-full bg-[#0B1230] text-white hover:bg-[#151D42] py-3.5 px-4 text-xs font-extrabold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-[#0B1230]/20 transition-all">
                 <span>Enter Faculty Portal</span>
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
               </a>
-              <button type="button" onclick="loginAsDemo('faculty', 'fac-ai-01')" class="w-full btn-cloud py-2.5 px-3 text-xs text-[#737B94] hover:text-[#0B1230] font-semibold border border-[#E9EDFF] flex items-center justify-center gap-2">
+              <button type="button" onclick="loginAsDemo('faculty', 'fac-ai-01')"
+                class="w-full btn-cloud py-2.5 px-3 text-xs text-[#737B94] hover:text-[#0B1230] font-semibold border border-[#E9EDFF] flex items-center justify-center gap-2">
                 <i data-lucide="award" class="w-3.5 h-3.5 text-[#0B1230]"></i>
                 <span>Quick Demo: Dr. Sarah Jenkins (AI Lead)</span>
               </button>
@@ -472,7 +778,8 @@
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
       <div class="flex items-center gap-3">
         <img src="assets/logo.png" alt="Logo" class="h-12 w-auto object-contain">
-        <span class="text-[#737B94] font-medium border-l border-[#E9EDFF] pl-3">© 2026 What's that? Academic Platform</span>
+        <span class="text-[#737B94] font-medium border-l border-[#E9EDFF] pl-3">© 2026 What's that? Academic
+          Platform</span>
       </div>
       <div class="flex flex-wrap items-center gap-6 text-[#737B94] font-semibold">
         <a href="login.html" class="hover:text-[#4B46FF] transition-colors">Sign In</a>
@@ -487,6 +794,130 @@
   <script src="js/app.js?v=2.1"></script>
   <script>
     lucide.createIcons();
+
+    /* ---------------- Scroll reveal ---------------- */
+    (function initReveal() {
+      const items = document.querySelectorAll('.reveal');
+      if (!('IntersectionObserver' in window) || items.length === 0) {
+        items.forEach(el => el.classList.add('is-visible'));
+        return;
+      }
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => entry.target.classList.add('is-visible'), i * 60);
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      items.forEach(el => io.observe(el));
+    })();
+
+    /* ---------------- Live Auto-Sort Simulator ---------------- */
+    (function initAutoSort() {
+      const typedEl = document.getElementById('typedQuery');
+      const tagRow = document.getElementById('tagRow');
+      const routeSection = document.getElementById('routeSection');
+      const routeTarget = document.getElementById('routeTarget');
+      const routeStatus = document.getElementById('routeStatus');
+      if (!typedEl || !tagRow || !routeSection) return;
+
+      const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const doubts = [
+        {
+          query: "Why does my Sobel filter blur diagonal edges more than horizontal ones?",
+          tags: ["Subject: DIP", "Concept: Sobel vs Laplacian", "Difficulty: Intermediate", "Confidence: 94%"],
+          routeIcon: "bot",
+          routeName: "AI RAG Pipeline",
+          routeSub: "Syllabus-grounded answer",
+          time: "0.8s"
+        },
+        {
+          query: "My genetic algorithm keeps converging to the same local optimum every run.",
+          tags: ["Subject: AI & ML", "Concept: Genetic Algorithms", "Intent: Debugging", "Confidence: 88%"],
+          routeIcon: "user-check",
+          routeName: "Prof. David Kumar",
+          routeSub: "Data Structures & Algorithms",
+          time: "1.4s"
+        },
+        {
+          query: "If a JWT is signed, why is it not considered encrypted?",
+          tags: ["Subject: Web Tech", "Concept: Client-Server State", "Difficulty: Advanced", "Confidence: 91%"],
+          routeIcon: "bot",
+          routeName: "AI RAG Pipeline",
+          routeSub: "Syllabus-grounded answer",
+          time: "0.6s"
+        }
+      ];
+
+      let doubtIndex = 0;
+
+      function typeText(text, el, speed) {
+        return new Promise((resolve) => {
+          let i = 0;
+          el.textContent = "";
+          const interval = setInterval(() => {
+            el.textContent += text[i];
+            i++;
+            if (i >= text.length) {
+              clearInterval(interval);
+              resolve();
+            }
+          }, speed);
+        });
+      }
+
+      function wait(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      function renderTags(tags) {
+        tagRow.innerHTML = tags.map((t, i) => `
+          <span class="tag-chip font-mono text-[10px] px-2.5 py-1 rounded-full bg-[#4B46FF]/15 text-[#B8C1FF] border border-[#4B46FF]/30" style="animation-delay:${i * 140}ms">${t}</span>
+        `).join("");
+      }
+
+      function renderStatic(doubt) {
+        typedEl.textContent = doubt.query;
+        renderTags(doubt.tags);
+        routeTarget.innerHTML = `<i data-lucide="${doubt.routeIcon}" class="w-4 h-4 text-[#6C8CFF]"></i><span>${doubt.routeName}</span>`;
+        routeStatus.textContent = `Routed in ${doubt.time} • ${doubt.routeSub}`;
+        routeSection.classList.add('show');
+        lucide.createIcons();
+      }
+
+      async function runCycle() {
+        const doubt = doubts[doubtIndex % doubts.length];
+        doubtIndex++;
+
+        // reset
+        tagRow.innerHTML = "";
+        routeSection.classList.remove('show');
+        typedEl.textContent = "";
+
+        await typeText(doubt.query, typedEl, 24);
+        await wait(280);
+        renderTags(doubt.tags);
+        await wait(doubt.tags.length * 140 + 300);
+
+        routeTarget.innerHTML = `<i data-lucide="${doubt.routeIcon}" class="w-4 h-4 text-[#6C8CFF]"></i><span>${doubt.routeName}</span>`;
+        routeStatus.textContent = `Routed in ${doubt.time} • ${doubt.routeSub}`;
+        lucide.createIcons();
+        routeSection.classList.add('show');
+
+        await wait(2800);
+        await wait(400);
+        runCycle();
+      }
+
+      if (prefersReducedMotion) {
+        renderStatic(doubts[0]);
+      } else {
+        runCycle();
+      }
+    })();
   </script>
 </body>
+
 </html>
