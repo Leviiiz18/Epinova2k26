@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+langchain
+langchain-openai
+langchain-community
+chromadb
+python-pptx
+pydantic
+python-dotenv
+sentence-transformers
+unstructured
+pypdf
+psycopg[binary]
+pgvector
+langchain-postgres
