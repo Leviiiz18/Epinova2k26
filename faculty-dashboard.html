@@ -4,10 +4,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Faculty Learning Intelligence Dashboard — Study Buddy (PS-01)</title>
+  <title>Faculty Intelligence Dashboard — What's that?</title>
 
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS CDN & Config -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif']
+          },
+          colors: {
+            brand: {
+              DEFAULT: '#4B46FF',
+              hover: '#3934E6',
+              accent: '#6C8CFF',
+              navy: '#0B1230',
+              dark: '#070B1D',
+              ice: '#F7F9FF',
+              main: '#F5F7FC',
+              secondary: '#E9EDFF',
+              success: '#35C98A',
+              warning: '#FFC857',
+              error: '#FF5C70',
+              text: '#20263D',
+              muted: '#737B94'
+            }
+          },
+          borderRadius: {
+            '2xl': '18px',
+            '3xl': '24px'
+          }
+        }
+      }
+    }
+  </script>
 
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -16,175 +48,154 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between">
+<body class="bg-[#F5F7FC] text-[#20263D] min-h-screen flex flex-col justify-between font-sans">
 
   <!-- Header -->
-  <header class="sticky top-0 z-40 crisp-nav bg-white/95 border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#E9EDFF]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
 
       <!-- Brand Logo -->
-      <a href="index.html" class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white">
-          <i data-lucide="graduation-cap" class="w-4 h-4"></i>
-        </div>
-        <div>
-          <span class="text-base font-bold text-slate-900">Study Buddy</span>
-          <span class="badge-clean-neutral text-[10px] font-semibold px-2 py-0.5 rounded ml-2">Faculty
-            Intelligence</span>
-        </div>
+      <a href="index.html" class="flex items-center gap-3">
+        <img src="assets/logo.png" alt="Logo" class="h-16 sm:h-18 w-auto object-contain hover:scale-105 transition-transform">
+        <span class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-[#F7F9FF] border border-[#E9EDFF] text-[#4B46FF]">Faculty Intelligence</span>
       </a>
 
+      <!-- Notifications Bell -->
+      <div class="relative ml-auto mr-4">
+        <button id="fac-notification-btn" onclick="toggleNotifications(event)" class="p-2 text-[#737B94] hover:text-[#0B1230] hover:bg-[#F7F9FF] rounded-xl transition-colors relative border border-transparent hover:border-[#E9EDFF]">
+          <i data-lucide="bell" class="w-5 h-5"></i>
+          <span id="fac-notification-badge" class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[#FF5C70] rounded-full hidden"></span>
+        </button>
+        <div id="fac-notification-dropdown" class="origin-top-right absolute right-0 mt-2 w-80 rounded-2xl shadow-xl bg-white ring-1 ring-black ring-opacity-5 divide-y divide-[#E9EDFF] hidden z-50 border border-[#E9EDFF]">
+          <div class="p-4 bg-[#F7F9FF]">
+            <h3 class="text-xs font-bold text-[#0B1230] uppercase tracking-wider">Notifications</h3>
+          </div>
+          <div id="fac-notification-list" class="max-h-64 overflow-y-auto">
+             <div class="p-4 text-center text-xs text-[#737B94]">Loading...</div>
+          </div>
+        </div>
+      </div>
+
       <!-- Faculty Profile -->
-      <div class="flex items-center gap-2.5">
+      <div class="flex items-center gap-3">
         <img id="fac-header-avatar"
           src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250"
-          class="w-8 h-8 rounded-full border border-slate-200 object-cover" alt="Faculty Avatar">
+          class="w-9 h-9 rounded-full border border-[#E9EDFF] object-cover shadow-sm" alt="Faculty Avatar">
         <div class="hidden sm:block text-left">
-          <div class="text-xs font-bold text-slate-900 leading-tight" id="fac-header-name">Dr. Sarah Jenkins</div>
-          <div class="text-[10px] text-slate-500 font-medium">Faculty &bull; Computer Science</div>
+          <div class="text-xs font-bold text-[#0B1230] leading-tight" id="fac-header-name">Dr. Sarah Jenkins</div>
+          <div class="text-[10px] text-[#737B94] font-semibold">Faculty &bull; Computer Science</div>
         </div>
-        <div class="w-px h-6 bg-slate-200 mx-1"></div>
+        <div class="w-px h-6 bg-[#E9EDFF] mx-1"></div>
         <button type="button" onclick="logout()" title="Log out" aria-label="Log out"
-          class="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 transition-colors px-2 py-1.5 rounded-md hover:bg-slate-100">
-          <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
-          <span class="hidden sm:inline font-medium">Log out</span>
+          class="flex items-center gap-1.5 text-xs text-[#737B94] hover:text-[#FF5C70] transition-colors px-3 py-2 rounded-xl hover:bg-[#FF5C70]/10 border border-transparent">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+          <span class="hidden sm:inline font-bold">Log out</span>
         </button>
       </div>
     </div>
   </header>
 
   <!-- Main Container -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 flex-1 w-full">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 flex-1 w-full">
 
     <!-- 1. TOP STATS BAR -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-      <div class="p-6 pb-5">
+    <div class="card-modern bg-white shadow-sm border-[#E9EDFF] p-0 overflow-hidden">
+      <div class="p-6 sm:p-8">
         <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
             <span
-              class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span>
+              class="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[#737B94] mb-2">
+              <span class="w-2 h-2 rounded-full bg-[#35C98A] inline-block animate-pulse"></span>
               Section 15 &bull; Campus Learning Intelligence
             </span>
-            <h1 class="text-xl sm:text-2xl font-bold text-slate-950 leading-tight">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#0B1230] leading-tight">
               Campus Concept Analytics &amp; Learning Gaps
             </h1>
-            <p class="text-xs text-slate-500 mt-1.5 leading-relaxed max-w-xl">
+            <p class="text-xs sm:text-sm text-[#737B94] mt-2 leading-relaxed max-w-2xl font-medium">
               Real-time doubt clustering, prerequisite failure patterns, and recommended classroom interventions.
             </p>
           </div>
-          <span class="badge-clean-emerald text-xs font-semibold px-3 py-1.5 rounded-lg self-start whitespace-nowrap">
+          <span class="text-xs font-extrabold text-[#35C98A] bg-[#35C98A]/10 border border-[#35C98A]/20 px-3.5 py-2 rounded-xl self-start whitespace-nowrap">
             NeonDB Sync Active
           </span>
         </div>
       </div>
-      <div class="grid grid-cols-2 sm:grid-cols-4 border-t border-slate-100">
-        <div class="p-4 border-r border-slate-100">
-          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Active Doubts</div>
-          <div class="text-2xl font-bold text-slate-900">42</div>
-          <div class="text-[11px] text-slate-500 mt-0.5">queries in queue</div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 border-t border-[#E9EDFF] bg-[#F7F9FF]">
+        <div class="p-5 border-r border-[#E9EDFF]">
+          <div class="text-[10px] font-extrabold text-[#737B94] uppercase tracking-wider mb-1">Total Queries</div>
+          <div id="fac-total-queries-count" class="text-3xl font-extrabold text-[#0B1230]">0</div>
+          <div class="text-[11px] text-[#737B94] font-medium mt-1">all-time queries</div>
         </div>
-        <div class="p-4 sm:border-r border-slate-100">
-          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Top Gap</div>
-          <div class="text-sm font-bold text-amber-600 leading-snug mt-0.5">Unsorted Binary Search</div>
-          <div class="text-[11px] text-slate-500 mt-0.5">unresolved concept</div>
+        <div class="p-5 sm:border-r border-[#E9EDFF]">
+          <div class="text-[10px] font-extrabold text-[#737B94] uppercase tracking-wider mb-1">Answered</div>
+          <div id="fac-answered-queries-count" class="text-3xl font-extrabold text-[#35C98A]">0</div>
+          <div class="text-[11px] text-[#737B94] font-medium mt-1">has at least 1 answer</div>
         </div>
-        <div class="p-4 border-r border-t sm:border-t-0 border-slate-100">
-          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Peer Resolution</div>
-          <div class="text-2xl font-bold text-emerald-600">78.4%</div>
-          <div class="text-[11px] text-slate-500 mt-0.5">success rate</div>
+        <div class="p-5 border-r border-t sm:border-t-0 border-[#E9EDFF]">
+          <div class="text-[10px] font-extrabold text-[#737B94] uppercase tracking-wider mb-1">Unanswered</div>
+          <div id="fac-unanswered-queries-count" class="text-3xl font-extrabold text-[#FF5C70]">0</div>
+          <div class="text-[11px] text-[#737B94] font-medium mt-1">needs immediate attention</div>
         </div>
-        <div class="p-4 border-t sm:border-t-0 border-slate-100">
-          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Prerequisite Alert</div>
-          <div class="text-sm font-bold text-slate-900 leading-snug mt-0.5">Stack &bull; Recursion</div>
-          <div class="text-[11px] text-slate-500 mt-0.5">linked gaps</div>
+        <div class="p-5 border-t sm:border-t-0 border-[#E9EDFF]">
+          <div class="text-[10px] font-extrabold text-[#737B94] uppercase tracking-wider mb-1">Yet to Verify</div>
+          <div id="fac-unverified-queries-count" class="text-3xl font-extrabold text-[#FFC857]">0</div>
+          <div class="text-[11px] text-[#737B94] font-medium mt-1">awaiting faculty approval</div>
         </div>
       </div>
     </div>
 
-    <!-- 2. CAMPUS LEARNING GAPS & RECOMMENDED INTERVENTIONS (Section 15 of PDF) -->
+    <!-- 2. CAMPUS LEARNING GAPS & RECOMMENDED INTERVENTIONS -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
       <!-- Learning Gap Heatmap -->
-      <div class="crisp-card p-5 bg-white shadow-sm border border-slate-200">
+      <div class="card-modern bg-white p-6 shadow-sm border-[#E9EDFF]">
         <h3
-          class="text-xs font-bold uppercase tracking-wider text-slate-900 mb-3 pb-2 border-b border-slate-100 flex items-center justify-between">
+          class="text-xs font-extrabold uppercase tracking-wider text-[#0B1230] mb-4 pb-3 border-b border-[#E9EDFF] flex items-center justify-between">
           <span>Campus Concept Gap Clusters</span>
-          <span class="text-[10px] text-slate-400">Aggregated Signal</span>
+          <span class="text-[10px] font-bold text-[#737B94] bg-[#F7F9FF] px-2 py-1 rounded-md border border-[#E9EDFF]">Aggregated Signal</span>
         </h3>
 
-        <div class="space-y-3 text-xs">
-          <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
-            <div class="flex justify-between items-center mb-1">
-              <span class="font-bold text-slate-900">Binary Search &rarr; Sorted Array Requirement</span>
-              <span class="badge-clean-rose text-[10px] font-bold px-1.5 py-0.2 rounded">32% Failure Rate</span>
-            </div>
-            <p class="text-[11px] text-slate-500 mb-2">Common misconception: Assuming binary search operates on
-              arbitrary unsorted data.</p>
-            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-              <div class="h-full bg-rose-500 rounded-full" style="width: 32%"></div>
-            </div>
-          </div>
-
-          <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
-            <div class="flex justify-between items-center mb-1">
-              <span class="font-bold text-slate-900">Depth-First Search &rarr; Call Stack Mechanism</span>
-              <span class="badge-clean-amber text-[10px] font-bold px-1.5 py-0.2 rounded">24% Gap</span>
-            </div>
-            <p class="text-[11px] text-slate-500 mb-2">Prerequisite gap: Students not understanding how function call
-              frames behave as LIFO stack.</p>
-            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-              <div class="h-full bg-amber-500 rounded-full" style="width: 24%"></div>
-            </div>
-          </div>
+        <div id="fac-gap-heatmap-container" class="space-y-3.5 text-xs">
+          <!-- Dynamic Content -->
         </div>
       </div>
 
-      <!-- Recommended Classroom Interventions (Section 15 of PDF) -->
-      <div class="crisp-card p-5 bg-white shadow-sm border border-slate-200">
+      <!-- Recommended Classroom Interventions -->
+      <div class="card-modern bg-white p-6 shadow-sm border-[#E9EDFF]">
         <h3
-          class="text-xs font-bold uppercase tracking-wider text-slate-900 mb-3 pb-2 border-b border-slate-100 flex items-center justify-between">
+          class="text-xs font-extrabold uppercase tracking-wider text-[#0B1230] mb-4 pb-3 border-b border-[#E9EDFF] flex items-center justify-between">
           <span>AI-Recommended Classroom Interventions</span>
-          <span class="text-[10px] text-emerald-600 font-bold">Actionable</span>
+          <span class="text-[10px] text-[#35C98A] font-extrabold bg-[#35C98A]/10 px-2 py-1 rounded-md border border-[#35C98A]/20">Actionable</span>
         </h3>
 
-        <div class="space-y-3 text-xs">
-          <div class="p-3 rounded-lg bg-emerald-50/50 border border-emerald-200 text-slate-800">
-            <div class="font-bold text-emerald-950 mb-1 flex items-center gap-1.5">
-              <i data-lucide="zap" class="w-3.5 h-3.5 text-emerald-600"></i>
-              <span>Next Lecture Topic: Explicit Stack Simulation</span>
-            </div>
-            <p class="text-[11px] text-slate-600 leading-relaxed">
-              Spend 10 minutes in CS101 demonstrating how iterative DFS uses a <code>Stack</code> object vs function
-              call stack to resolve 24 student inquiries.
-            </p>
-          </div>
-
-          <div class="p-3 rounded-lg bg-blue-50/50 border border-blue-200 text-slate-800">
-            <div class="font-bold text-blue-950 mb-1 flex items-center gap-1.5">
-              <i data-lucide="book-marked" class="w-3.5 h-3.5 text-blue-600"></i>
-              <span>Resource Validation</span>
-            </div>
-            <p class="text-[11px] text-slate-600 leading-relaxed">
-              Validate Rahul Sharma&apos;s peer explanation for DFS with 1 click to promote it into campus canonical
-              knowledge.
-            </p>
-          </div>
+        <div id="fac-ai-interventions-container" class="space-y-3.5 text-xs">
+          <!-- Dynamic Content -->
         </div>
       </div>
-
     </div>
 
     <!-- 3. DOUBT QUEUE -->
     <div class="space-y-4">
-      <div class="flex items-center justify-between">
-        <h2 class="text-base font-bold text-slate-950 flex items-center gap-2">
-          <i data-lucide="inbox" class="w-4 h-4 text-slate-600"></i>
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <h2 class="text-lg font-extrabold text-[#0B1230] flex items-center gap-2">
+          <i data-lucide="inbox" class="w-5 h-5 text-[#4B46FF]"></i>
           Faculty Doubt Queue &amp; Auto-Sort Verification
         </h2>
-        <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg"
+        <span class="text-xs font-bold text-[#4B46FF] bg-[#F7F9FF] px-3.5 py-2 rounded-xl border border-[#E9EDFF]"
           id="fac-header-domain">Domain: Artificial Intelligence</span>
       </div>
+
+      <!-- Filters -->
+      <div class="flex flex-wrap items-center gap-2 border-b border-[#E9EDFF] pb-4" id="faculty-filters">
+        <button onclick="setFacFilter('all')" class="fac-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-[#4B46FF] text-white shadow-sm" data-filter="all">All Questions</button>
+        <button onclick="setFacFilter('active')" class="fac-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-[#737B94] hover:bg-[#F7F9FF] border border-[#E9EDFF]" data-filter="active">Active (Unresolved)</button>
+        <button onclick="setFacFilter('unanswered')" class="fac-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-[#737B94] hover:bg-[#F7F9FF] border border-[#E9EDFF]" data-filter="unanswered">Unanswered</button>
+        <button onclick="setFacFilter('answered')" class="fac-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-[#737B94] hover:bg-[#F7F9FF] border border-[#E9EDFF]" data-filter="answered">Answered</button>
+        <button onclick="setFacFilter('not_verified')" class="fac-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-[#737B94] hover:bg-[#F7F9FF] border border-[#E9EDFF]" data-filter="not_verified">Not Verified</button>
+        <button onclick="setFacFilter('verified')" class="fac-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-[#737B94] hover:bg-[#F7F9FF] border border-[#E9EDFF]" data-filter="verified">Verified</button>
+      </div>
+
       <div id="faculty-queue-list" class="space-y-4">
         <!-- Injected via JS -->
       </div>
@@ -195,35 +206,34 @@
   <!-- ANSWER / VALIDATE MODAL -->
   <div id="faculty-answer-modal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
     <div
-      class="crisp-card max-w-xl w-full p-6 bg-white shadow-xl border border-slate-300 relative max-h-[90vh] overflow-y-auto">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-4">
+      class="card-modern max-w-xl w-full p-6 bg-white shadow-2xl border-[#E9EDFF] relative max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-[#E9EDFF] mb-5">
         <div>
-          <h3 class="text-base font-bold text-slate-900">Faculty Knowledge Validation</h3>
-          <p class="text-xs text-slate-500">Provide official faculty explanation or validate peer response</p>
+          <h3 class="text-base font-extrabold text-[#0B1230]">Faculty Knowledge Validation</h3>
+          <p class="text-xs text-[#737B94] font-medium">Provide official faculty explanation or validate peer response</p>
         </div>
         <button type="button" onclick="closeFacultyModal()" aria-label="Close modal"
-          class="text-slate-400 hover:text-slate-700 p-1">
-          <i data-lucide="x" class="w-4 h-4"></i>
+          class="text-[#737B94] hover:text-[#0B1230] p-1.5 rounded-xl hover:bg-[#F7F9FF]">
+          <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <form onsubmit="submitFacultyAnswer(event)" class="space-y-3.5">
+      <form onsubmit="submitFacultyAnswer(event)" class="space-y-4">
         <input type="hidden" id="fac-hidden-doubt-id">
 
         <div>
-          <label class="block text-xs font-semibold text-slate-700 mb-1">Official Solution (Markdown / Code /
-            Formulas)</label>
-          <textarea id="fac-solution-text" rows="5" required
+          <label class="block text-xs font-bold text-[#737B94] uppercase tracking-wider mb-2">Official Solution (Markdown / Code / Formulas)</label>
+          <textarea id="fac-solution-text" rows="6" required
             placeholder="Write the authoritative explanation to be saved in NeonDB..."
-            class="w-full bg-white border border-slate-300 rounded-md p-3 text-xs text-slate-900 focus:outline-none focus:border-slate-900"></textarea>
+            class="w-full bg-[#F7F9FF] border border-[#E9EDFF] rounded-xl p-3.5 text-xs text-[#20263D] focus:bg-white focus:border-[#4B46FF] focus:ring-2 ring-[#4B46FF]/10 outline-none transition-all leading-relaxed"></textarea>
         </div>
 
-        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-[#E9EDFF]">
           <button type="button" onclick="closeFacultyModal()"
-            class="px-3.5 py-2 text-xs font-medium text-slate-600 hover:text-slate-900">
+            class="px-4 py-2.5 text-xs font-bold text-[#737B94] hover:text-[#0B1230] transition-colors">
             Cancel
           </button>
-          <button type="submit" class="btn-primary px-4 py-2 text-xs font-semibold">
+          <button type="submit" class="btn-electric bg-[#4B46FF] hover:bg-[#3934E6] text-white px-5 py-2.5 text-xs font-bold rounded-xl shadow-md cursor-pointer transition-all">
             Save &bull; Validate Knowledge
           </button>
         </div>
@@ -232,15 +242,34 @@
   </div>
 
   <!-- Footer -->
-  <footer class="border-t border-slate-200 bg-white py-4 px-4 text-center text-xs text-slate-400">
-    <span>Study Buddy Platform &bull; AI-Powered Peer Learning Intelligence (PS-01)</span>
+  <footer class="bg-white border-t border-[#E9EDFF] mt-auto py-5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-[#737B94] text-xs">
+      <img src="assets/logo.png" alt="Logo" class="h-10 w-auto object-contain">
+      <span>&copy; 2026 What's that? Platform. Authorized Faculty Access Only.</span>
+    </div>
   </footer>
 
   <!-- Scripts -->
   <script src="js/data.js?v=2.1"></script>
   <script src="js/app.js?v=2.1"></script>
   <script>
+    let currentFacFilter = 'all';
+
+    function setFacFilter(filter) {
+      currentFacFilter = filter;
+      const btns = document.querySelectorAll('.fac-filter-btn');
+      btns.forEach(btn => {
+        if (btn.dataset.filter === filter) {
+          btn.className = 'fac-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-[#4B46FF] text-white shadow-sm';
+        } else {
+          btn.className = 'fac-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-[#737B94] hover:bg-[#F7F9FF] border border-[#E9EDFF]';
+        }
+      });
+      renderFacultyQueue();
+    }
+
     document.addEventListener("DOMContentLoaded", async () => {
+      checkAuth("faculty");
       const user = DB.getCurrentUser();
       if (user) {
         const nameEl = document.getElementById("fac-header-name");
@@ -290,22 +319,147 @@
       window.history.pushState({}, "", window.location.pathname);
     }
 
-    // Minimal markdown -> HTML for the AI's exam-style answers (just **bold**)
     function renderLiteMarkdown(text) {
       if (!text) return "";
       const escaped = String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
       return escaped.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
     }
 
+    function updateAnalytics(allDoubts) {
+      document.getElementById('fac-total-queries-count').textContent = allDoubts.length;
+      
+      const answered = allDoubts.filter(d => d.answers && d.answers.length > 0).length;
+      document.getElementById('fac-answered-queries-count').textContent = answered;
+      
+      const unanswered = allDoubts.filter(d => !d.answers || d.answers.length === 0).length;
+      document.getElementById('fac-unanswered-queries-count').textContent = unanswered;
+      
+      const unverified = allDoubts.filter(d => {
+        if (!d.answers || d.answers.length === 0) return false;
+        return d.answers.some(a => !a.isFacultyVerified);
+      }).length;
+      document.getElementById('fac-unverified-queries-count').textContent = unverified;
+
+      const activeDoubtsCount = allDoubts.filter(d => d.status !== 'Resolved').length;
+      const conceptCounts = {};
+      allDoubts.filter(d => d.status !== 'Resolved').forEach(d => {
+        conceptCounts[d.concept] = (conceptCounts[d.concept] || 0) + 1;
+      });
+      let topGap = "No Gaps";
+      let topGapCount = 0;
+      for (const c in conceptCounts) {
+        if (conceptCounts[c] > topGapCount) {
+          topGapCount = conceptCounts[c];
+          topGap = c;
+        }
+      }
+      
+      const sortedGaps = Object.keys(conceptCounts).sort((a,b) => conceptCounts[b] - conceptCounts[a]).slice(0, 2);
+      let heatmapHTML = '';
+      if (sortedGaps.length === 0) {
+        heatmapHTML = '<div class="text-[#737B94] italic p-4 text-center">No active gaps detected.</div>';
+      } else {
+        sortedGaps.forEach((gap, index) => {
+          const count = conceptCounts[gap];
+          const percentage = Math.round((count / Math.max(1, activeDoubtsCount)) * 100);
+          const color = index === 0 ? 'FF5C70' : 'FFC857';
+          const misconcept = allDoubts.find(d => d.concept === gap)?.misconception || `Misunderstanding of ${gap}`;
+          
+          heatmapHTML += `
+              <div class="p-4 rounded-xl bg-[#F7F9FF] border border-[#E9EDFF]">
+                <div class="flex justify-between items-center mb-1.5">
+                  <span class="font-bold text-[#0B1230] text-xs">${gap} &rarr; Foundation Required</span>
+                  <span class="bg-[#FF5C70]/10 text-[#FF5C70] border border-[#FF5C70]/20 text-[10px] font-extrabold px-2 py-0.5 rounded-md">${percentage}% Failure Rate</span>
+                </div>
+                <p class="text-[11px] text-[#737B94] mb-2.5 font-medium">Detected issue: ${misconcept}</p>
+                <div class="w-full h-2 bg-[#E9EDFF] rounded-full overflow-hidden">
+                  <div class="h-full bg-[#FF5C70] rounded-full" style="width: ${percentage}%"></div>
+                </div>
+              </div>
+          `;
+        });
+      }
+      document.getElementById('fac-gap-heatmap-container').innerHTML = heatmapHTML;
+      
+      let interventionsHTML = '';
+      if (topGap !== "No Gaps") {
+         interventionsHTML += `
+              <div class="p-4 rounded-xl bg-[#35C98A]/10 border border-[#35C98A]/20 text-[#0B1230] mb-3">
+                <div class="font-bold text-[#0B1230] mb-1 flex items-center gap-2 text-xs">
+                  <i data-lucide="zap" class="w-4 h-4 text-[#35C98A]"></i>
+                  <span>Next Lecture Topic: Explicit ${topGap} Simulation</span>
+                </div>
+                <p class="text-[11px] text-[#737B94] leading-relaxed font-medium">
+                  Spend 10 minutes demonstrating core concepts of <strong>${topGap}</strong> to address ${topGapCount} recent inquiries.
+                </p>
+              </div>
+         `;
+      }
+      
+      let foundPeer = null;
+      allDoubts.forEach(d => {
+        if (d.answers) {
+          d.answers.forEach(a => {
+            if (!a.isFacultyVerified && !a.authorName.includes("AI")) {
+              foundPeer = { doubtId: d.id, author: a.authorName, concept: d.concept };
+            }
+          });
+        }
+      });
+      
+      if (foundPeer) {
+          interventionsHTML += `
+              <div class="p-4 rounded-xl bg-[#4B46FF]/10 border border-[#4B46FF]/20 text-[#0B1230]">
+                <div class="font-bold text-[#0B1230] mb-1 flex items-center gap-2 text-xs">
+                  <i data-lucide="book-marked" class="w-4 h-4 text-[#4B46FF]"></i>
+                  <span>Resource Validation</span>
+                </div>
+                <p class="text-[11px] text-[#737B94] leading-relaxed font-medium">
+                  Validate <strong>${foundPeer.author}</strong>'s peer explanation for ${foundPeer.concept} to promote it into campus canonical knowledge.
+                  <button type="button" onclick="openFacultyAnswer('${foundPeer.doubtId}')" class="text-[#4B46FF] font-bold ml-1 hover:underline">Review Now</button>
+                </p>
+              </div>
+          `;
+      }
+      
+      if (!interventionsHTML) {
+        interventionsHTML = '<div class="text-[#737B94] italic p-4 text-center">No immediate interventions required.</div>';
+      }
+      
+      document.getElementById('fac-ai-interventions-container').innerHTML = interventionsHTML;
+    }
+
     function renderFacultyQueue() {
-      const doubts = DB.getDoubts();
+      let allDoubts = DB.getDoubts();
+      updateAnalytics(allDoubts);
+
+      let doubts = allDoubts;
+      
+      if (currentFacFilter === 'active') {
+        doubts = doubts.filter(d => d.status !== 'Resolved');
+      } else if (currentFacFilter === 'unanswered') {
+        doubts = doubts.filter(d => !d.answers || d.answers.length === 0);
+      } else if (currentFacFilter === 'answered') {
+        doubts = doubts.filter(d => d.answers && d.answers.length > 0);
+      } else if (currentFacFilter === 'not_verified') {
+        doubts = doubts.filter(d => {
+          if (!d.answers || d.answers.length === 0) return true;
+          return d.answers.some(a => !a.isFacultyVerified);
+        });
+      } else if (currentFacFilter === 'verified') {
+        doubts = doubts.filter(d => {
+          if (!d.answers || d.answers.length === 0) return false;
+          return d.answers.some(a => a.isFacultyVerified);
+        });
+      }
+
       const container = document.getElementById("faculty-queue-list");
 
       if (doubts.length === 0) {
         container.innerHTML = `
-          <div class="p-8 text-center bg-white border border-slate-200 rounded-lg text-slate-400 text-xs shadow-sm">
-            <i data-lucide="info" class="w-8 h-8 mx-auto mb-2 text-slate-300"></i>
-            <span>No incoming doubts in the queue. The dashboard is clean!</span>
+          <div class="card-modern p-10 text-center bg-white border-[#E9EDFF] rounded-2xl text-[#737B94] text-xs shadow-sm">
+            <i data-lucide="info" class="w-8 h-8 mx-auto mb-3 text-[#4B46FF]"></i>
+            <span class="font-medium">No incoming doubts in the queue matching these filters.</span>
           </div>
         `;
         lucide.createIcons();
@@ -320,27 +474,27 @@
           peerAnswersBlock = d.answers.map((a, idx) => {
             const isPeer = a.authorName.includes("Peer Mentor") || a.authorName.includes("AI") || a.authorName.includes("StudyBuddy");
             const verifyBtn = (!a.isFacultyVerified) ? `
-              <button type="button" onclick="facultyVerifyPeerAnswer('${d.id}', ${idx})" class="mt-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded font-bold transition-all text-[10px] flex items-center gap-1 shadow-sm">
+              <button type="button" onclick="facultyVerifyPeerAnswer('${d.id}', ${idx})" class="mt-3 btn-electric bg-[#4B46FF] hover:bg-[#3934E6] text-white px-3.5 py-1.5 rounded-xl font-bold text-[11px] flex items-center gap-1.5 shadow-sm cursor-pointer transition-all">
                 <i data-lucide="check" class="w-3.5 h-3.5"></i>
                 <span>Approve & Verify Answer (Award Tag)</span>
               </button>
             ` : (a.isFacultyVerified ? `
-              <span class="text-emerald-600 font-bold text-[10px] flex items-center gap-0.5 mt-2">
-                <i data-lucide="award" class="w-3.5 h-3.5"></i>
+              <span class="text-[#35C98A] font-extrabold text-[11px] flex items-center gap-1 mt-3">
+                <i data-lucide="award" class="w-4 h-4"></i>
                 <span>Officially Faculty Verified</span>
               </span>
             ` : '');
 
             return `
-              <div class="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs">
-                <div class="flex items-center justify-between font-bold text-slate-700 mb-1">
+              <div class="mt-3.5 p-4 bg-[#F7F9FF] border border-[#E9EDFF] rounded-xl text-xs">
+                <div class="flex items-center justify-between font-bold text-[#0B1230] mb-1.5">
                   <span>Solution by: ${a.authorName}</span>
                   <div class="flex items-center gap-1.5">
-                    ${a.isAiVerified ? '<span class="bg-purple-100 text-purple-700 text-[8px] font-extrabold px-1.5 py-0.5 rounded flex items-center gap-0.5">🤖 AI Verified</span>' : ''}
-                    ${a.isFacultyVerified ? '<span class="bg-emerald-100 text-emerald-700 text-[8px] font-extrabold px-1.5 py-0.5 rounded flex items-center gap-0.5">🎓 Faculty Verified</span>' : ''}
+                    ${a.isAiVerified ? '<span class="bg-[#4B46FF]/10 text-[#4B46FF] border border-[#4B46FF]/20 text-[9px] font-extrabold px-2 py-0.5 rounded-md flex items-center gap-1">🤖 AI Verified</span>' : ''}
+                    ${a.isFacultyVerified ? '<span class="bg-[#35C98A]/10 text-[#35C98A] border border-[#35C98A]/20 text-[9px] font-extrabold px-2 py-0.5 rounded-md flex items-center gap-1">🎓 Faculty Verified</span>' : ''}
                   </div>
                 </div>
-                <p class="text-slate-600 pl-2 border-l-2 border-slate-300 italic">${renderLiteMarkdown(a.content)}</p>
+                <p class="text-[#20263D] pl-3 border-l-2 border-[#4B46FF] italic font-normal">${renderLiteMarkdown(a.content)}</p>
                 ${verifyBtn}
               </div>
             `;
@@ -348,34 +502,34 @@
         }
 
         return `
-          <div class="crisp-card p-5 bg-white border border-slate-200 hover:shadow-md transition-shadow">
-            <div class="flex items-center justify-between gap-2 mb-2">
-              <div class="flex items-center gap-1.5">
-                <span class="badge-clean-neutral px-2 py-0.5 rounded text-[10px] font-bold">${d.subject} &bull; ${d.concept}</span>
-                <span class="badge-clean-neutral px-2 py-0.5 rounded text-[10px] text-slate-500">${d.difficulty}</span>
-                <span class="badge-clean-purple px-2 py-0.5 rounded text-[10px] font-bold">Auto-Sort: ${d.intent}</span>
+          <div class="card-modern p-6 bg-white border-[#E9EDFF] hover:border-[#4B46FF]/30 hover:shadow-lg transition-all">
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <div class="flex items-center gap-2">
+                <span class="bg-[#F7F9FF] border border-[#E9EDFF] text-[#4B46FF] px-2.5 py-1 rounded-lg text-[10px] font-extrabold">${d.subject} &bull; ${d.concept}</span>
+                <span class="bg-[#F7F9FF] border border-[#E9EDFF] text-[#737B94] px-2.5 py-1 rounded-lg text-[10px] font-bold">${d.difficulty}</span>
+                <span class="bg-[#4B46FF]/10 text-[#4B46FF] px-2.5 py-1 rounded-lg text-[10px] font-extrabold">Auto-Sort: ${d.intent}</span>
               </div>
-              <span class="${isResolved ? 'badge-clean-emerald' : 'badge-clean-amber'} px-2 py-0.5 rounded text-[10px] font-bold">
+              <span class="${isResolved ? 'bg-[#35C98A]/10 text-[#35C98A] border border-[#35C98A]/20' : 'bg-[#FFC857]/15 text-[#0B1230] border border-[#FFC857]/30'} px-2.5 py-1 rounded-lg text-[10px] font-extrabold">
                 ${d.status}
               </span>
             </div>
 
-            <h4 class="text-sm font-bold text-slate-950 mb-1 flex items-center gap-2 flex-wrap">
+            <h4 class="text-base font-extrabold text-[#0B1230] mb-1.5 flex items-center gap-2 flex-wrap">
               <span>${d.title}</span>
-              ${d.examMode === "5m" ? '<span class="bg-violet-100 border border-violet-200 text-violet-700 px-2 py-0.5 rounded text-[10px] font-bold">5 Mark</span>' : ''}
-              ${d.examMode === "10m" ? '<span class="bg-violet-100 border border-violet-200 text-violet-700 px-2 py-0.5 rounded text-[10px] font-bold">10 Mark</span>' : ''}
+              ${d.examMode === "5m" ? '<span class="bg-[#4B46FF]/10 text-[#4B46FF] px-2.5 py-0.5 rounded-md text-[10px] font-bold">5 Mark</span>' : ''}
+              ${d.examMode === "10m" ? '<span class="bg-[#4B46FF]/10 text-[#4B46FF] px-2.5 py-0.5 rounded-md text-[10px] font-bold">10 Mark</span>' : ''}
             </h4>
-            <p class="text-xs text-slate-600 mb-3">${d.rawQuery}</p>
+            <p class="text-xs text-[#737B94] mb-4 font-normal leading-relaxed">${d.rawQuery}</p>
 
-            <div class="p-2.5 rounded bg-slate-50 border border-slate-100 text-[11px] mb-3 text-slate-600">
-              <strong>Detected Misconception:</strong> ${d.misconception}
+            <div class="p-3 rounded-xl bg-[#F7F9FF] border border-[#E9EDFF] text-xs mb-4 text-[#20263D]">
+              <strong class="text-[#0B1230]">Detected Misconception:</strong> ${d.misconception}
             </div>
 
             ${peerAnswersBlock}
 
-            <div class="flex items-center justify-between pt-2.5 mt-3 border-t border-slate-100 text-xs">
-              <span class="text-slate-500">Student: <strong>${d.studentName}</strong> (${d.studentYear})</span>
-              <button type="button" onclick="openFacultyAnswer('${d.id}')" class="btn-primary px-3 py-1.5 text-xs font-semibold">
+            <div class="flex items-center justify-between pt-3 mt-4 border-t border-[#E9EDFF] text-xs">
+              <span class="text-[#737B94] font-medium">Student: <strong class="text-[#0B1230]">${d.studentName}</strong> (${d.studentYear})</span>
+              <button type="button" onclick="openFacultyAnswer('${d.id}')" class="btn-electric bg-[#4B46FF] hover:bg-[#3934E6] text-white px-4 py-2 text-xs font-bold rounded-xl cursor-pointer transition-all">
                 ${isResolved ? 'Update / Validate Solution' : 'Answer Doubt'}
               </button>
             </div>
@@ -386,14 +540,19 @@
       lucide.createIcons();
     }
 
-    async function facultyVerifyPeerAnswer(doubtId, answerIdx) {
-      await DB.setAnswerFacultyVerified(doubtId, answerIdx, true);
-
-      // Award extra 15 points to the peer mentor student
-      await DB.updateUserPoints(15);
-
-      showToast("Peer solution verified! Faculty approval tag awarded (+15 pts).", "success");
+    function facultyVerifyPeerAnswer(doubtId, answerIdx) {
+      const doubts = DB.getDoubts();
+      const doubt = doubts.find(d => String(d.id) === String(doubtId));
+      if (doubt && doubt.answers && doubt.answers[answerIdx]) {
+         doubt.answers[answerIdx].isFacultyVerified = true;
+         DB.saveDoubts(doubts);
+      }
       renderFacultyQueue();
+      showToast("Peer solution verified! Faculty approval tag awarded (+15 pts).", "success");
+
+      DB.setAnswerFacultyVerified(doubtId, answerIdx, true).then(() => {
+        DB.updateUserPoints(15);
+      }).catch(err => console.error("Verify error:", err));
     }
 
     function openFacultyAnswer(doubtId) {
@@ -408,7 +567,6 @@
       e.preventDefault();
 
       const submitBtn = e.target.querySelector('button[type="submit"]');
-      // Guard: a second click/submit while one is already in flight is ignored.
       if (submitBtn && submitBtn.disabled) return;
 
       const doubtId = document.getElementById("fac-hidden-doubt-id").value;
@@ -422,9 +580,11 @@
         lucide.createIcons();
       }
 
+      const user = DB.getCurrentUser();
       const answerData = {
-        authorName: "Dr. Sarah Jenkins (Faculty Lead)",
-        authorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250",
+        authorName: user.name,
+        authorAvatar: user.avatar,
+        authorEmail: user.email,
         style: "Technical",
         isAiVerified: true,
         isFacultyVerified: true,
@@ -432,10 +592,28 @@
       };
 
       try {
-        await DB.resolveDoubt(doubtId, answerData);
+        const doubts = DB.getDoubts();
+        const d = doubts.find(dx => String(dx.id) === String(doubtId));
+        if (d) {
+          if (!d.answers) d.answers = [];
+          d.answers.push({
+            id: "temp-" + Date.now(),
+            ...answerData,
+            helpfulnessUpvotes: 0,
+            replies: [],
+            createdAt: new Date().toISOString()
+          });
+          d.status = 'Resolved';
+          DB.saveDoubts(doubts);
+        }
+
         closeFacultyModal();
         showToast("Solution saved & knowledge validated in NeonDB!", "success");
         renderFacultyQueue();
+
+        DB.resolveDoubt(doubtId, answerData).catch(err => {
+            console.error("Error saving faculty solution:", err);
+        });
       } catch (err) {
         showToast("Failed to save solution. Please try again.", "error");
       } finally {

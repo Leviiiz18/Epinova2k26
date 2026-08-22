@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile — What's that?</title>
+  <meta name="description" content="View your What's that? profile, activity stats, points, and account settings." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: #F5F7FC; font-family: 'Inter', sans-serif; }
+    .stat-card { transition: transform 0.18s ease, box-shadow 0.18s ease; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(75,70,255,0.10); }
+    .avatar-ring { box-shadow: 0 0 0 4px #fff, 0 0 0 7px #4B46FF33; }
+    @keyframes shimmer { 0%,100%{opacity:.6} 50%{opacity:1} }
+    .shimmer { animation: shimmer 2s infinite; }
+    .badge-premium { background: linear-gradient(135deg,#4B46FF,#7C78FF); }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#E9EDFF]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <a href="student-dashboard.html" title="Back to Dashboard"
+          class="flex items-center justify-center text-[#737B94] hover:text-[#0B1230] transition-all bg-[#F7F9FF] hover:bg-[#E9EDFF] p-2.5 rounded-xl border border-[#E9EDFF] shadow-sm">
+          <i data-lucide="chevron-left" class="w-5 h-5 text-[#4B46FF]"></i>
+        </a>
+        <div class="h-5 w-px bg-[#E9EDFF]"></div>
+        <a href="index.html" class="flex items-center">
+          <img src="assets/logo.png" alt="What's that?" class="h-14 w-auto object-contain hover:scale-105 transition-transform">
+        </a>
+      </div>
+      <span class="text-xs font-bold text-[#4B46FF] bg-[#F7F9FF] px-3.5 py-2 rounded-xl border border-[#E9EDFF]">My Profile</span>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-10 w-full space-y-6">
+
+    <!-- Profile Hero Card -->
+    <div class="relative bg-white rounded-3xl border border-[#E9EDFF] shadow-sm">
+
+      <!-- Cover gradient (standalone, no overflow-hidden clipping needed) -->
+      <div class="h-32 bg-gradient-to-br from-[#4B46FF] via-[#6A66FF] to-[#9B98FF] rounded-t-3xl relative">
+        <span class="absolute bottom-0 right-6 text-[80px] opacity-10 font-black select-none leading-none">?</span>
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,255,255,0.15),transparent_60%)] rounded-t-3xl"></div>
+      </div>
+
+      <!-- Avatar — pinned at the boundary, absolutely positioned so nothing clips it -->
+      <div class="absolute left-6" style="top: calc(128px - 40px);">
+        <img id="prof-avatar"
+          src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150"
+          class="w-20 h-20 rounded-2xl object-cover border-4 border-white shadow-lg avatar-ring"
+          alt="Avatar">
+      </div>
+
+      <!-- Content — padded so name clears the avatar -->
+      <div class="px-6 pb-6 pt-3">
+        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <!-- Name block — left-padded to sit beside the avatar -->
+          <div class="pl-24 pt-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="text-xl font-extrabold text-[#0B1230]" id="prof-name">Alex Morgan</h1>
+              <span id="prof-role-badge"
+                class="badge-premium text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Student</span>
+            </div>
+            <p class="text-xs text-[#737B94] font-medium mt-0.5" id="prof-email">alex.morgan@studybuddy.edu</p>
+          </div>
+          <!-- Points wallet -->
+          <div class="flex items-center gap-2 bg-[#FFC857]/15 border border-[#FFC857]/40 px-4 py-2.5 rounded-2xl shadow-sm mt-1 self-start">
+            <span class="text-lg">🪙</span>
+            <div>
+              <div class="text-xs text-[#737B94] font-semibold uppercase tracking-wider leading-none">Points</div>
+              <div class="text-2xl font-black text-[#0B1230] leading-tight" id="prof-points">100</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Meta pills -->
+        <div class="flex flex-wrap items-center gap-2 mt-5">
+          <span class="flex items-center gap-1.5 bg-[#F7F9FF] border border-[#E9EDFF] px-3 py-1.5 rounded-xl text-xs font-bold text-[#4B46FF]">
+            <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+            <span id="prof-year">3rd Year</span>
+          </span>
+          <span class="flex items-center gap-1.5 bg-[#F7F9FF] border border-[#E9EDFF] px-3 py-1.5 rounded-xl text-xs font-bold text-[#20263D]">
+            <i data-lucide="user" class="w-3.5 h-3.5 text-[#737B94]"></i>
+            <span id="prof-id-display">ID: —</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="stats-grid">
+      <!-- Injected by JS -->
+    </div>
+
+    <!-- Activity Summary -->
+    <div class="bg-white rounded-3xl border border-[#E9EDFF] shadow-sm p-6 space-y-5">
+      <div class="flex items-center gap-2 mb-1">
+        <i data-lucide="bar-chart-2" class="w-4 h-4 text-[#4B46FF]"></i>
+        <h2 class="text-sm font-extrabold text-[#0B1230] uppercase tracking-wider">Activity Breakdown</h2>
+      </div>
+
+      <!-- Progress bars -->
+      <div class="space-y-4" id="activity-bars">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+
+    <!-- Recent Doubts -->
+    <div class="bg-white rounded-3xl border border-[#E9EDFF] shadow-sm p-6">
+      <div class="flex items-center gap-2 mb-4">
+        <i data-lucide="help-circle" class="w-4 h-4 text-[#4B46FF]"></i>
+        <h2 class="text-sm font-extrabold text-[#0B1230] uppercase tracking-wider">My Recent Doubts</h2>
+      </div>
+      <div id="prof-doubts-list" class="space-y-2.5">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+
+    <!-- Danger Zone: Account Actions -->
+    <div class="bg-white rounded-3xl border border-[#E9EDFF] shadow-sm p-6">
+      <div class="flex items-center gap-2 mb-5">
+        <i data-lucide="settings" class="w-4 h-4 text-[#737B94]"></i>
+        <h2 class="text-sm font-extrabold text-[#0B1230] uppercase tracking-wider">Account</h2>
+      </div>
+      <div class="space-y-3">
+        <!-- Switch to other role (demo helper) -->
+        <button onclick="switchRole()"
+          class="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-[#F7F9FF] border border-[#E9EDFF] text-left hover:bg-[#E9EDFF] transition-all group">
+          <div class="w-9 h-9 bg-[#4B46FF]/10 rounded-xl flex items-center justify-center shrink-0">
+            <i data-lucide="refresh-cw" class="w-4 h-4 text-[#4B46FF]"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-bold text-[#0B1230]">Switch Role</div>
+            <div class="text-xs text-[#737B94] font-medium" id="switch-role-hint">Switch to Faculty view</div>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-[#737B94] group-hover:translate-x-0.5 transition-transform"></i>
+        </button>
+
+        <!-- Logout -->
+        <button onclick="logout()"
+          class="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-[#FFF5F7] border border-[#FF5C70]/20 text-left hover:bg-[#FF5C70]/10 transition-all group">
+          <div class="w-9 h-9 bg-[#FF5C70]/10 rounded-xl flex items-center justify-center shrink-0">
+            <i data-lucide="log-out" class="w-4 h-4 text-[#FF5C70]"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-sm font-bold text-[#FF5C70]">Sign Out</div>
+            <div class="text-xs text-[#737B94] font-medium">You will be redirected to the login page</div>
+          </div>
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-[#E9EDFF] mt-auto py-5">
+    <div class="max-w-4xl mx-auto px-4 flex items-center justify-between text-[#737B94] text-xs">
+      <img src="assets/logo.png" alt="Logo" class="h-8 w-auto object-contain">
+      <span>&copy; 2026 What's that? Platform</span>
+    </div>
+  </footer>
+
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+
+  <script src="js/data.js?v=2.1"></script>
+  <script src="js/app.js?v=2.1"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = DB.getCurrentUser();
+      if (!user) { window.location.href = 'login.html'; return; }
+
+      // --- Populate Hero ---
+      document.getElementById('prof-name').textContent = user.name || 'User';
+      document.getElementById('prof-email').textContent = user.email || '';
+      const rawYear = user.year || user.yearName || '';
+      document.getElementById('prof-year').textContent = rawYear.replace(/\s*\(.*?\)\s*/g, '').trim();
+      document.getElementById('prof-points').textContent = (user.points || 100).toLocaleString();
+      document.getElementById('prof-id-display').textContent = 'ID: ' + (user.id ? String(user.id).slice(0, 8) + '…' : '—');
+
+      if (user.avatar) {
+        document.getElementById('prof-avatar').src = user.avatar;
+      }
+
+      const roleBadge = document.getElementById('prof-role-badge');
+      if (user.role === 'faculty') {
+        roleBadge.textContent = 'Faculty';
+        roleBadge.style.background = 'linear-gradient(135deg,#35C98A,#1EA87A)';
+        document.getElementById('switch-role-hint').textContent = 'Switch to Student view';
+      }
+
+      // --- Compute Stats from LocalStorage ---
+      const allDoubts = DB.getDoubts();
+      const myDoubts = allDoubts.filter(d => d.studentEmail === user.email || d.studentName === user.name);
+      const myAnswered = allDoubts.reduce((acc, d) => {
+        const mine = (d.answers || []).filter(a => a.authorEmail === user.email || a.authorName === user.name);
+        return acc + mine.length;
+      }, 0);
+      const mySolved = myDoubts.filter(d => d.status === 'Resolved').length;
+      const myVerified = allDoubts.reduce((acc, d) => {
+        const mine = (d.answers || []).filter(a => (a.authorEmail === user.email || a.authorName === user.name) && a.isFacultyVerified);
+        return acc + mine.length;
+      }, 0);
+      const upvotedDoubts = JSON.parse(localStorage.getItem('upvoted_doubts') || '[]');
+
+      // --- Stats Grid ---
+      const stats = [
+        { icon: 'help-circle', label: 'Doubts Asked', value: myDoubts.length, color: '#4B46FF', bg: '#EEF0FF' },
+        { icon: 'message-circle', label: 'Answers Given', value: myAnswered, color: '#35C98A', bg: '#E8FBF3' },
+        { icon: 'check-circle-2', label: 'Solved Doubts', value: mySolved, color: '#FFC857', bg: '#FFF8E1' },
+        { icon: 'shield-check', label: 'Verified Answers', value: myVerified, color: '#A78BFA', bg: '#F3EEFF' },
+      ];
+      document.getElementById('stats-grid').innerHTML = stats.map(s => `
+        <div class="stat-card bg-white rounded-2xl border border-[#E9EDFF] shadow-sm p-5 flex flex-col items-start gap-3">
+          <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:${s.bg}">
+            <i data-lucide="${s.icon}" class="w-4 h-4" style="color:${s.color}"></i>
+          </div>
+          <div>
+            <div class="text-2xl font-black text-[#0B1230]">${s.value}</div>
+            <div class="text-[11px] font-semibold text-[#737B94] leading-tight mt-0.5">${s.label}</div>
+          </div>
+        </div>
+      `).join('');
+
+      // --- Activity Bars ---
+      const totalActivity = Math.max(1, myDoubts.length + myAnswered + myVerified);
+      const bars = [
+        { label: 'Doubts Posted', value: myDoubts.length, total: totalActivity, color: '#4B46FF' },
+        { label: 'Answers Written', value: myAnswered, total: totalActivity, color: '#35C98A' },
+        { label: 'Verified Answers', value: myVerified, total: totalActivity, color: '#A78BFA' },
+        { label: 'Questions Upvoted', value: upvotedDoubts.length, total: Math.max(1, upvotedDoubts.length, myDoubts.length), color: '#FFC857' },
+      ];
+      document.getElementById('activity-bars').innerHTML = bars.map(b => {
+        const pct = Math.min(100, Math.round((b.value / b.total) * 100));
+        return `
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-semibold text-[#20263D]">${b.label}</span>
+              <span class="text-xs font-bold text-[#0B1230]">${b.value}</span>
+            </div>
+            <div class="h-2 bg-[#F7F9FF] rounded-full border border-[#E9EDFF] overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-700" style="width:${pct}%;background:${b.color}"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // --- Recent Doubts ---
+      const recentDoubts = [...myDoubts].reverse().slice(0, 5);
+      if (recentDoubts.length === 0) {
+        document.getElementById('prof-doubts-list').innerHTML = `
+          <div class="text-center py-8 text-xs text-[#737B94]">
+            <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 text-[#E9EDFF]"></i>
+            No doubts posted yet
+          </div>`;
+      } else {
+        document.getElementById('prof-doubts-list').innerHTML = recentDoubts.map(d => `
+          <a href="question.html?id=${d.id}"
+            class="flex items-center gap-3 px-4 py-3 rounded-xl border border-[#E9EDFF] bg-[#F7F9FF] hover:border-[#4B46FF]/30 hover:bg-white transition-all group">
+            <div class="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center ${d.status === 'Resolved' ? 'bg-[#35C98A]/10' : 'bg-[#4B46FF]/08'}">
+              <i data-lucide="${d.status === 'Resolved' ? 'check-circle-2' : 'help-circle'}" class="w-4 h-4 ${d.status === 'Resolved' ? 'text-[#35C98A]' : 'text-[#4B46FF]'}"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-bold text-[#0B1230] truncate group-hover:text-[#4B46FF] transition-colors">${d.title}</div>
+              <div class="text-[10px] text-[#737B94] font-medium mt-0.5">${d.subject || 'General'} · ${d.answers ? d.answers.length : 0} answer${(d.answers && d.answers.length === 1) ? '' : 's'}</div>
+            </div>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-[#737B94] shrink-0 group-hover:translate-x-0.5 transition-transform"></i>
+          </a>
+        `).join('');
+      }
+
+      lucide.createIcons();
+    });
+
+    function switchRole() {
+      const user = DB.getCurrentUser();
+      if (!user) return;
+      if (user.role === 'student') {
+        loginAsDemo('faculty');
+      } else {
+        loginAsDemo('student');
+      }
+    }
+  </script>
+</body>
+</html>

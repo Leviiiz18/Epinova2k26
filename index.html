@@ -3,20 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Study Buddy — Academic Doubt Resolution Platform</title>
-  <meta name="description" content="Study Buddy connects students directly with subject faculty for 24/7 academic doubt resolution and year-wise course management.">
+  <title>What's that? — Academic Doubt Resolution Platform</title>
+  <meta name="description" content="What's that? connects students directly with subject faculty for 24/7 academic doubt resolution and year-wise course management.">
 
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS CDN & Config -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif']
+          },
           colors: {
-            slate: {
-              850: '#172033',
-              950: '#0b0f19'
+            brand: {
+              DEFAULT: '#4B46FF',
+              hover: '#3934E6',
+              accent: '#6C8CFF',
+              navy: '#0B1230',
+              dark: '#070B1D',
+              ice: '#F7F9FF',
+              main: '#F5F7FC',
+              secondary: '#E9EDFF',
+              success: '#35C98A',
+              warning: '#FFC857',
+              error: '#FF5C70',
+              text: '#20263D',
+              muted: '#737B94'
             }
+          },
+          borderRadius: {
+            '2xl': '18px',
+            '3xl': '24px'
           }
         }
       }
@@ -29,36 +47,30 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between">
+<body class="bg-[#F5F7FC] text-[#20263D] min-h-screen flex flex-col justify-between font-sans">
 
   <!-- Navigation Bar -->
-  <header class="sticky top-0 z-50 crisp-nav bg-white/95 border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+  <header class="sticky top-0 z-50 crisp-nav bg-white/95 border-b border-[#E9EDFF]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
 
       <!-- Brand Logo -->
-      <a href="index.html" class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-lg bg-slate-900 flex items-center justify-center text-white">
-          <i data-lucide="graduation-cap" class="w-5 h-5"></i>
-        </div>
-        <div>
-          <span class="text-lg font-bold tracking-tight text-slate-900">Study Buddy</span>
-          <span class="hidden sm:inline-block text-xs text-slate-500 ml-2 pl-2 border-l border-slate-200">Academic Doubt Platform</span>
-        </div>
+      <a href="index.html" class="flex items-center py-1">
+        <img src="assets/logo.png" alt="Logo" class="h-16 sm:h-20 w-auto object-contain hover:scale-105 transition-transform">
       </a>
 
       <!-- Center Links -->
-      <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600">
-        <a href="#purpose" class="hover:text-slate-900 transition-colors">Purpose</a>
-        <a href="#dashboard-preview" class="hover:text-slate-900 transition-colors">Dashboard Preview</a>
-        <a href="#start-now" class="hover:text-slate-900 transition-colors">Portals</a>
+      <nav class="hidden md:flex items-center gap-7 text-sm font-semibold text-[#737B94]">
+        <a href="#purpose" class="hover:text-[#4B46FF] transition-colors">Purpose</a>
+        <a href="#dashboard-preview" class="hover:text-[#4B46FF] transition-colors">Dashboard Preview</a>
+        <a href="#start-now" class="hover:text-[#4B46FF] transition-colors">Portals</a>
       </nav>
 
       <!-- Top Right Actions -->
       <div class="flex items-center gap-3">
-        <a href="login.html" class="px-3.5 py-1.5 text-sm font-medium text-slate-700 hover:text-slate-900 rounded-md hover:bg-slate-100 transition-colors">
+        <a href="login.html" class="px-4 py-2 text-sm font-semibold text-[#0B1230] hover:text-[#4B46FF] rounded-xl hover:bg-[#F7F9FF] transition-colors">
           Log In
         </a>
-        <a href="login.html?tab=signup" class="btn-primary px-4 py-1.5 text-sm">
+        <a href="login.html?tab=signup" class="btn-electric px-5 py-2.5 text-sm font-semibold">
           Sign Up
         </a>
       </div>
@@ -71,31 +83,35 @@
     <!-- ========================================== -->
     <!-- SECTION 1: PURPOSE & DOUBT RESOLUTION HERO -->
     <!-- ========================================== -->
-    <section id="purpose" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 border-b border-slate-200 bg-white">
-      <div class="max-w-5xl mx-auto text-center">
+    <section id="purpose" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 border-b border-[#E9EDFF] bg-white relative overflow-hidden">
+      <!-- Background subtle glow -->
+      <div class="absolute -top-40 -left-40 w-96 h-96 bg-[#4B46FF]/5 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-[#6C8CFF]/5 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="max-w-5xl mx-auto text-center relative z-10">
 
         <!-- Top pill indicator -->
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold uppercase tracking-wider mb-6">
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E9EDFF]/60 border border-[#4B46FF]/20 text-[#4B46FF] text-xs font-bold uppercase tracking-wider mb-6">
+          <span class="w-2 h-2 rounded-full bg-[#35C98A] animate-pulse"></span>
           <span>Section 1 • Purpose</span>
         </div>
 
-        <h1 class="text-4xl sm:text-6xl font-bold tracking-tight text-slate-950 max-w-3xl mx-auto leading-tight mb-6">
+        <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-[#0B1230] max-w-3xl mx-auto leading-tight mb-6">
           The Gamified Peer-to-Peer Academic Learning Community.
         </h1>
 
-        <p class="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed mb-10 font-normal">
+        <p class="text-lg text-[#737B94] max-w-2xl mx-auto leading-relaxed mb-10 font-medium">
           Clear your doubts instantly with AI-powered auto-sorting, learn together with peer mentors, and claim reward points by answering community questions.
         </p>
 
         <!-- CTA Buttons -->
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-16">
-          <a href="#start-now" class="w-full sm:w-auto btn-primary px-6 py-3 text-sm flex items-center justify-center gap-2">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+          <a href="#start-now" class="w-full sm:w-auto btn-electric px-7 py-3.5 text-sm flex items-center justify-center gap-2">
             <span>Get Started</span>
             <i data-lucide="arrow-down" class="w-4 h-4"></i>
           </a>
-          <a href="#dashboard-preview" class="w-full sm:w-auto btn-secondary px-6 py-3 text-sm flex items-center justify-center gap-2">
-            <i data-lucide="layout" class="w-4 h-4 text-slate-500"></i>
+          <a href="#dashboard-preview" class="w-full sm:w-auto btn-cloud px-7 py-3.5 text-sm flex items-center justify-center gap-2">
+            <i data-lucide="layout" class="w-4 h-4 text-[#4B46FF]"></i>
             <span>View Dashboard Showcase</span>
           </a>
         </div>
@@ -103,32 +119,32 @@
         <!-- 3 Structured Feature Columns -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left pt-4">
 
-          <div class="crisp-card p-6 bg-slate-50/50">
-            <div class="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-900 mb-4 shadow-sm">
+          <div class="card-modern p-6 bg-[#F7F9FF]/60">
+            <div class="w-11 h-11 rounded-xl bg-[#4B46FF]/10 border border-[#4B46FF]/20 flex items-center justify-center text-[#4B46FF] mb-4">
               <i data-lucide="git-branch" class="w-5 h-5"></i>
             </div>
-            <h3 class="text-base font-bold text-slate-900 mb-1.5">Direct Subject Routing</h3>
-            <p class="text-xs text-slate-600 leading-relaxed">
+            <h3 class="text-base font-bold text-[#0B1230] mb-1.5">Direct Subject Routing</h3>
+            <p class="text-xs text-[#737B94] leading-relaxed font-medium">
               Every inquiry is routed solely to faculty qualified in that domain, preventing delays and mismatched answers.
             </p>
           </div>
 
-          <div class="crisp-card p-6 bg-slate-50/50">
-            <div class="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-900 mb-4 shadow-sm">
+          <div class="card-modern p-6 bg-[#F7F9FF]/60">
+            <div class="w-11 h-11 rounded-xl bg-[#4B46FF]/10 border border-[#4B46FF]/20 flex items-center justify-center text-[#4B46FF] mb-4">
               <i data-lucide="layers" class="w-5 h-5"></i>
             </div>
-            <h3 class="text-base font-bold text-slate-900 mb-1.5">Year-Wise Organization</h3>
-            <p class="text-xs text-slate-600 leading-relaxed">
+            <h3 class="text-base font-bold text-[#0B1230] mb-1.5">Year-Wise Organization</h3>
+            <p class="text-xs text-[#737B94] leading-relaxed font-medium">
               Quickly switch between 1st, 2nd, 3rd, and 4th year common semester subjects with designated faculty rosters.
             </p>
           </div>
 
-          <div class="crisp-card p-6 bg-slate-50/50">
-            <div class="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-900 mb-4 shadow-sm">
+          <div class="card-modern p-6 bg-[#F7F9FF]/60">
+            <div class="w-11 h-11 rounded-xl bg-[#4B46FF]/10 border border-[#4B46FF]/20 flex items-center justify-center text-[#4B46FF] mb-4">
               <i data-lucide="clock-4" class="w-5 h-5"></i>
             </div>
-            <h3 class="text-base font-bold text-slate-900 mb-1.5">24/7 Availability</h3>
-            <p class="text-xs text-slate-600 leading-relaxed">
+            <h3 class="text-base font-bold text-[#0B1230] mb-1.5">24/7 Availability</h3>
+            <p class="text-xs text-[#737B94] leading-relaxed font-medium">
               Submit questions at any hour. Track pending and resolved progress with real-time faculty solution notes.
             </p>
           </div>
@@ -141,92 +157,92 @@
     <!-- ============================================== -->
     <!-- SECTION 2: PICTURE OF DASHBOARD (CUSTOM DROP)  -->
     <!-- ============================================== -->
-    <section id="dashboard-preview" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 border-b border-slate-200 bg-slate-50">
+    <section id="dashboard-preview" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 border-b border-[#E9EDFF] bg-[#F5F7FC]">
       <div class="max-w-6xl mx-auto">
 
         <div class="text-center max-w-2xl mx-auto mb-12">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-700 text-xs font-semibold uppercase tracking-wider mb-4 shadow-sm">
-            <i data-lucide="image" class="w-3.5 h-3.5 text-slate-500"></i>
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#E9EDFF] text-[#4B46FF] text-xs font-bold uppercase tracking-wider mb-4 shadow-sm">
+            <i data-lucide="image" class="w-3.5 h-3.5"></i>
             <span>Section 2 • Dashboard Preview</span>
           </div>
-          <h2 class="text-3xl sm:text-4xl font-bold text-slate-950 tracking-tight mb-3">
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-[#0B1230] tracking-tight mb-3">
             Dashboard Interface Preview
           </h2>
-          <p class="text-sm text-slate-600">
+          <p class="text-sm text-[#737B94] font-medium">
             A clean, high-contrast interface designed for academic focus and swift doubt turnaround.
           </p>
         </div>
 
         <!-- Dashboard Picture Container Frame -->
-        <div class="crisp-card p-3 sm:p-4 bg-white shadow-sm overflow-hidden">
+        <div class="card-modern p-4 sm:p-5 bg-white shadow-lg overflow-hidden">
           
           <!-- Mock Browser Bar -->
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100 text-xs text-slate-400">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-[#E9EDFF] text-xs text-[#737B94]">
             <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-              <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-              <span class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
-              <span class="ml-2 font-mono text-[11px] text-slate-500">studybuddy.edu/student-dashboard</span>
+              <span class="w-3 h-3 rounded-full bg-[#FF5C70]"></span>
+              <span class="w-3 h-3 rounded-full bg-[#FFC857]"></span>
+              <span class="w-3 h-3 rounded-full bg-[#35C98A]"></span>
+              <span class="ml-3 font-mono text-[11px] text-[#20263D] font-medium">whatsthat.edu/student-dashboard</span>
             </div>
-            <span class="badge-clean-neutral px-2.5 py-0.5 rounded text-[11px] font-medium">Dashboard Screenshot Frame</span>
+            <span class="badge-clean-purple px-3 py-1 rounded-lg text-[11px] font-bold">Dashboard Showcase</span>
           </div>
 
           <!-- Screenshot Picture Slot with clean fallback -->
-          <div class="rounded-lg overflow-hidden border border-slate-200 bg-slate-100 min-h-[380px] flex flex-col justify-center items-center relative">
+          <div class="rounded-xl overflow-hidden border border-[#E9EDFF] bg-[#F7F9FF] min-h-[380px] flex flex-col justify-center items-center relative">
             <img id="custom-dashboard-img" 
                  src="assets/dashboard-preview.png" 
-                 alt="Study Buddy Dashboard Picture" 
+                 alt="What's that? Dashboard Picture" 
                  class="w-full h-auto object-cover"
                  onerror="if(this.src.endsWith('.png')){ this.src='assets/dashboard-preview.svg'; } else { this.style.display='none'; document.getElementById('dashboard-fallback-mockup').style.display='block'; }">
 
             <!-- Clean Structured Interactive Fallback -->
             <div id="dashboard-fallback-mockup" class="w-full p-6 text-left bg-white" style="display: none;">
-              <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+              <div class="flex items-center justify-between pb-4 border-b border-[#E9EDFF]">
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-lg bg-slate-900 text-white font-bold text-sm flex items-center justify-center">AM</div>
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-r from-[#4B46FF] to-[#6C8CFF] text-white font-bold text-sm flex items-center justify-center shadow-sm">AM</div>
                   <div>
-                    <h4 class="font-bold text-slate-900 text-sm">Alex Morgan</h4>
-                    <p class="text-xs text-slate-500">3rd Year Student • Computer Science &amp; Engineering</p>
+                    <h4 class="font-bold text-[#0B1230] text-sm">Alex Morgan</h4>
+                    <p class="text-xs text-[#737B94]">3rd Year Student • Computer Science &amp; Engineering</p>
                   </div>
                 </div>
                 <div class="flex items-center gap-2">
-                  <span class="badge-clean-purple px-2.5 py-1 rounded text-xs font-semibold">AI &amp; ML Routing Online</span>
-                  <span class="badge-clean-emerald px-2.5 py-1 rounded text-xs font-semibold">12 Solved</span>
+                  <span class="badge-clean-purple px-2.5 py-1 rounded-lg text-xs font-semibold">AI &amp; ML Routing Online</span>
+                  <span class="badge-clean-emerald px-2.5 py-1 rounded-lg text-xs font-semibold">12 Solved</span>
                 </div>
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
-                <div class="p-4 rounded-lg bg-slate-50 border border-slate-200">
-                  <div class="text-xs font-bold uppercase text-slate-500 mb-3">Enrolled Common Courses</div>
+                <div class="p-4 rounded-xl bg-[#F7F9FF] border border-[#E9EDFF]">
+                  <div class="text-xs font-bold uppercase text-[#737B94] mb-3">Enrolled Common Courses</div>
                   <div class="space-y-2 text-xs">
-                    <div class="p-2 rounded bg-white border border-slate-200 flex justify-between items-center">
-                      <span class="font-semibold text-slate-800">AI &amp; Machine Learning</span>
-                      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <div class="p-2.5 rounded-lg bg-white border border-[#E9EDFF] flex justify-between items-center">
+                      <span class="font-semibold text-[#0B1230]">AI &amp; Machine Learning</span>
+                      <span class="w-2 h-2 rounded-full bg-[#35C98A]"></span>
                     </div>
-                    <div class="p-2 rounded bg-white border border-slate-200 flex justify-between items-center">
-                      <span class="font-semibold text-slate-800">Computer Networks</span>
-                      <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <div class="p-2.5 rounded-lg bg-white border border-[#E9EDFF] flex justify-between items-center">
+                      <span class="font-semibold text-[#0B1230]">Computer Networks</span>
+                      <span class="w-2 h-2 rounded-full bg-[#FFC857]"></span>
                     </div>
-                    <div class="p-2 rounded bg-white border border-slate-200 flex justify-between items-center">
-                      <span class="font-semibold text-slate-800">Full-Stack Web Dev</span>
-                      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <div class="p-2.5 rounded-lg bg-white border border-[#E9EDFF] flex justify-between items-center">
+                      <span class="font-semibold text-[#0B1230]">Full-Stack Web Dev</span>
+                      <span class="w-2 h-2 rounded-full bg-[#35C98A]"></span>
                     </div>
                   </div>
                 </div>
 
-                <div class="md:col-span-2 p-4 rounded-lg bg-slate-50 border border-slate-200">
+                <div class="md:col-span-2 p-4 rounded-xl bg-[#F7F9FF] border border-[#E9EDFF]">
                   <div class="flex justify-between items-center mb-2">
                     <span class="badge-clean-purple px-2 py-0.5 rounded text-[11px] font-bold">Artificial Intelligence &amp; ML</span>
                     <span class="badge-clean-emerald px-2 py-0.5 rounded text-[11px] font-bold">✓ Solved by Dr. Sarah Jenkins</span>
                   </div>
-                  <h5 class="text-sm font-bold text-slate-900 mb-1">
+                  <h5 class="text-sm font-bold text-[#0B1230] mb-1">
                     "Clarification on Backpropagation gradient calculation for Softmax with Cross-Entropy Loss"
                   </h5>
-                  <div class="p-3 rounded bg-white border border-slate-200 text-xs text-slate-700 my-2">
-                    <strong class="text-slate-900 block mb-1">Faculty Resolution:</strong>
+                  <div class="p-3 rounded-lg bg-white border border-[#E9EDFF] text-xs text-[#20263D] my-2">
+                    <strong class="text-[#0B1230] block mb-1">Faculty Resolution:</strong>
                     "The Kronecker delta simplifies the summation since ∂y_i/∂z_j is y_i(1 - y_i) when i=j and -y_i*y_j when i≠j, leaving purely (y_hat - y)."
                   </div>
-                  <div class="text-[11px] text-slate-500 flex justify-between">
+                  <div class="text-[11px] text-[#737B94] flex justify-between font-medium">
                     <span>Submitted by Priya Patel (3rd Year)</span>
                     <span>Response time: 24 mins</span>
                   </div>
@@ -234,8 +250,8 @@
               </div>
 
               <!-- Picture upload guidance note -->
-              <div class="mt-4 p-3 rounded-lg bg-slate-50 border border-dashed border-slate-300 text-center text-xs text-slate-500">
-                <strong>Section 2 Picture Slot:</strong> Place your dashboard screenshot at <code class="font-mono bg-white px-1.5 py-0.5 rounded border border-slate-200 text-slate-800">assets/dashboard-preview.png</code> to display it directly.
+              <div class="mt-4 p-3 rounded-xl bg-[#F5F7FC] border border-dashed border-[#6C8CFF]/40 text-center text-xs text-[#737B94]">
+                <strong>Section 2 Picture Slot:</strong> Place your dashboard screenshot at <code class="font-mono bg-white px-2 py-0.5 rounded border border-[#E9EDFF] text-[#4B46FF]">assets/dashboard-preview.png</code> to display it directly.
               </div>
             </div>
 
@@ -252,15 +268,15 @@
     <section id="start-now" class="py-20 sm:py-28 px-4 sm:px-6 lg:px-8 bg-white">
       <div class="max-w-4xl mx-auto text-center">
 
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold uppercase tracking-wider mb-4">
-          <i data-lucide="user-check" class="w-3.5 h-3.5 text-slate-500"></i>
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E9EDFF] text-[#4B46FF] text-xs font-bold uppercase tracking-wider mb-4">
+          <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
           <span>Section 3 • Start Now</span>
         </div>
 
-        <h2 class="text-3xl sm:text-4xl font-bold text-slate-950 tracking-tight mb-3">
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-[#0B1230] tracking-tight mb-3">
           Select Your Portal
         </h2>
-        <p class="text-sm text-slate-600 max-w-xl mx-auto mb-12">
+        <p class="text-sm text-[#737B94] max-w-xl mx-auto mb-12 font-medium">
           Choose whether you are entering as a student to solve doubts or as a faculty member to manage your subject queue.
         </p>
 
@@ -268,84 +284,84 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
 
           <!-- Student Card -->
-          <div class="crisp-card p-7 border-slate-200 flex flex-col justify-between hover:border-slate-400">
+          <div class="card-modern p-8 border-[#E9EDFF] flex flex-col justify-between hover:border-[#4B46FF]/40 bg-white">
             <div>
-              <div class="w-12 h-12 rounded-lg bg-slate-900 text-white flex items-center justify-center mb-5">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-[#4B46FF] to-[#6C8CFF] text-white flex items-center justify-center mb-5 shadow-md shadow-[#4B46FF]/20">
                 <i data-lucide="book-open" class="w-6 h-6"></i>
               </div>
 
-              <div class="badge-clean-neutral inline-block px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider mb-2">
+              <div class="badge-clean-purple inline-block px-3 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider mb-2">
                 Students
               </div>
-              <h3 class="text-xl font-bold text-slate-950 mb-2">Student Portal</h3>
-              <p class="text-xs text-slate-600 leading-relaxed mb-6">
+              <h3 class="text-xl font-extrabold text-[#0B1230] mb-2">Student Portal</h3>
+              <p class="text-xs text-[#737B94] leading-relaxed mb-6 font-medium">
                 Post academic questions, explore 1st to 4th year common subjects, and track faculty resolutions.
               </p>
 
-              <ul class="space-y-2 text-xs text-slate-700 mb-8">
+              <ul class="space-y-2.5 text-xs text-[#20263D] mb-8 font-medium">
                 <li class="flex items-center gap-2">
-                  <i data-lucide="check" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-[#35C98A] flex-shrink-0"></i>
                   <span>Year-wise syllabus &amp; common subject feeds</span>
                 </li>
                 <li class="flex items-center gap-2">
-                  <i data-lucide="check" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-[#35C98A] flex-shrink-0"></i>
                   <span>Strict automatic routing to domain faculty</span>
                 </li>
                 <li class="flex items-center gap-2">
-                  <i data-lucide="check" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-[#35C98A] flex-shrink-0"></i>
                   <span>Real-time pending &amp; resolved status tracker</span>
                 </li>
               </ul>
             </div>
 
-            <div class="space-y-2.5">
-              <a href="login.html?role=student" class="w-full btn-primary py-2.5 px-4 text-xs font-semibold flex items-center justify-center gap-2">
+            <div class="space-y-3">
+              <a href="login.html?role=student" class="w-full btn-electric py-3 px-4 text-xs font-bold flex items-center justify-center gap-2">
                 <span>Enter Student Portal</span>
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
               </a>
-              <button type="button" onclick="loginAsDemo('student')" class="w-full btn-secondary py-2 px-3 text-xs text-slate-600 hover:text-slate-900">
+              <button type="button" onclick="loginAsDemo('student')" class="w-full btn-cloud py-2.5 px-3 text-xs text-[#737B94] hover:text-[#4B46FF]">
                 Demo Student (Alex • 3rd Year)
               </button>
             </div>
           </div>
 
           <!-- Faculty Card -->
-          <div class="crisp-card p-7 border-slate-200 flex flex-col justify-between hover:border-slate-400">
+          <div class="card-modern p-8 border-[#E9EDFF] flex flex-col justify-between hover:border-[#4B46FF]/40 bg-white">
             <div>
-              <div class="w-12 h-12 rounded-lg bg-slate-900 text-white flex items-center justify-center mb-5">
+              <div class="w-12 h-12 rounded-xl bg-[#0B1230] text-white flex items-center justify-center mb-5 shadow-md">
                 <i data-lucide="user-check" class="w-6 h-6"></i>
               </div>
 
-              <div class="badge-clean-neutral inline-block px-2.5 py-0.5 rounded text-[11px] font-bold uppercase tracking-wider mb-2">
+              <div class="badge-clean-neutral inline-block px-3 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider mb-2">
                 Faculty
               </div>
-              <h3 class="text-xl font-bold text-slate-950 mb-2">Faculty Portal</h3>
-              <p class="text-xs text-slate-600 leading-relaxed mb-6">
+              <h3 class="text-xl font-extrabold text-[#0B1230] mb-2">Faculty Portal</h3>
+              <p class="text-xs text-[#737B94] leading-relaxed mb-6 font-medium">
                 Receive and resolve doubts specifically assigned to your subject specialization.
               </p>
 
-              <ul class="space-y-2 text-xs text-slate-700 mb-8">
+              <ul class="space-y-2.5 text-xs text-[#20263D] mb-8 font-medium">
                 <li class="flex items-center gap-2">
-                  <i data-lucide="check" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-[#35C98A] flex-shrink-0"></i>
                   <span>Specialized queue filtered strictly by your domain</span>
                 </li>
                 <li class="flex items-center gap-2">
-                  <i data-lucide="check" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-[#35C98A] flex-shrink-0"></i>
                   <span>Structured solution builder with formulas &amp; code</span>
                 </li>
                 <li class="flex items-center gap-2">
-                  <i data-lucide="check" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
+                  <i data-lucide="check-circle-2" class="w-4 h-4 text-[#35C98A] flex-shrink-0"></i>
                   <span>Manage online availability &amp; track response stats</span>
                 </li>
               </ul>
             </div>
 
-            <div class="space-y-2.5">
-              <a href="login.html?role=faculty" class="w-full btn-primary py-2.5 px-4 text-xs font-semibold flex items-center justify-center gap-2">
+            <div class="space-y-3">
+              <a href="login.html?role=faculty" class="w-full btn-electric py-3 px-4 text-xs font-bold flex items-center justify-center gap-2">
                 <span>Enter Faculty Portal</span>
                 <i data-lucide="arrow-right" class="w-4 h-4"></i>
               </a>
-              <button type="button" onclick="loginAsDemo('faculty', 'fac-ai-01')" class="w-full btn-secondary py-2 px-3 text-xs text-slate-600 hover:text-slate-900">
+              <button type="button" onclick="loginAsDemo('faculty', 'fac-ai-01')" class="w-full btn-cloud py-2.5 px-3 text-xs text-[#737B94] hover:text-[#4B46FF]">
                 Demo Faculty (Dr. Sarah • AI Lead)
               </button>
             </div>
@@ -359,16 +375,15 @@
   </main>
 
   <!-- Footer -->
-  <footer class="border-t border-slate-200 bg-white py-8 px-4 text-center text-xs text-slate-500">
+  <footer class="border-t border-[#E9EDFF] bg-white py-6 px-4 text-center text-xs text-[#737B94]">
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-2">
-        <span class="font-bold text-slate-900">Study Buddy</span>
-        <span>— Academic Doubt Resolution &amp; Curriculum Platform.</span>
+      <div class="flex items-center">
+        <img src="assets/logo.png" alt="Logo" class="h-14 w-auto object-contain">
       </div>
-      <div class="flex items-center gap-6 text-slate-600">
-        <a href="login.html" class="hover:text-slate-900">Sign In</a>
-        <a href="student-dashboard.html" class="hover:text-slate-900">Student Dashboard</a>
-        <a href="faculty-dashboard.html" class="hover:text-slate-900">Faculty Dashboard</a>
+      <div class="flex items-center gap-6 text-[#737B94] font-medium">
+        <a href="login.html" class="hover:text-[#4B46FF] transition-colors">Sign In</a>
+        <a href="student-dashboard.html" class="hover:text-[#4B46FF] transition-colors">Student Dashboard</a>
+        <a href="faculty-dashboard.html" class="hover:text-[#4B46FF] transition-colors">Faculty Dashboard</a>
       </div>
     </div>
   </footer>

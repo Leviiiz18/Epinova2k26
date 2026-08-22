@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Study Buddy • Interactive Knowledge Graph</title>
+  <title>What's that? • Interactive Knowledge Graph</title>
   <meta name="description" content="Explore connected academic concepts with interactive circle-to-card expansion and concept taxonomy navigation.">
 
   <!-- Tailwind CSS CDN -->
@@ -35,18 +35,13 @@
 
   <!-- Header -->
   <header class="sticky top-0 z-40 crisp-nav bg-white/95 border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
 
       <!-- Brand Logo & Context -->
       <div class="flex items-center gap-3">
         <a href="index.html" class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white shadow-sm">
-            <i data-lucide="git-branch" class="w-4 h-4 text-indigo-400"></i>
-          </div>
-          <div>
-            <span class="text-base font-bold text-slate-900 tracking-tight">Study Buddy</span>
-            <span class="badge-clean-purple text-[10px] font-semibold px-2 py-0.5 rounded ml-2">Knowledge Graph</span>
-          </div>
+          <img src="assets/logo.png" alt="Logo" class="h-16 w-auto object-contain">
+          <span class="badge-clean-purple text-[10px] font-semibold px-2 py-0.5 rounded">Knowledge Graph</span>
         </a>
       </div>
 
@@ -66,9 +61,8 @@
           <span class="hidden md:inline">Topic Directory</span>
         </button>
 
-        <a href="student-dashboard.html" class="btn-primary px-3.5 py-1.5 text-xs font-semibold flex items-center gap-1.5">
-          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
-          <span>Student Portal</span>
+        <a href="student-dashboard.html" title="Back to Student Portal" class="btn-primary p-2 text-xs font-semibold flex items-center justify-center rounded-xl">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
         </a>
       </div>
 
@@ -99,16 +93,22 @@
       <!-- Domain Category Filter Pills -->
       <div class="flex items-center gap-1.5 flex-wrap">
         <button class="domain-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-900 text-white transition-colors" onclick="filterCategory('all', this)">
-          All Domains
+          All Syllabus
         </button>
-        <button class="domain-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" onclick="filterCategory('Algorithms', this)">
-          Algorithms
+        <button class="domain-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" onclick="filterCategory('Artificial Intelligence & ML', this)">
+          AI & Machine Learning
         </button>
-        <button class="domain-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" onclick="filterCategory('Neural Networks & Optimization', this)">
-          Neural Networks
+        <button class="domain-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" onclick="filterCategory('Digital Image Processing', this)">
+          Image Processing (DIP)
         </button>
-        <button class="domain-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" onclick="filterCategory('Data Structures', this)">
-          Data Structures
+        <button class="domain-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" onclick="filterCategory('Data Structures & Algorithms', this)">
+          Data Structures & Algorithms
+        </button>
+        <button class="domain-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" onclick="filterCategory('Programming & Web Tech', this)">
+          Programming & Web Tech
+        </button>
+        <button class="domain-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors" onclick="filterCategory('Soft Computing', this)">
+          Soft Computing
         </button>
       </div>
     </div>
@@ -127,7 +127,7 @@
               Concept Network
             </span>
             <span id="activeTopicBadge" class="badge-clean-blue text-[11px] font-semibold px-2 py-0.5 rounded">
-              Focus: Algorithms
+              Focus: Digital Image Processing Basics
             </span>
           </div>
 
@@ -216,282 +216,387 @@
   <script>
     // Knowledge Base Data mapping to the taxonomy
     const KNOWLEDGE_GRAPH_DATA = {
-      "Algorithms": {
-        id: "bbbbbbbb-0000-0000-0000-000000000001",
-        title: "Algorithms",
-        category: "Algorithms",
-        difficulty: "Core Domain",
-        summary: "Step-by-step computational procedures for calculations, data processing, and automated reasoning.",
-        explanation: "An algorithm is a finite sequence of well-defined instructions to solve computational problems. In computer science, algorithms are categorized by paradigm (divide-and-conquer, dynamic programming, search, traversal) and evaluated by time and space complexity.",
+      "Digital Image Processing Basics": {
+        id: "dip-001",
+        title: "Digital Image Processing Basics",
+        category: "Digital Image Processing",
+        difficulty: "Core Syllabus",
+        summary: "Fundamental techniques for processing digital images using computer algorithms.",
+        explanation: "Digital Image Processing involves converting continuous image data into discrete digital arrays, performing spatial & frequency domain transformations, and applying pixel-level Operations.",
         keyPoints: [
-          "Defines structured steps to transform input into desired output",
-          "Characterized by Correctness, Finiteness, and Asymptotic Efficiency",
-          "Includes Binary Search, Recursion, Dynamic Programming, and Search paradigms"
+          "Sampling & Quantization convert physical signals to matrix representations",
+          "Image enhancement techniques operate in spatial and frequency domains",
+          "Includes applications in Medical Imaging, Remote Sensing, and Computer Vision"
         ],
-        misconception: "An algorithm is just code; an algorithm is an abstract blueprint independent of programming language.",
-        prerequisites: ["Discrete Math", "Basic Programming", "Data Structures"],
+        misconception: "Image processing is identical to Computer Vision; IP focuses on image-to-image transformations rather than semantic understanding.",
+        prerequisites: ["Matrix Algebra", "Signals & Systems"],
         children: [
-          { name: "Binary Search", rel: "Divide & Conquer" },
-          { name: "Recursion", rel: "Core Paradigm" },
-          { name: "Dynamic Programming", rel: "Optimization" },
-          { name: "Sorting", rel: "Prerequisite Order" }
+          { name: "Image Enhancement", rel: "Spatial Transformation" },
+          { name: "Sobel vs. Laplacian Filters", rel: "Edge Detection" },
+          { name: "Sampling & Quantization", rel: "Discretization" }
         ]
       },
 
-      "Binary Search": {
-        id: "cccccccc-0000-0000-0000-000000000001",
-        title: "Binary Search",
-        category: "Algorithms",
-        difficulty: "Beginner",
-        summary: "Divide-and-conquer search requiring monotonic ordering.",
-        explanation: "Binary Search locates the target position within a monotonically sorted collection by repeatedly comparing the target to the middle element. If unequal, the half in which the target cannot lie is discarded in O(1) time.",
+      "Image Enhancement": {
+        id: "dip-002",
+        title: "Image Enhancement",
+        category: "Digital Image Processing",
+        difficulty: "Intermediate",
+        summary: "Spatial domain and histogram manipulation methods to improve visual clarity.",
+        explanation: "Enhancement methods adjust contrast, reduce noise using spatial filters (Gaussian, Median, Sobel), and redistribute pixel intensity values via histogram equalization.",
         keyPoints: [
-          "Mandatory Prerequisite: Array or search space MUST be monotonically sorted",
-          "Time Complexity: O(log N) — Halves candidate range on each iteration",
-          "Space Complexity: O(1) iterative or O(log N) recursive"
+          "Spatial filtering uses convolutions with NxN kernels",
+          "Histogram Equalization balances intensity distribution across dynamic ranges",
+          "Differentiates linear filtering from order-statistic non-linear filtering"
         ],
-        misconception: "Binary search works on unsorted data. Running it on unsorted elements produces unpredictable incorrect answers.",
-        prerequisites: ["Arrays", "Monotonic Ordering"],
+        misconception: "Enhancement adds new information to an image; it highlights existing features.",
+        prerequisites: ["Digital Image Processing Basics"],
         children: [
-          { name: "Arrays", rel: "Data Structure" },
-          { name: "Monotonic Ordering", rel: "Prerequisite Requirement" },
-          { name: "Algorithms", rel: "Parent Domain" },
-          { name: "Recursion", rel: "Implementation Variant" }
+          { name: "Digital Image Processing Basics", rel: "Foundation" },
+          { name: "Sobel vs. Laplacian Filters", rel: "Filter Types" }
         ]
       },
 
-      "Recursion": {
-        id: "cccccccc-0000-0000-0000-000000000002",
-        title: "Recursion",
-        category: "Algorithms",
-        difficulty: "Beginner",
-        summary: "Self-referencing function execution requiring terminal state.",
-        explanation: "Recursion is a computational approach where a function solves a problem by calling a copy of itself with a smaller input. It relies on the Call Stack to maintain state between invocations until reaching a terminating Base Case.",
+      "Genetic Algorithms": {
+        id: "ai-001",
+        title: "Genetic Algorithms",
+        category: "Artificial Intelligence & ML",
+        difficulty: "Core Syllabus",
+        summary: "Evolutionary search heuristics inspired by natural biological selection and genetics.",
+        explanation: "Genetic Algorithms maintain a population of candidate solutions encoded as chromosomes. Through iterative selection, crossover, and mutation, the population evolves optimal or near-optimal solutions for hard search spaces.",
         keyPoints: [
-          "Requires a strict Base Case to prevent infinite Call Stack overflow",
-          "Recursive step reduces the problem state closer to the base condition",
-          "Syntactic sugar for maintaining state on an explicit LIFO Call Stack"
+          "Population initialized with candidate chromosome strings",
+          "Fitness function evaluates candidate viability in each iteration",
+          "Crossover combines parental genes while Mutation maintains diversity"
         ],
-        misconception: "Recursion has no stopping condition and executes forever without base case validation.",
-        prerequisites: ["Functions", "Conditionals"],
+        misconception: "GAs guarantee finding the global optimum; they are stochastic heuristics.",
+        prerequisites: ["Search Paradigms", "Probability"],
         children: [
-          { name: "Base Case & Call Stack", rel: "Underlying Mechanism" },
-          { name: "Functions", rel: "Language Construct" },
-          { name: "Algorithms", rel: "Parent Domain" },
-          { name: "Dynamic Programming", rel: "Optimization Target" }
+          { name: "Heuristic Search", rel: "Search Paradigm" },
+          { name: "Supervised Learning", rel: "Optimization Pair" }
         ]
       },
 
-      "Dynamic Programming": {
-        id: "bbbbbbbb-0000-0000-0000-000000000002",
-        title: "Dynamic Programming",
-        category: "Algorithms",
-        difficulty: "Advanced",
-        summary: "Algorithm design paradigm solving complex problems by breaking them into overlapping subproblems with optimal substructure.",
-        explanation: "Dynamic Programming (DP) optimizes recursive solutions by caching sub-problem solutions (Memoization) or building solutions iteratively from the ground up (Tabulation), preventing exponential re-computation of identical states.",
+      "Heuristic Search": {
+        id: "ai-002",
+        title: "Heuristic Search",
+        category: "Artificial Intelligence & ML",
+        difficulty: "Core Syllabus",
+        summary: "Informed search strategies using domain-specific estimation functions (A*, Greedy Best-First).",
+        explanation: "Heuristic search algorithms use a heuristic function h(n) estimating cost from current node to target, drastically pruning search trees compared to uninformed search.",
         keyPoints: [
-          "Requires Overlapping Subproblems and Optimal Substructure",
-          "Top-Down Approach: Recursion + Memoization (Cache Table)",
-          "Bottom-Up Approach: Iterative Tabulation (State Transition Equations)"
+          "A* evaluation function f(n) = g(n) + h(n)",
+          "Admissible heuristics never overestimate cost to goal",
+          "Drastically reduces space/time complexity in pathfinding"
         ],
-        misconception: "DP is just recursion with caching; identifying state transitions and bounding the state space is the core challenge.",
-        prerequisites: ["Recursion", "Mathematical Induction"],
+        misconception: "Heuristics always give exact answers; they trade guarantees for speed.",
+        prerequisites: ["Depth-First Search (DFS)", "Binary Search"],
         children: [
-          { name: "Recursion", rel: "Foundational Pattern" },
-          { name: "Algorithms", rel: "Parent Domain" },
-          { name: "Backpropagation", rel: "Analogy (Chain Rule DP)" }
+          { name: "Genetic Algorithms", rel: "Stochastic Variant" },
+          { name: "Depth-First Search (DFS)", rel: "Uninformed Foundation" }
         ]
       },
 
-      "Neural Networks & Optimization": {
-        id: "bbbbbbbb-0000-0000-0000-000000000003",
-        title: "Neural Networks & Optimization",
-        category: "Neural Networks & Optimization",
-        difficulty: "Advanced",
-        summary: "Layered parameterized function approximators trained via gradient-based optimization.",
-        explanation: "Neural networks process multi-dimensional data across interconnected layers of weights and non-linear activations, updating parameters via gradient computation of an objective loss function.",
+      "Supervised Learning": {
+        id: "ai-003",
+        title: "Supervised Learning",
+        category: "Artificial Intelligence & ML",
+        difficulty: "Core Syllabus",
+        summary: "Machine learning paradigm mapping input features to labeled target outputs.",
+        explanation: "Supervised models learn a predictive function from labeled training data. Optimization minimizes loss functions via techniques like gradient descent.",
         keyPoints: [
-          "Layers compute affine transformations followed by non-linear activations",
-          "Loss function evaluates divergence between predictions and targets",
-          "Trained using Backpropagation and Gradient Descent"
+          "Classification predicts discrete labels, Regression predicts continuous values",
+          "Loss functions quantify deviation between prediction and ground truth",
+          "Cross-validation prevents overfitting to training data"
         ],
-        misconception: "Neural networks are black boxes that cannot be analyzed mathematically; they are differentiable computational graphs.",
-        prerequisites: ["Linear Algebra", "Multivariate Calculus", "Optimization"],
+        misconception: "More training epochs always improve accuracy; excess epochs cause overfitting.",
+        prerequisites: ["Matrix Algebra", "Probability"],
         children: [
-          { name: "Backpropagation", rel: "Core Training Engine" },
-          { name: "Softmax & Cross-Entropy", rel: "Loss Formulations" },
-          { name: "Chain Rule", rel: "Mathematical Basis" }
+          { name: "Backpropagation", rel: "Training Mechanism" },
+          { name: "Genetic Algorithms", rel: "Optimization Alternative" }
         ]
       },
 
       "Backpropagation": {
-        id: "cccccccc-0000-0000-0000-000000000004",
+        id: "ai-004",
         title: "Backpropagation",
-        category: "Neural Networks & Optimization",
-        difficulty: "Advanced",
-        summary: "Chain-rule gradient computation across network layers.",
-        explanation: "Backpropagation calculates the gradient of the loss function with respect to each weight by applying the calculus chain rule backwards from output to input layer, enabling gradient-based parameter updates.",
+        category: "Artificial Intelligence & ML",
+        difficulty: "Advanced Syllabus",
+        summary: "Efficient reverse-mode automatic differentiation algorithm for training neural networks.",
+        explanation: "Backpropagation computes error gradients with respect to each weight using the chain rule of calculus, enabling iterative parameter updates via gradient descent.",
         keyPoints: [
-          "Applies the Chain Rule backwards through computational layers",
-          "Calculates partial derivatives ∂L/∂w for all tunable parameters",
-          "Combined with optimizers like SGD, Adam, or RMSprop"
+          "Forward pass calculates activation outputs and loss score",
+          "Backward pass applies calculus chain rule to calculate weight gradients",
+          "Powers modern deep neural networks and multi-layer perceptrons"
         ],
-        misconception: "Softmax derivatives require individual Jacobian matrix inversion; summation over cross-terms cancels into the clean error residual (y_hat - y).",
-        prerequisites: ["Multivariate Calculus", "Chain Rule", "Log-Likelihood Loss"],
+        misconception: "Backprop updates weights directly; it calculates gradients used by optimizers.",
+        prerequisites: ["Supervised Learning", "Calculus & Chain Rule"],
         children: [
-          { name: "Neural Networks & Optimization", rel: "Host Domain" },
-          { name: "Chain Rule", rel: "Calculus Foundation" },
-          { name: "Softmax & Cross-Entropy", rel: "Loss Gradient" }
+          { name: "Supervised Learning", rel: "Learning Strategy" }
         ]
       },
 
-      "Softmax & Cross-Entropy": {
-        id: "cccccccc-0000-0000-0000-000000000005",
-        title: "Softmax & Cross-Entropy",
-        category: "Neural Networks & Optimization",
-        difficulty: "Advanced",
-        summary: "Softmax & Cross-Entropy Gradient calculation and cancellation.",
-        explanation: "Softmax converts unnormalized raw logits into normalized probability distributions. Cross-entropy quantifies the divergence between predicted probabilities and ground truth one-hot targets. Their combined analytical gradient simplifies directly to (y_hat - y).",
+      "Binary Search": {
+        id: "dsa-001",
+        title: "Binary Search",
+        category: "Data Structures & Algorithms",
+        difficulty: "Core Syllabus",
+        summary: "Logarithmic time interval-halving search algorithm on sorted sequences.",
+        explanation: "Binary search compares target value to array midpoint. Depending on comparison result, it recursively discards half of remaining search space.",
         keyPoints: [
-          "Softmax maps K logits to sum-to-1 probabilities: e^(z_i) / ∑ e^(z_j)",
-          "Cross-Entropy Loss: -∑ y_i * log(p_i)",
-          "Analytical Derivative: ∂L/∂z_i = (y_hat_i - y_i) — Pure prediction error"
+          "Requires sorted input data structure",
+          "Time complexity: O(log n), Space complexity: O(1) iterative",
+          "Optimal for fast lookups in static or infrequently updated arrays"
         ],
-        misconception: "Softmax and cross-entropy should be computed in separate isolated steps; computing them jointly avoids numerical underflow via log-sum-exp.",
-        prerequisites: ["Probability Distributions", "Logarithms", "Backpropagation"],
+        misconception: "Binary search works on unsorted linked lists; random access is required for O(log n).",
+        prerequisites: ["Recursion", "Array Data Structure"],
         children: [
-          { name: "Backpropagation", rel: "Gradient Pipeline" },
-          { name: "Neural Networks & Optimization", rel: "Context" }
+          { name: "Recursion", rel: "Implementation Paradigm" },
+          { name: "Heuristic Search", rel: "Search Evolution" }
         ]
       },
 
-      "Base Case & Call Stack": {
-        id: "cccccccc-0000-0000-0000-000000000006",
-        title: "Base Case & Call Stack",
-        category: "Data Structures",
-        difficulty: "Beginner",
-        summary: "LIFO execution frame management for recursive procedures.",
-        explanation: "The Call Stack manages function invocation in modern runtimes. When a function is called, a stack frame containing local variables and return address is pushed; upon reaching the Base Case, frames unwind in LIFO order.",
+      "Recursion": {
+        id: "dsa-002",
+        title: "Recursion",
+        category: "Data Structures & Algorithms",
+        difficulty: "Core Syllabus",
+        summary: "Programming pattern where a function calls itself until reaching a base condition.",
+        explanation: "Recursion decomposes complex problems into smaller self-similar sub-problems. Every recursive call pushes a call stack frame until base case terminates recursion.",
         keyPoints: [
-          "Base Case provides the terminal halting condition",
-          "Call Stack allocates activation records per subroutine invocation",
-          "Stack overflow occurs when recursion depth exceeds allotted thread memory"
+          "Base case terminates call stack expansion",
+          "Recursive step moves state toward base case",
+          "Direct foundation for tree traversals, divide-and-conquer algorithms"
         ],
-        misconception: "Call stack memory is unbounded; unbounded recursive calls result in StackOverflowError.",
-        prerequisites: ["Functions", "Conditionals"],
-        children: [
-          { name: "Recursion", rel: "Parent Concept" },
-          { name: "Algorithms", rel: "Domain" }
-        ]
-      },
-
-      "Monotonic Ordering": {
-        id: "cccccccc-0000-0000-0000-000000000007",
-        title: "Monotonic Ordering",
-        category: "Algorithms",
-        difficulty: "Beginner",
-        summary: "Strict monotonic sequence requirement enabling logarithmic halving.",
-        explanation: "A sequence is monotonic if it is either entirely non-increasing or non-decreasing. This order property allows binary search to definitively discard half the remaining search space on each comparison.",
-        keyPoints: [
-          "Sequence satisfies a[i] <= a[i+1] (or >= for descending)",
-          "Preserves invariant needed for midpoint direction decision",
-          "Achieved via sorting algorithms in O(N log N) time"
-        ],
-        misconception: "Partial sorting is sufficient; any disorder breaks the binary elimination invariant.",
-        prerequisites: ["Arrays", "Sorting"],
-        children: [
-          { name: "Binary Search", rel: "Required By" },
-          { name: "Sorting", rel: "Enabler" }
-        ]
-      },
-
-      "Chain Rule": {
-        id: "cccccccc-0000-0000-0000-000000000008",
-        title: "Chain Rule",
-        category: "Neural Networks & Optimization",
-        difficulty: "Intermediate",
-        summary: "Calculus rule for computing the derivative of composite functions.",
-        explanation: "The Chain Rule states that for composite functions f(g(x)), the derivative with respect to x is f'(g(x)) * g'(x). In neural networks, this enables reverse-mode automatic differentiation across deep layers.",
-        keyPoints: [
-          "∂z/∂x = (∂z/∂y) * (∂y/∂x)",
-          "Applied iteratively backwards in computational graphs",
-          "Fundamental mathematical engine behind backpropagation"
-        ],
-        misconception: "Derivatives must be calculated symbolically for whole networks; backpropagation computes numerical local gradients layer-by-layer.",
-        prerequisites: ["Multivariate Calculus"],
-        children: [
-          { name: "Backpropagation", rel: "Applied In" },
-          { name: "Neural Networks & Optimization", rel: "Domain" }
-        ]
-      },
-
-      "Arrays": {
-        id: "cccccccc-0000-0000-0000-000000000009",
-        title: "Arrays",
-        category: "Data Structures",
-        difficulty: "Beginner",
-        summary: "Contiguous memory sequence of homogeneous elements with O(1) index lookup.",
-        explanation: "An array stores elements at contiguous memory locations, allowing constant time random access via pointer arithmetic: memory_address = base + index * element_size.",
-        keyPoints: [
-          "O(1) random access by index",
-          "Contiguous block in virtual memory",
-          "Foundation for binary search and sorting procedures"
-        ],
-        misconception: "Insertion at arbitrary positions is O(1); shifting elements requires O(N) time.",
-        prerequisites: ["Data Types"],
+        misconception: "Recursion is always faster than iteration; function call overhead adds stack frames.",
+        prerequisites: ["C Variables & Data Types", "Control Flow & Conditionals"],
         children: [
           { name: "Binary Search", rel: "Application" },
-          { name: "Monotonic Ordering", rel: "Property" }
+          { name: "Depth-First Search (DFS)", rel: "Graph Application" }
         ]
       },
 
-      "Sorting": {
-        id: "cccccccc-0000-0000-0000-000000000010",
-        title: "Sorting",
-        category: "Algorithms",
-        difficulty: "Beginner",
-        summary: "Arranging elements in monotonic order using comparison or non-comparison algorithms.",
-        explanation: "Sorting re-orders elements so they satisfy monotonic ordering. Comparison sorts (MergeSort, QuickSort, HeapSort) are bounded by O(N log N) lower bound; linear non-comparison sorts (Counting, Radix) trade space for O(N) time.",
+      "Depth-First Search (DFS)": {
+        id: "dsa-003",
+        title: "Depth-First Search (DFS)",
+        category: "Data Structures & Algorithms",
+        difficulty: "Core Syllabus",
+        summary: "Graph traversal exploring as deep as possible along each branch before backtracking.",
+        explanation: "DFS uses a LIFO stack (or call stack recursively) to visit graph nodes deep down a path before backtracking to unvisited branch points.",
         keyPoints: [
-          "Enables logarithmic Binary Search",
-          "Comparison sort lower bound is Ω(N log N)",
-          "In-place vs extra memory tradeoffs"
+          "Explores single paths completely before backtracking",
+          "Used in topological sorting, connected components, and pathfinding",
+          "Time complexity: O(V + E)"
         ],
-        misconception: "Sorting is always faster than linear scan for a single query; sorting is beneficial when amortized over multiple subsequent queries.",
-        prerequisites: ["Arrays", "Comparison Operators"],
+        misconception: "DFS always finds shortest path; BFS is required for unweighted shortest paths.",
+        prerequisites: ["Recursion"],
         children: [
-          { name: "Monotonic Ordering", rel: "Output Property" },
-          { name: "Binary Search", rel: "Prerequisite For" },
-          { name: "Algorithms", rel: "Parent Domain" }
+          { name: "Recursion", rel: "Mechanism" },
+          { name: "Heuristic Search", rel: "Informed Extension" }
         ]
       },
 
-      "Functions": {
-        id: "cccccccc-0000-0000-0000-000000000011",
-        title: "Functions",
-        category: "Data Structures",
-        difficulty: "Beginner",
-        summary: "Reusable blocks of code encapsulating specific computational subroutines.",
-        explanation: "Functions accept parameters, execute scoped operations, and return results. In recursion, a function invokes itself with modified arguments until a terminal condition is met.",
+      "C Variables & Data Types": {
+        id: "prog-001",
+        title: "C Variables & Data Types",
+        category: "Programming & Web Tech",
+        difficulty: "Core Syllabus",
+        summary: "Memory storage concepts, primitive types, and variable declarations in procedural C.",
+        explanation: "Variables represent named memory locations storing values. Primitive data types (int, float, char, double) define bit sizes and supported arithmetic operations.",
         keyPoints: [
-          "Encapsulates input parameters and return values",
-          "Creates isolated local variable activation scopes",
-          "Underlying construct for recursive problem decomposition"
+          "Strongly typed procedural variable definitions",
+          "Memory allocation based on platform architecture size",
+          "Foundation for pointers, structs, and memory management"
         ],
-        misconception: "Functions create permanent memory structures; local frames are deallocated upon return.",
-        prerequisites: ["Variables", "Control Flow"],
+        misconception: "Variable names are stored inside binary executables; compilers map names to memory addresses.",
+        prerequisites: ["Computer Fundamentals"],
         children: [
-          { name: "Recursion", rel: "Enables" },
-          { name: "Base Case & Call Stack", rel: "Execution Context" }
+          { name: "Control Flow & Conditionals", rel: "Sequential Order" },
+          { name: "Recursion", rel: "Language Usage" }
+        ]
+      },
+
+      "Control Flow & Conditionals": {
+        id: "prog-002",
+        title: "Control Flow & Conditionals",
+        category: "Programming & Web Tech",
+        difficulty: "Core Syllabus",
+        summary: "Branching (if/else, switch) and looping (for, while) control structures.",
+        explanation: "Control flow statements direct program execution sequence based on boolean condition evaluations and iterative loop terminations.",
+        keyPoints: [
+          "Conditional branching creates dynamic decision paths",
+          "Iteration constructs repeat code execution while conditions hold true",
+          "Short-circuit evaluation optimizes boolean expressions"
+        ],
+        misconception: "Switch statements and if-else chains perform identically; compilers optimize switches via jump tables.",
+        prerequisites: ["C Variables & Data Types"],
+        children: [
+          { name: "C Variables & Data Types", rel: "Prerequisite" },
+          { name: "Recursion", rel: "Branching Paradigm" }
+        ]
+      },
+
+      "C# Object Oriented Programming": {
+        id: "prog-003",
+        title: "C# Object Oriented Programming",
+        category: "Programming & Web Tech",
+        difficulty: "Core Syllabus",
+        summary: "Encapsulation, inheritance, polymorphism, and abstraction in strongly-typed C#.",
+        explanation: "OOP models domain entities as objects containing data fields and behavior methods. Classes define blueprints with strict access modifiers.",
+        keyPoints: [
+          "Encapsulation hides internal object state via properties",
+          "Inheritance enables code reuse through class hierarchies",
+          "Polymorphism allows interface-driven dynamic dispatch"
+        ],
+        misconception: "OOP guarantees modular code; poor domain modeling causes tight coupling.",
+        prerequisites: ["C Variables & Data Types"],
+        children: [
+          { name: "Advanced Web Architectures", rel: "Framework Base" }
+        ]
+      },
+
+      "Advanced Web Architectures": {
+        id: "prog-004",
+        title: "Advanced Web Architectures",
+        category: "Programming & Web Tech",
+        difficulty: "Intermediate",
+        summary: "Client-server web architecture patterns, RESTful APIs, and modern web services.",
+        explanation: "Architectural patterns for scalable web apps, separating frontend UI presentation layers from backend API state controllers.",
+        keyPoints: [
+          "Decoupled frontend-backend REST communication",
+          "Asynchronous HTTP fetch operations",
+          "Microservice vs Monolithic layout decisions"
+        ],
+        misconception: "REST requires JSON; REST is architectural, independent of data format.",
+        prerequisites: ["C# Object Oriented Programming"],
+        children: [
+          { name: "Client-Server State Management", rel: "Sub-Topic" }
+        ]
+      },
+
+      "Client-Server State Management": {
+        id: "prog-005",
+        title: "Client-Server State Management",
+        category: "Programming & Web Tech",
+        difficulty: "Intermediate",
+        summary: "Session handling, token authorization, and database state synchronization.",
+        explanation: "Techniques for managing stateless HTTP protocols through session cookies, JWT authentication tokens, and client-side reactive state.",
+        keyPoints: [
+          "HTTP is inherently stateless; tokens maintain session context",
+          "JWT tokens secure API endpoints across domains",
+          "State management libraries sync UI to backend state"
+        ],
+        misconception: "JWTs encrypt payload data; JWTs are base64-encoded and signed, not encrypted by default.",
+        prerequisites: ["Advanced Web Architectures"],
+        children: [
+          { name: "Advanced Web Architectures", rel: "Parent Architecture" }
+        ]
+      },
+
+      "Soft Computing Fundamentals": {
+        id: "sc-001",
+        title: "Soft Computing Fundamentals",
+        category: "Soft Computing",
+        difficulty: "Core Syllabus",
+        summary: "Tolerance for imprecision, uncertainty, and partial truth to achieve tractability.",
+        explanation: "Soft computing combines Fuzzy Logic, Neural Networks, and Evolutionary Algorithms to solve complex real-world problems resistant to hard computing models.",
+        keyPoints: [
+          "Handles approximate reasoning and noisy real-world data",
+          "Complements exact mathematical modeling",
+          "Powers intelligent decision support systems"
+        ],
+        misconception: "Soft computing is inaccurate; it models real-world ambiguity precisely where hard logic fails.",
+        prerequisites: ["Artificial Intelligence & ML"],
+        children: [
+          { name: "Fuzzy Inference Systems", rel: "Core Module" },
+          { name: "Neuro-Fuzzy Hybridization", rel: "Advanced Module" }
+        ]
+      },
+
+      "Fuzzy Inference Systems": {
+        id: "sc-002",
+        title: "Fuzzy Inference Systems",
+        category: "Soft Computing",
+        difficulty: "Intermediate",
+        summary: "Mapping input fuzzy sets to output fuzzy sets using IF-THEN rules.",
+        explanation: "FIS uses membership functions (Triangular, Gaussian) to fuzzify crisp inputs, evaluate fuzzy rule bases, and defuzzify results into actionable outputs.",
+        keyPoints: [
+          "Mamdani and Sugeno fuzzy inference methods",
+          "Fuzzification maps crisp values to membership degrees [0, 1]",
+          "Defuzzification converts fuzzy output sets back to crisp numbers"
+        ],
+        misconception: "Fuzzy logic is probability theory; fuzzy logic measures degree of truth, probability measures likelihood.",
+        prerequisites: ["Soft Computing Fundamentals"],
+        children: [
+          { name: "Soft Computing Fundamentals", rel: "Foundation" },
+          { name: "Neuro-Fuzzy Hybridization", rel: "Synergy" }
+        ]
+      },
+
+      "Neuro-Fuzzy Hybridization": {
+        id: "sc-003",
+        title: "Neuro-Fuzzy Hybridization",
+        category: "Soft Computing",
+        difficulty: "Advanced Syllabus",
+        summary: "ANFIS architecture merging neural learning with fuzzy rule interpretability.",
+        explanation: "ANFIS (Adaptive Neuro-Fuzzy Inference System) uses neural backpropagation learning to automatically tune fuzzy membership parameters from data.",
+        keyPoints: [
+          "Combines neural learning capabilities with human-interpretable fuzzy rules",
+          "Automatically extracts fuzzy rules from empirical datasets",
+          "Hybrid learning algorithm uses least-squares and backpropagation"
+        ],
+        misconception: "ANFIS requires manual rule creation; it optimizes rules automatically.",
+        prerequisites: ["Fuzzy Inference Systems", "Backpropagation"],
+        children: [
+          { name: "Fuzzy Inference Systems", rel: "Fuzzy Base" },
+          { name: "Backpropagation", rel: "Learning Engine" }
+        ]
+      },
+
+      "Leadership Foundations": {
+        id: "prof-001",
+        title: "Leadership Foundations",
+        category: "Professional Skills",
+        difficulty: "General Syllabus",
+        summary: "Core leadership principles, team dynamics, and strategic communication.",
+        explanation: "Explores leadership styles (transformational, situational), conflict resolution strategies, and collaborative team motivation frameworks.",
+        keyPoints: [
+          "Situational leadership adapts to team maturity levels",
+          "Active listening and constructive feedback foster team trust",
+          "Vision alignment drives collective performance"
+        ],
+        misconception: "Leadership is an innate trait; leadership skills are cultivated through reflective practice.",
+        prerequisites: ["Communication Skills"],
+        children: [
+          { name: "Emotional Intelligence", rel: "Core Competency" }
+        ]
+      },
+
+      "Emotional Intelligence": {
+        id: "prof-002",
+        title: "Emotional Intelligence",
+        category: "Professional Skills",
+        difficulty: "General Syllabus",
+        summary: "Self-awareness, self-regulation, empathy, and social skills in professional settings.",
+        explanation: "Emotional Intelligence (EQ) measures the ability to perceive, evaluate, and manage personal emotions and inter-personal dynamics effectively.",
+        keyPoints: [
+          "5 EQ pillars: Self-Awareness, Self-Regulation, Motivation, Empathy, Social Skills",
+          "High EQ correlates strongly with team management success",
+          "Mitigates cognitive bias during high-pressure decisions"
+        ],
+        misconception: "EQ suppresses emotion; EQ enables understanding and constructive direction of emotion.",
+        prerequisites: ["Leadership Foundations"],
+        children: [
+          { name: "Leadership Foundations", rel: "Leadership Pillar" }
         ]
       }
     };
 
     // State
-    let currentTopic = "Algorithms";
+    let currentTopic = "Digital Image Processing Basics";
     let isExpanded = true;
     let isTransitioning = false;
-    let historyStack = ["Algorithms"];
+    let historyStack = ["Digital Image Processing Basics"];
     let currentCategoryFilter = "all";
 
     // DOM Elements
@@ -502,8 +607,46 @@
     const expandBtnLabel = document.getElementById("expandBtnLabel");
 
     // Initialize
-    window.addEventListener("DOMContentLoaded", () => {
+    window.addEventListener("DOMContentLoaded", async () => {
       lucide.createIcons();
+      
+      // Async fetch concepts from database API to dynamically synchronize syllabus taxonomy
+      try {
+        const resp = await fetch("/api/concepts");
+        if (resp.ok) {
+          const resData = await resp.json();
+          if (resData.success && resData.concepts && resData.concepts.length > 0) {
+            resData.concepts.forEach(c => {
+              const nodeName = c.name;
+              if (!KNOWLEDGE_GRAPH_DATA[nodeName]) {
+                KNOWLEDGE_GRAPH_DATA[nodeName] = {
+                  id: c.id,
+                  title: c.name,
+                  category: c.subject_name || c.topic_name || "Digital Image Processing",
+                  difficulty: c.difficulty_level || "Core Syllabus",
+                  summary: c.canonical_summary || `${c.name} concept in course syllabus.`,
+                  explanation: c.canonical_summary || `${c.name} fundamental concept.`,
+                  keyPoints: [
+                    `Sub-concept: ${c.sub_concept || 'General'}`,
+                    `Subject: ${c.subject_name || 'CSE Syllabus'}`,
+                    `Topic: ${c.topic_name || 'Curriculum'}`
+                  ],
+                  misconception: c.common_misconception || "N/A",
+                  prerequisites: [c.topic_name || "Digital Image Processing Basics"],
+                  children: []
+                };
+              } else {
+                // Enrich existing node with database details
+                if (c.canonical_summary) KNOWLEDGE_GRAPH_DATA[nodeName].summary = c.canonical_summary;
+                if (c.common_misconception) KNOWLEDGE_GRAPH_DATA[nodeName].misconception = c.common_misconception;
+              }
+            });
+          }
+        }
+      } catch (err) {
+        console.log("Using localized syllabus dataset for Knowledge Graph:", err);
+      }
+
       renderGraph(currentTopic, false);
       populateDirectoryList();
     });
@@ -518,7 +661,8 @@
     // Main Graph Rendering Engine with Even Satellite Spacing
     function renderGraph(topicKey, animated = true) {
       if (!KNOWLEDGE_GRAPH_DATA[topicKey]) {
-        topicKey = "Algorithms";
+        const keys = Object.keys(KNOWLEDGE_GRAPH_DATA);
+        topicKey = keys.length > 0 ? keys[0] : "Digital Image Processing Basics";
       }
 
       currentTopic = topicKey;
@@ -861,25 +1005,29 @@
 
     // Resets to root concept
     function resetGraph() {
-      historyStack = ["Algorithms"];
-      currentTopic = "Algorithms";
+      historyStack = ["Digital Image Processing Basics"];
+      currentTopic = "Digital Image Processing Basics";
       isExpanded = true;
       expandBtnLabel.textContent = "Switch to Compact Circle (0.25s)";
-      renderGraph("Algorithms", true);
+      renderGraph("Digital Image Processing Basics", true);
     }
 
-    // Updates the visual breadcrumb trail
+    // Updates the visual breadcrumb trail based on current topic taxonomy domain
     function updateBreadcrumbUI() {
+      const data = KNOWLEDGE_GRAPH_DATA[currentTopic] || {};
+      const category = data.category || "Syllabus";
+      const title = data.title || currentTopic;
+
       breadcrumbTrail.innerHTML = `
         <span class="hover:text-indigo-600 cursor-pointer" onclick="resetGraph()">Computer Science</span>
         <i data-lucide="chevron-right" class="w-3 h-3 text-slate-400"></i>
-        ${historyStack.slice(-3).map((item, idx, arr) => `
-          <span class="${idx === arr.length - 1 ? 'text-indigo-600 font-bold' : 'hover:text-indigo-600 cursor-pointer text-slate-600'}" onclick="switchTopic('${item}')">
-            ${item}
-          </span>
-          ${idx < arr.length - 1 ? '<i data-lucide="chevron-right" class="w-3 h-3 text-slate-400"></i>' : ''}
-        `).join("")}
+        <span class="hover:text-indigo-600 cursor-pointer text-slate-600 font-medium" onclick="filterCategory('${category}', this)">
+          ${category}
+        </span>
+        <i data-lucide="chevron-right" class="w-3 h-3 text-slate-400"></i>
+        <span class="text-indigo-600 font-bold">${title}</span>
       `;
+      lucide.createIcons();
     }
 
     // Direct switch topic wrapper
@@ -929,13 +1077,17 @@
       btnElement.className = "domain-btn px-3 py-1 text-xs font-medium rounded-full bg-slate-900 text-white transition-colors";
 
       if (category === "all") {
-        switchTopic("Algorithms");
-      } else if (category === "Algorithms") {
-        switchTopic("Binary Search");
-      } else if (category === "Neural Networks & Optimization") {
-        switchTopic("Backpropagation");
-      } else if (category === "Data Structures") {
-        switchTopic("Base Case & Call Stack");
+        switchTopic("Digital Image Processing Basics");
+      } else {
+        const match = Object.keys(KNOWLEDGE_GRAPH_DATA).find(k => 
+          KNOWLEDGE_GRAPH_DATA[k].category === category || 
+          KNOWLEDGE_GRAPH_DATA[k].category.toLowerCase().includes(category.toLowerCase())
+        );
+        if (match) {
+          switchTopic(match);
+        } else {
+          switchTopic("Digital Image Processing Basics");
+        }
       }
     }
 

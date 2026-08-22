@@ -1,6 +1,12 @@
 /**
  * Study Buddy - Core Application Logic
  */
+if (!localStorage.getItem('cache_cleared_v3')) {
+  localStorage.removeItem('upvoted_doubts');
+  localStorage.removeItem('liked_answers');
+  localStorage.removeItem('rated_answers');
+  localStorage.setItem('cache_cleared_v3', 'true');
+}
 
 // Toast notifications
 function showToast(message, type = "success") {
@@ -114,3 +120,113 @@ function closeModal(modalId) {
     document.body.style.overflow = "";
   }
 }
+
+// Notification Logic
+let isNotificationsOpen = false;
+let latestNotifications = [];
+
+async function fetchNotifications() {
+  const user = DB.getCurrentUser();
+  if (!user) return;
+  
+  try {
+    const res = await fetch(`http://localhost:8000/api/notifications?email=${encodeURIComponent(user.email)}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    latestNotifications = data.notifications || [];
+    renderNotifications();
+  } catch (e) {
+    console.warn("Failed to fetch notifications", e);
+  }
+}
+
+function renderNotifications() {
+  const listEl = document.getElementById('notification-list');
+  const badgeEl = document.getElementById('notification-badge');
+  const listFacEl = document.getElementById('fac-notification-list');
+  const badgeFacEl = document.getElementById('fac-notification-badge');
+  
+  const unreadCount = latestNotifications.filter(n => !n.is_read).length;
+  
+  if (badgeEl) {
+    if (unreadCount > 0) badgeEl.classList.remove('hidden');
+    else badgeEl.classList.add('hidden');
+  }
+
+  if (badgeFacEl) {
+    if (unreadCount > 0) badgeFacEl.classList.remove('hidden');
+    else badgeFacEl.classList.add('hidden');
+  }
+
+  const renderTarget = listFacEl ? listFacEl : listEl;
+  if (!renderTarget) return;
+  
+  if (latestNotifications.length === 0) {
+    renderTarget.innerHTML = `<div class="p-4 text-center text-xs text-slate-400">No new notifications</div>`;
+    return;
+  }
+  
+  renderTarget.innerHTML = latestNotifications.map(n => `
+    <div class="p-3 hover:bg-slate-50 transition-colors cursor-pointer ${n.is_read ? 'opacity-70' : 'bg-indigo-50/30'}" onclick="markNotificationRead('${n.id}')">
+      <div class="flex items-start gap-3">
+        <div class="mt-0.5">
+          <i data-lucide="${n.is_read ? 'bell' : 'bell-ring'}" class="w-4 h-4 ${n.is_read ? 'text-slate-400' : 'text-indigo-600'}"></i>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold text-slate-900">${n.title}</h4>
+          <p class="text-[11px] text-slate-600 mt-0.5 leading-snug">${n.message}</p>
+          <span class="text-[9px] text-slate-400 mt-1 block">${new Date(n.created_at).toLocaleString()}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+}
+
+async function markNotificationRead(id) {
+  try {
+    await fetch(`http://localhost:8000/api/notifications/${id}/read`, { method: "POST" });
+    fetchNotifications();
+  } catch (e) {
+    console.warn("Failed to mark read", e);
+  }
+}
+
+function toggleNotifications(event) {
+  event.stopPropagation();
+  const dropdown = document.getElementById('notification-dropdown') || document.getElementById('fac-notification-dropdown');
+  if (dropdown) {
+    isNotificationsOpen = !isNotificationsOpen;
+    if (isNotificationsOpen) {
+      dropdown.classList.remove('hidden');
+      fetchNotifications();
+    } else {
+      dropdown.classList.add('hidden');
+    }
+  }
+}
+
+document.addEventListener('click', (e) => {
+  if (isNotificationsOpen) {
+    const dropdown = document.getElementById('notification-dropdown') || document.getElementById('fac-notification-dropdown');
+    const btn = document.getElementById('notification-btn') || document.getElementById('fac-notification-btn');
+    if (dropdown && !dropdown.contains(e.target) && (!btn || !btn.contains(e.target))) {
+      isNotificationsOpen = false;
+      dropdown.classList.add('hidden');
+    }
+  }
+});
+
+// Poll every 30 seconds
+setInterval(() => {
+  if (DB.getCurrentUser()) fetchNotifications();
+}, 30000);
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (DB.getCurrentUser()) {
+    fetchNotifications();
+  }
+});

@@ -4,62 +4,117 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Question Details — Study Buddy</title>
+  <title>Question Details — What's that?</title>
+  
+  <!-- Tailwind CSS CDN & Custom Config -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif']
+          },
+          colors: {
+            brand: {
+              DEFAULT: '#4B46FF',
+              hover: '#3934E6',
+              accent: '#6C8CFF',
+              navy: '#0B1230',
+              dark: '#070B1D',
+              ice: '#F7F9FF',
+              main: '#F5F7FC',
+              secondary: '#E9EDFF',
+              success: '#35C98A',
+              warning: '#FFC857',
+              error: '#FF5C70',
+              text: '#20263D',
+              muted: '#737B94'
+            }
+          },
+          borderRadius: {
+            '2xl': '18px',
+            '3xl': '24px'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="css/style.css">
   <style>
     .glass-card {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(12px);
-      border: 1px solid rgba(226, 232, 240, 0.8);
+      border: 1px solid #E9EDFF;
     }
+
     .ai-gradient-border {
       position: relative;
-      border-radius: 1rem;
-      background: linear-gradient(to right, #818cf8, #a78bfa, #c084fc);
+      border-radius: 1.25rem;
+      background: linear-gradient(135deg, #4B46FF, #6C8CFF, #FF5C70);
       padding: 1px;
     }
+
     .ai-gradient-content {
       background: white;
-      border-radius: calc(1rem - 1px);
+      border-radius: calc(1.25rem - 1px);
     }
   </style>
 </head>
 
-<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col font-sans">
+<body class="bg-[#F5F7FC] text-[#20263D] min-h-screen flex flex-col font-sans">
 
   <!-- Header -->
-  <header class="sticky top-0 z-40 bg-white/95 border-b border-slate-200 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#E9EDFF]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+
       <!-- Brand & Back Button -->
       <div class="flex items-center gap-4">
-        <a href="student-dashboard.html" class="flex items-center gap-1.5 text-slate-500 hover:text-slate-900 transition-colors text-xs font-bold bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg border border-slate-200">
-          <i data-lucide="chevron-left" class="w-4 h-4"></i>
-          <span>Back to Feed</span>
+        <a href="student-dashboard.html" title="Back to Feed"
+          class="flex items-center justify-center text-[#737B94] hover:text-[#0B1230] transition-all bg-[#F7F9FF] hover:bg-[#E9EDFF] p-2.5 rounded-xl border border-[#E9EDFF] shadow-sm">
+          <i data-lucide="chevron-left" class="w-5 h-5 text-[#4B46FF]"></i>
         </a>
-        <div class="h-4 w-px bg-slate-200"></div>
-        <a href="index.html" class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-sm">
-            <i data-lucide="graduation-cap" class="w-4 h-4"></i>
-          </div>
-          <span class="text-base font-extrabold text-slate-900 hidden sm:inline">Study Buddy</span>
+        <div class="h-5 w-px bg-[#E9EDFF]"></div>
+        <a href="index.html" class="flex items-center">
+          <img src="assets/logo.png" alt="Logo" class="h-16 sm:h-18 w-auto object-contain hover:scale-105 transition-transform">
         </a>
       </div>
 
       <!-- User Info & Points -->
       <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2 bg-amber-50 border border-amber-200/80 rounded-xl px-3.5 py-1.5 shadow-sm shadow-amber-100/50 cursor-pointer" onclick="showPointsInfo()">
-          <span class="text-sm">🎁</span>
-          <span class="text-xs font-extrabold text-amber-800" id="points-balance">100</span>
-          <span class="text-[10px] font-bold text-amber-600/80 uppercase tracking-wider">pts</span>
+        <!-- Notifications Bell -->
+        <div class="relative">
+          <button id="notification-btn" onclick="toggleNotifications(event)" class="p-2 text-[#737B94] hover:text-[#0B1230] hover:bg-[#F7F9FF] rounded-xl transition-colors relative border border-transparent hover:border-[#E9EDFF]">
+            <i data-lucide="bell" class="w-5 h-5"></i>
+            <span id="notification-badge" class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[#FF5C70] rounded-full hidden"></span>
+          </button>
+          <div id="notification-dropdown" class="origin-top-right absolute right-0 mt-2 w-80 rounded-2xl shadow-xl bg-white ring-1 ring-black ring-opacity-5 divide-y divide-[#E9EDFF] hidden z-50 border border-[#E9EDFF]">
+            <div class="p-4 bg-[#F7F9FF]">
+              <h3 class="text-xs font-bold text-[#0B1230] uppercase tracking-wider">Notifications</h3>
+            </div>
+            <div id="notification-list" class="max-h-64 overflow-y-auto">
+               <div class="p-4 text-center text-xs text-[#737B94]">Loading...</div>
+            </div>
+          </div>
         </div>
-        <div class="flex items-center gap-2.5">
-          <img src="" id="user-avatar" class="w-8 h-8 rounded-full object-cover border border-slate-200">
+
+        <div
+          class="flex items-center gap-2 bg-[#FFC857]/15 border border-[#FFC857]/30 rounded-xl px-4 py-2 shadow-sm cursor-pointer hover:bg-[#FFC857]/25 transition-all"
+          onclick="showPointsInfo()">
+          <span class="text-base">🎁</span>
+          <span class="text-sm font-extrabold text-[#0B1230]" id="points-balance">100</span>
+          <span class="text-[10px] font-extrabold text-[#737B94] uppercase tracking-wider">pts</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <img src="" id="user-avatar" class="w-9 h-9 rounded-full object-cover border border-[#E9EDFF] shadow-sm">
           <div class="hidden md:block text-left">
-            <div class="text-xs font-bold text-slate-900 leading-tight" id="user-name">Guest</div>
-            <div class="text-[10px] text-slate-500 font-medium" id="user-year">1st Year</div>
+            <div class="text-xs font-bold text-[#0B1230] leading-tight" id="user-name">Guest</div>
+            <div class="text-[10px] text-[#737B94] font-semibold" id="user-year">1st Year</div>
           </div>
         </div>
       </div>
@@ -69,24 +124,24 @@
 
   <!-- Main Layout -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full grid grid-cols-1 lg:grid-cols-3 gap-8">
-    
+
     <!-- Question & Answers (Left 2 Columns) -->
     <div class="lg:col-span-2 space-y-6">
-      
+
       <!-- Question Detail Card -->
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6" id="question-card">
+      <div class="card-modern bg-white p-6 shadow-sm border-[#E9EDFF]" id="question-card">
         <!-- Rendered via JS -->
         <div class="animate-pulse space-y-4">
-          <div class="h-4 bg-slate-200 rounded w-1/4"></div>
-          <div class="h-6 bg-slate-200 rounded w-3/4"></div>
-          <div class="h-24 bg-slate-200 rounded"></div>
+          <div class="h-4 bg-[#F7F9FF] rounded-xl w-1/4"></div>
+          <div class="h-6 bg-[#F7F9FF] rounded-xl w-3/4"></div>
+          <div class="h-24 bg-[#F7F9FF] rounded-xl"></div>
         </div>
       </div>
 
       <!-- Answers List -->
       <div class="space-y-4">
-        <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-2">
-          <i data-lucide="message-square" class="w-4 h-4"></i>
+        <h2 class="text-xs font-extrabold uppercase tracking-wider text-[#737B94] mb-3 flex items-center gap-2">
+          <i data-lucide="message-square" class="w-4 h-4 text-[#4B46FF]"></i>
           <span id="answers-header-count">Answers</span>
         </h2>
         <div class="space-y-4" id="answers-container">
@@ -95,7 +150,7 @@
       </div>
 
       <!-- Answer Composer -->
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6" id="reply-composer-container">
+      <div class="card-modern bg-white p-6 shadow-sm border-[#E9EDFF]" id="reply-composer-container">
         <!-- Rendered via JS -->
       </div>
 
@@ -103,25 +158,27 @@
 
     <!-- Sidebar (Right Column) -->
     <div class="space-y-6">
-      
+
       <!-- Prerequisite Knowledge Graph / Concept info -->
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
-          <i data-lucide="network" class="w-4 h-4 text-indigo-500"></i>
+      <div class="card-modern bg-white p-6 shadow-sm border-[#E9EDFF] space-y-4">
+        <h3
+          class="text-xs font-extrabold uppercase tracking-wider text-[#0B1230] pb-3 border-b border-[#E9EDFF] flex items-center gap-2">
+          <i data-lucide="network" class="w-4 h-4 text-[#4B46FF]"></i>
           <span>Knowledge Graph Node</span>
         </h3>
-        <div id="concept-info-container" class="text-xs space-y-3">
+        <div id="concept-info-container" class="text-xs space-y-3.5">
           <!-- Rendered via JS -->
         </div>
       </div>
 
       <!-- Course references / Slides -->
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900 pb-2 border-b border-slate-100 flex items-center gap-2">
-          <i data-lucide="book-open" class="w-4 h-4 text-emerald-500"></i>
+      <div class="card-modern bg-white p-6 shadow-sm border-[#E9EDFF] space-y-4">
+        <h3
+          class="text-xs font-extrabold uppercase tracking-wider text-[#0B1230] pb-3 border-b border-[#E9EDFF] flex items-center gap-2">
+          <i data-lucide="book-open" class="w-4 h-4 text-[#35C98A]"></i>
           <span>Course Slide References</span>
         </h3>
-        <div id="resources-container" class="space-y-2.5">
+        <div id="resources-container" class="space-y-3">
           <!-- Rendered via JS -->
         </div>
       </div>
@@ -133,27 +190,36 @@
   <!-- Custom Confirmation Alert Modal -->
   <div id="confirm-modal" class="fixed inset-0 z-[150] hidden items-center justify-center p-4">
     <!-- Backdrop -->
-    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeConfirmModal()"></div>
-    
+    <div class="absolute inset-0 bg-[#0B1230]/40 backdrop-blur-sm" onclick="closeConfirmModal()"></div>
+
     <!-- Content Card -->
-    <div class="bg-white max-w-sm w-full rounded-2xl p-6 border border-slate-200 shadow-2xl relative z-10 text-center space-y-4">
-      <div class="w-12 h-12 bg-rose-50 border border-rose-100 rounded-full flex items-center justify-center mx-auto text-rose-500">
+    <div
+      class="card-modern max-w-sm w-full bg-white p-6 border-[#E9EDFF] shadow-2xl relative z-10 text-center space-y-4">
+      <div
+        class="w-12 h-12 bg-[#FF5C70]/10 border border-[#FF5C70]/20 rounded-2xl flex items-center justify-center mx-auto text-[#FF5C70]">
         <i data-lucide="alert-triangle" class="w-6 h-6"></i>
       </div>
       <div>
-        <h4 class="text-sm font-bold text-slate-900">Are you absolutely sure?</h4>
-        <p class="text-xs text-slate-500 mt-1 leading-relaxed">This action will delete your solution and revert any points awarded for this answer. This cannot be undone.</p>
+        <h4 class="text-base font-extrabold text-[#0B1230]">Are you absolutely sure?</h4>
+        <p class="text-xs text-[#737B94] mt-1.5 leading-relaxed font-medium">This action will delete your solution and revert any
+          points awarded for this answer. This cannot be undone.</p>
       </div>
       <div class="flex gap-2 justify-center pt-2">
-        <button onclick="closeConfirmModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
-        <button id="confirm-delete-btn-action" onclick="executeDeleteAnswer()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition-colors shadow-md shadow-rose-100">Yes, Delete</button>
+        <button onclick="closeConfirmModal()"
+          class="px-4 py-2.5 rounded-xl border border-[#E9EDFF] text-xs font-bold text-[#737B94] hover:bg-[#F7F9FF] transition-all">Cancel</button>
+        <button id="confirm-delete-btn-action" onclick="executeDeleteAnswer()"
+          class="px-4 py-2.5 rounded-xl bg-[#FF5C70] hover:bg-[#FF5C70]/90 text-white text-xs font-bold transition-all shadow-md">Yes,
+          Delete</button>
       </div>
     </div>
   </div>
 
   <!-- Footer -->
-  <footer class="border-t border-slate-200 bg-white py-6 px-4 text-center text-xs text-slate-400 mt-12">
-    <span>Study Buddy Platform &bull; AI-Powered Peer Learning Intelligence (PS-01)</span>
+  <footer class="bg-white border-t border-[#E9EDFF] mt-auto py-5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-[#737B94] text-xs">
+      <img src="assets/logo.png" alt="Logo" class="h-10 w-auto object-contain">
+      <span>What's that? Platform &bull; AI-Powered Peer Learning Intelligence (PS-01)</span>
+    </div>
   </footer>
 
   <!-- Scripts -->
@@ -178,7 +244,6 @@
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
-      // 1. Auth check
       state.user = DB.getCurrentUser();
       if (!state.user) {
         window.location.href = "login.html";
@@ -187,7 +252,6 @@
 
       state.userYearValue = parseYearValue(state.user.year || state.user.yearName);
 
-      // Render Header User Info
       document.getElementById("user-name").textContent = state.user.name;
       document.getElementById("user-year").textContent = state.user.year || state.user.yearName || "1st Year";
       document.getElementById("points-balance").textContent = state.user.points || 0;
@@ -197,7 +261,6 @@
         document.getElementById("user-avatar").src = "https://via.placeholder.com/150";
       }
 
-      // 2. Parse Question ID from URL
       const urlParams = new URLSearchParams(window.location.search);
       state.currentDoubtId = urlParams.get("id");
       if (!state.currentDoubtId) {
@@ -206,7 +269,6 @@
         return;
       }
 
-      // 3. Sync doubts from backend
       await DB.syncDoubts();
       loadDoubtData();
     });
@@ -217,8 +279,8 @@
 
       if (!state.activeDoubt) {
         document.getElementById("question-card").innerHTML = `
-          <div class="text-center py-8 text-slate-500 text-sm">
-            <i data-lucide="alert-circle" class="w-8 h-8 mx-auto mb-2 text-rose-500"></i>
+          <div class="text-center py-8 text-[#737B94] text-xs">
+            <i data-lucide="alert-circle" class="w-8 h-8 mx-auto mb-2 text-[#FF5C70]"></i>
             <span>Doubt not found in database.</span>
           </div>
         `;
@@ -237,46 +299,48 @@
       const card = document.getElementById("question-card");
       const isDoubtAuthor = String(d.studentName).trim().toLowerCase() === String(state.user.name).trim().toLowerCase();
 
+      const upvotedDoubts = JSON.parse(localStorage.getItem('upvoted_doubts') || '[]');
+      const hasUpvoted = upvotedDoubts.includes(String(d.id));
+
       card.innerHTML = `
         <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-2.5">
-            <img src="${d.studentAvatar || 'https://via.placeholder.com/150'}" class="w-10 h-10 rounded-full border border-slate-200 object-cover">
+          <div class="flex items-center gap-3">
+            <img src="${d.studentAvatar || 'https://via.placeholder.com/150'}" class="w-10 h-10 rounded-full border border-[#E9EDFF] object-cover shadow-sm">
             <div>
-              <div class="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <div class="text-sm font-extrabold text-[#0B1230] flex items-center gap-2">
                 ${d.studentName}
-                <span class="bg-slate-100 border border-slate-200 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-bold shadow-sm">${d.studentYear}</span>
+                <span class="bg-[#F7F9FF] border border-[#E9EDFF] text-[#737B94] px-2 py-0.5 rounded-md text-[10px] font-bold">${d.studentYear}</span>
               </div>
-              <div class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">${d.subject} &bull; ${d.timestamp || 'Just now'}</div>
+              <div class="text-[11px] text-[#737B94] font-semibold uppercase tracking-wider mt-0.5">${d.subject} &bull; ${d.timestamp || 'Just now'}</div>
             </div>
           </div>
           
           <div class="flex items-center gap-3">
-            <div class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 shadow-sm flex items-center gap-1.5">
+            <div class="text-xs font-extrabold text-[#0B1230] bg-[#FFC857]/15 px-3 py-1.5 rounded-xl border border-[#FFC857]/30 flex items-center gap-1.5">
               <span>🎁</span> ${d.points || 25} pts bounty
             </div>
             
-            <!-- Three-dot Dropdown Options for Question -->
             <div class="relative inline-block text-left">
-              <button onclick="toggleDoubtMenu(event)" class="text-slate-400 hover:text-slate-700 transition-colors p-1.5 rounded-lg hover:bg-slate-100" title="Options">
+              <button onclick="toggleDoubtMenu(event)" class="text-[#737B94] hover:text-[#0B1230] transition-colors p-2 rounded-xl hover:bg-[#F7F9FF]" title="Options">
                 <i data-lucide="more-vertical" class="w-4 h-4"></i>
               </button>
-              <div id="doubt-menu" class="origin-top-right absolute right-0 mt-1 w-40 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-slate-100 focus:outline-none hidden z-50 border border-slate-200">
-                <div class="py-1">
+              <div id="doubt-menu" class="origin-top-right absolute right-0 mt-1 w-44 rounded-2xl shadow-xl bg-white ring-1 ring-black ring-opacity-5 divide-y divide-[#E9EDFF] focus:outline-none hidden z-50 border border-[#E9EDFF]">
+                <div class="py-1.5">
                   ${isDoubtAuthor ? `
-                    <button onclick="startEditDoubt()" class="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium">
-                      <i data-lucide="edit-2" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <button onclick="startEditDoubt()" class="w-full text-left px-4 py-2 text-xs text-[#20263D] hover:bg-[#F7F9FF] flex items-center gap-2 font-bold">
+                      <i data-lucide="edit-2" class="w-3.5 h-3.5 text-[#737B94]"></i>
                       <span>Edit Question</span>
                     </button>
                   ` : ''}
-                  <button onclick="handleCopyDoubt(event)" class="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium">
-                    <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-400"></i>
+                  <button onclick="handleCopyDoubt(event)" class="w-full text-left px-4 py-2 text-xs text-[#20263D] hover:bg-[#F7F9FF] flex items-center gap-2 font-bold">
+                    <i data-lucide="copy" class="w-3.5 h-3.5 text-[#737B94]"></i>
                     <span>Copy Content</span>
                   </button>
                 </div>
                 ${isDoubtAuthor ? `
-                  <div class="py-1">
-                    <button onclick="handleDeleteDoubt()" class="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 flex items-center gap-2 font-semibold">
-                      <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-400"></i>
+                  <div class="py-1.5">
+                    <button onclick="handleDeleteDoubt()" class="w-full text-left px-4 py-2 text-xs text-[#FF5C70] hover:bg-[#FF5C70]/10 flex items-center gap-2 font-bold">
+                      <i data-lucide="trash-2" class="w-3.5 h-3.5 text-[#FF5C70]"></i>
                       <span>Delete Question</span>
                     </button>
                   </div>
@@ -287,28 +351,28 @@
         </div>
 
         <div id="doubt-title-container">
-          <h1 class="text-2xl font-extrabold text-slate-900 mb-3 leading-snug">${d.title}</h1>
+          <h1 class="text-2xl font-extrabold text-[#0B1230] mb-3 leading-snug">${d.title}</h1>
         </div>
         <div id="doubt-query-container">
-          <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${d.rawQuery}</p>
+          <p class="text-xs text-[#20263D] leading-relaxed whitespace-pre-wrap font-medium">${d.rawQuery}</p>
         </div>
 
         ${d.detected_misconception ? `
-          <div class="mt-4 p-3 bg-amber-50/50 border border-amber-100 rounded-xl text-xs flex gap-2">
-            <span class="text-sm">💡</span>
+          <div class="mt-4 p-3.5 bg-[#FFC857]/10 border border-[#FFC857]/20 rounded-xl text-xs flex gap-2.5">
+            <span class="text-base">💡</span>
             <div>
-              <span class="font-bold text-amber-800">Detected Misconception:</span>
-              <p class="text-slate-600 mt-0.5">${d.detected_misconception}</p>
+              <span class="font-extrabold text-[#0B1230]">Detected Misconception:</span>
+              <p class="text-[#737B94] mt-0.5 font-medium">${d.detected_misconception}</p>
             </div>
           </div>
         ` : ''}
 
-        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center gap-4 text-xs font-bold text-slate-500">
-          <button class="flex items-center gap-1.5 hover:text-indigo-600 transition-colors" onclick="handleUpvote(event)">
-            <i data-lucide="chevron-up" class="w-4 h-4"></i>
-            <span>Upvotes (${d.upvotes || 0})</span>
+        <div class="mt-6 pt-4 border-t border-[#E9EDFF] flex items-center gap-5 text-xs font-bold text-[#737B94]">
+          <button class="flex items-center gap-2 ${hasUpvoted ? 'text-[#4B46FF] cursor-default' : 'hover:text-[#4B46FF] transition-colors'}" onclick="${hasUpvoted ? '' : 'handleUpvote(event)'}">
+            <i data-lucide="hand" class="w-4 h-4 ${hasUpvoted ? 'fill-[#4B46FF] text-[#4B46FF]' : ''}"></i>
+            <span>${d.upvotes || 0} people have also faced the same problem</span>
           </button>
-          <button class="flex items-center gap-1.5 hover:text-indigo-600 transition-colors" onclick="handleShareLink(event)">
+          <button class="flex items-center gap-2 hover:text-[#4B46FF] transition-colors" onclick="handleShareLink(event)">
             <i data-lucide="share-2" class="w-4 h-4"></i>
             <span>Share Link</span>
           </button>
@@ -327,8 +391,8 @@
 
       if (answers.length === 0) {
         container.innerHTML = `
-          <div class="text-center py-12 bg-white rounded-2xl border border-slate-200 border-dashed">
-            <p class="text-sm text-slate-400 font-medium italic">No answers submitted yet. Be the first to help!</p>
+          <div class="text-center py-12 bg-white rounded-2xl border border-[#E9EDFF] border-dashed">
+            <p class="text-xs text-[#737B94] font-medium italic">No answers submitted yet. Be the first to help!</p>
           </div>
         `;
         return;
@@ -337,33 +401,32 @@
       container.innerHTML = answers.map(a => {
         let isFaculty = a.isFacultyVerified || a.authorName.includes("Faculty") || a.authorName.includes("Sarah Jenkins");
         let badgeHtml = "";
-        let borderClass = "border-slate-200";
+        let borderClass = "border-[#E9EDFF]";
 
         if (isFaculty) {
-          borderClass = "border-emerald-200 bg-emerald-50/10";
+          borderClass = "border-[#35C98A]/30 bg-[#35C98A]/5";
           badgeHtml = `
-            <span class="bg-emerald-100 border border-emerald-300 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-extrabold flex items-center gap-1 shadow-sm">
+            <span class="bg-[#35C98A]/10 border border-[#35C98A]/20 text-[#35C98A] px-2 py-0.5 rounded-md text-[10px] font-extrabold flex items-center gap-1">
               <i data-lucide="award" class="w-3 h-3"></i> Faculty Verified ✓
             </span>
           `;
         } else if (a.isAiVerified) {
-          borderClass = "border-violet-200 bg-violet-50/10";
+          borderClass = "border-[#4B46FF]/30 bg-[#4B46FF]/5";
           badgeHtml = `
-            <span class="bg-violet-100 border border-violet-300 text-violet-800 px-2 py-0.5 rounded text-[10px] font-extrabold flex items-center gap-1 shadow-sm">
+            <span class="bg-[#4B46FF]/10 border border-[#4B46FF]/20 text-[#4B46FF] px-2 py-0.5 rounded-md text-[10px] font-extrabold flex items-center gap-1">
               <i data-lucide="sparkles" class="w-3 h-3"></i> AI Verified ✓
             </span>
           `;
         } else {
           badgeHtml = `
-            <span class="bg-indigo-100 border border-indigo-200 text-indigo-800 px-2 py-0.5 rounded text-[10px] font-extrabold flex items-center gap-1 shadow-sm">
+            <span class="bg-[#F7F9FF] border border-[#E9EDFF] text-[#4B46FF] px-2 py-0.5 rounded-md text-[10px] font-extrabold flex items-center gap-1">
               <i data-lucide="check-circle" class="w-3 h-3"></i> Peer Answer
             </span>
           `;
         }
 
         const isAuthor = String(a.authorName).trim().toLowerCase() === String(state.user.name).trim().toLowerCase();
-        
-        // Escape content for safe JS string passing
+
         const escapedContent = String(a.content)
           .replace(/\\/g, '\\\\')
           .replace(/`/g, '\\`')
@@ -371,43 +434,66 @@
           .replace(/"/g, '&quot;')
           .replace(/'/g, '&#39;');
 
+        const likedAnswers = JSON.parse(localStorage.getItem('liked_answers') || '[]');
+        const isHelpful = likedAnswers.includes(String(a.id));
+
+        let ratedAnswersObj = {};
+        try {
+          const parsed = JSON.parse(localStorage.getItem('rated_answers') || '{}');
+          if (Array.isArray(parsed)) {
+            parsed.forEach(id => ratedAnswersObj[String(id)] = true);
+          } else if (parsed && typeof parsed === 'object') {
+            ratedAnswersObj = parsed;
+          }
+        } catch(e) {}
+        const userRating = ratedAnswersObj[String(a.id)];
+        const hasUserRated = userRating !== undefined && userRating !== null;
+        const hasRating = (a.rating !== null && a.rating !== undefined && a.ratingCount > 0);
+
         return `
-          <div class="p-5 bg-white rounded-2xl border ${borderClass} shadow-sm space-y-3 relative">
+          <div class="p-6 bg-white rounded-2xl border ${borderClass} shadow-sm space-y-4 relative">
             <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2.5">
-                <img src="${a.authorAvatar || 'https://via.placeholder.com/150'}" class="w-8 h-8 rounded-full border border-slate-200 object-cover">
+              <div class="flex items-center gap-3">
+                <img src="${a.authorAvatar || 'https://via.placeholder.com/150'}" class="w-9 h-9 rounded-full border border-[#E9EDFF] object-cover shadow-sm">
                 <div>
-                  <div class="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                  <div class="text-xs font-extrabold text-[#0B1230] flex items-center gap-2">
                     <span>${a.authorName}</span>
                     ${badgeHtml}
                   </div>
-                  <div class="text-[10px] text-slate-400 font-medium">Answered recently</div>
+                  <div class="text-[10px] text-[#737B94] font-medium">Answered recently</div>
                 </div>
               </div>
               
-              <!-- Three-dot Dropdown Options -->
               <div class="relative inline-block text-left">
-                <button onclick="toggleAnswerMenu(event, '${a.id}')" class="text-slate-400 hover:text-slate-700 transition-colors p-1.5 rounded-lg hover:bg-slate-100" title="Options">
+                <button onclick="toggleAnswerMenu(event, '${a.id}')" class="text-[#737B94] hover:text-[#0B1230] transition-colors p-2 rounded-xl hover:bg-[#F7F9FF]" title="Options">
                   <i data-lucide="more-vertical" class="w-4 h-4"></i>
                 </button>
-                <div id="menu-${a.id}" class="origin-top-right absolute right-0 mt-1 w-40 rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-slate-100 focus:outline-none hidden z-50 border border-slate-200">
-                  <div class="py-1">
+                <div id="menu-${a.id}" class="origin-top-right absolute right-0 mt-1 w-44 rounded-2xl shadow-xl bg-white ring-1 ring-black ring-opacity-5 divide-y divide-[#E9EDFF] focus:outline-none hidden z-50 border border-[#E9EDFF]">
+                  <div class="py-1.5">
                     ${isAuthor && !a.isAiVerified ? `
-                      <button onclick="startEditAnswer('${a.id}', \`${escapedContent}\`)" class="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium">
-                        <i data-lucide="edit-2" class="w-3.5 h-3.5 text-slate-400"></i>
+                      <button onclick="startEditAnswer('${a.id}', \`${escapedContent}\`)" class="w-full text-left px-4 py-2 text-xs text-[#20263D] hover:bg-[#F7F9FF] flex items-center gap-2 font-bold">
+                        <i data-lucide="edit-2" class="w-3.5 h-3.5 text-[#737B94]"></i>
                         <span>Edit Answer</span>
                       </button>
                     ` : ''}
-                    <button onclick="handleCopyAnswer(event, '${a.id}')" class="w-full text-left px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium">
-                      <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <button onclick="handleCopyAnswer(event, '${a.id}')" class="w-full text-left px-4 py-2 text-xs text-[#20263D] hover:bg-[#F7F9FF] flex items-center gap-2 font-bold">
+                      <i data-lucide="copy" class="w-3.5 h-3.5 text-[#737B94]"></i>
                       <span>Copy Content</span>
                     </button>
                   </div>
                   ${isAuthor && !a.isAiVerified ? `
-                    <div class="py-1">
-                      <button onclick="handleDeleteAnswer('${a.id}')" class="w-full text-left px-4 py-2 text-xs text-rose-600 hover:bg-rose-50 flex items-center gap-2 font-semibold">
-                        <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-400"></i>
+                    <div class="py-1.5">
+                      <button onclick="handleDeleteAnswer('${a.id}')" class="w-full text-left px-4 py-2 text-xs text-[#FF5C70] hover:bg-[#FF5C70]/10 flex items-center gap-2 font-bold">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5 text-[#FF5C70]"></i>
                         <span>Delete Answer</span>
+                      </button>
+                    </div>
+                  ` : ''}
+                  ${state.user.role === 'teacher' && !a.isFacultyVerified ? `
+                    <div class="py-1.5 border-t border-[#E9EDFF]">
+                      <button onclick="facultyVerifyPeerAnswerFromQuestion('${d.id}', ${idx})" class="w-full text-left px-4 py-2 text-xs text-[#35C98A] hover:bg-[#35C98A]/10 flex items-center gap-2 font-bold">
+                        <i data-lucide="check-circle" class="w-3.5 h-3.5 text-[#35C98A]"></i>
+                        <span>Verify Answer</span>
                       </button>
                     </div>
                   ` : ''}
@@ -415,79 +501,69 @@
               </div>
             </div>
 
-            <!-- Content Area (Editable inline) -->
-            <div id="content-container-${a.id}" class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${renderLiteMarkdown(a.content)}</div>
+            <div id="content-container-${a.id}" class="text-xs text-[#20263D] leading-relaxed whitespace-pre-wrap font-medium">${renderLiteMarkdown(a.content)}</div>
 
-            <!-- Helpful & Rating Actions Row -->
-            <div class="flex flex-wrap items-center justify-between border-t border-slate-100 pt-3 text-xs gap-3 mt-4">
+            <div class="flex flex-wrap items-center justify-between border-t border-[#E9EDFF] pt-3 text-xs gap-3 mt-4">
               <div class="flex items-center gap-4">
-                <!-- Helpful Like Button -->
-                <button onclick="executeLikeAnswer('${a.id}')" class="flex items-center gap-1.5 font-bold text-slate-500 hover:text-indigo-600 transition-colors bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100">
-                  <i data-lucide="thumbs-up" class="w-3.5 h-3.5"></i>
-                  <span>Helpful (${a.helpfulnessUpvotes || 0})</span>
+                <button onclick="${isHelpful ? '' : `executeLikeAnswer('${a.id}')`}" class="flex items-center gap-1.5 font-bold transition-all px-3 py-1.5 rounded-xl border ${isHelpful ? 'bg-[#4B46FF]/10 text-[#4B46FF] border-[#4B46FF]/20 cursor-default' : 'text-[#737B94] hover:text-[#4B46FF] bg-[#F7F9FF] border-[#E9EDFF]'}">
+                  <i data-lucide="thumbs-up" class="w-3.5 h-3.5 ${isHelpful ? 'fill-[#4B46FF]' : ''}"></i>
+                  <span>${isHelpful ? 'Marked as helpful' : 'Helpful'} (${a.helpfulnessUpvotes || 0})</span>
                 </button>
 
-                <!-- Star Rating Selection Widget -->
                 <div class="flex items-center gap-1">
-                  <span class="text-slate-400 font-medium mr-1">Rate:</span>
-                  <div class="flex items-center text-amber-400 gap-0.5">
-                    ${[1,2,3,4,5].map(star => {
-                      const hasRating = (a.rating !== null && a.rating !== undefined && a.ratingCount > 0);
-                      const isFilled = hasRating && star <= Math.round(a.rating);
-                      return `
-                        <button onclick="executeRateAnswer('${a.id}', ${star})" class="hover:scale-125 transition-transform" title="Rate ${star} Stars">
-                          <i data-lucide="star" class="w-3.5 h-3.5 ${isFilled ? 'fill-amber-400 text-amber-400' : 'text-slate-300'}"></i>
+                  <span class="text-[#737B94] font-medium mr-1">${hasUserRated ? 'You rated:' : 'Rate:'}</span>
+                  <div class="flex items-center text-[#FFC857] gap-0.5">
+                    ${[1, 2, 3, 4, 5].map(star => {
+          const isFilled = hasUserRated ? (star <= userRating) : (hasRating && star <= Math.round(a.rating));
+          return `
+                        <button ${hasUserRated ? 'disabled' : `onclick="executeRateAnswer('${a.id}', ${star})"`} class="${hasUserRated ? 'cursor-default' : 'hover:scale-125 transition-transform'}" title="${hasUserRated ? `You rated ${userRating} stars` : `Rate ${star} Stars`}">
+                          <i data-lucide="star" class="w-3.5 h-3.5 ${isFilled ? 'fill-[#FFC857] text-[#FFC857]' : 'text-[#E9EDFF]'}"></i>
                         </button>
                       `;
-                    }).join("")}
+        }).join("")}
                   </div>
-                  <span class="text-slate-400 font-semibold ml-1">
+                  <span class="text-[#737B94] font-semibold ml-1">
                     ${(a.rating !== null && a.rating !== undefined && a.ratingCount > 0) ? `(${parseFloat(a.rating).toFixed(1)} / 5)` : '(No ratings yet)'}
                   </span>
                 </div>
               </div>
 
-              <!-- Tag author button -->
-              <button onclick="tagAuthor('${a.authorName.replace(/'/g, "\\'")}', '${a.id}')" class="text-indigo-600 hover:text-indigo-700 font-extrabold flex items-center gap-1">
+              <button onclick="tagAuthor('${a.authorName.replace(/'/g, "\\'")}', '${a.id}')" class="text-[#4B46FF] hover:text-[#3934E6] font-extrabold flex items-center gap-1">
                 <i data-lucide="at-sign" class="w-3.5 h-3.5"></i> Tag in Reply
               </button>
             </div>
 
-            <!-- Replies Container -->
-            <div class="bg-slate-50/50 rounded-xl p-4 border border-slate-100 mt-3 space-y-3">
-              <h5 class="text-xs font-bold text-slate-700 flex items-center gap-1.5 mb-2">
-                <i data-lucide="message-square" class="w-3.5 h-3.5 text-slate-400"></i>
+            <div class="bg-[#F7F9FF] rounded-2xl p-4 border border-[#E9EDFF] mt-3 space-y-3">
+              <h5 class="text-xs font-extrabold text-[#0B1230] flex items-center gap-1.5 mb-2">
+                <i data-lucide="message-square" class="w-3.5 h-3.5 text-[#737B94]"></i>
                 Replies (${(a.replies || []).length})
               </h5>
               
-              <!-- Replies List -->
               <div class="space-y-3 max-h-60 overflow-y-auto no-scrollbar">
                 ${(a.replies || []).length === 0 ? `
-                  <p class="text-[11px] text-slate-400 italic">No replies yet. Start the conversation or thank the contributor!</p>
+                  <p class="text-[11px] text-[#737B94] italic font-medium">No replies yet. Start the conversation or thank the contributor!</p>
                 ` : (a.replies || []).map(r => {
-                  // Highlight Mentions: @Name tags
-                  const formattedContent = String(r.content).replace(/@([a-zA-Z0-9.\s]+)/g, (match, p1) => {
-                    return `<span class="inline-flex items-center gap-0.5 bg-indigo-50 border border-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[10px] font-bold shadow-sm">@${p1.trim()}</span>`;
-                  });
-                  return `
-                    <div class="flex gap-2.5 items-start bg-white p-2.5 rounded-lg border border-slate-100 shadow-sm text-xs">
-                      <img src="${r.authorAvatar || 'https://via.placeholder.com/150'}" class="w-6 h-6 rounded-full border border-slate-200 object-cover shrink-0">
+          const formattedContent = String(r.content).replace(/@([a-zA-Z0-9.\s]+)/g, (match, p1) => {
+            return `<span class="inline-flex items-center gap-0.5 bg-[#4B46FF]/10 border border-[#4B46FF]/20 text-[#4B46FF] px-1.5 py-0.5 rounded text-[10px] font-bold">@${p1.trim()}</span>`;
+          });
+          return `
+                    <div class="flex gap-3 items-start bg-white p-3 rounded-xl border border-[#E9EDFF] shadow-sm text-xs">
+                      <img src="${r.authorAvatar || 'https://via.placeholder.com/150'}" class="w-6 h-6 rounded-full border border-[#E9EDFF] object-cover shrink-0">
                       <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between gap-2 mb-1">
-                          <span class="font-extrabold text-slate-900">${r.authorName}</span>
-                          <span class="text-[9px] text-slate-400">${r.createdAt ? new Date(r.createdAt).toLocaleDateString() : 'Just now'}</span>
+                          <span class="font-extrabold text-[#0B1230]">${r.authorName}</span>
+                          <span class="text-[9px] text-[#737B94] font-medium">${r.createdAt ? new Date(r.createdAt).toLocaleDateString() : 'Just now'}</span>
                         </div>
-                        <p class="text-slate-600 leading-relaxed">${formattedContent}</p>
+                        <p class="text-[#20263D] leading-relaxed font-medium">${formattedContent}</p>
                       </div>
                     </div>
                   `;
-                }).join("")}
+        }).join("")}
               </div>
 
-              <!-- Reply Composer Form -->
-              <div class="flex gap-2 mt-3 pt-2 border-t border-slate-100">
-                <input type="text" id="reply-input-${a.id}" placeholder="Type a reply... Use @ to tag users" class="flex-1 text-xs bg-white border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-indigo-500 focus:ring-1 ring-indigo-100 transition-all">
-                <button onclick="submitReply('${a.id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1 transition-all shrink-0">
+              <div class="flex gap-2 mt-3 pt-2 border-t border-[#E9EDFF]">
+                <input type="text" id="reply-input-${a.id}" placeholder="Type a reply... Use @ to tag users" class="flex-1 text-xs bg-white border border-[#E9EDFF] rounded-xl px-3.5 py-2 focus:outline-none focus:border-[#4B46FF] focus:ring-2 ring-[#4B46FF]/10 transition-all font-medium">
+                <button onclick="submitReply('${a.id}')" class="btn-electric bg-[#4B46FF] hover:bg-[#3934E6] text-white text-xs font-bold px-4 py-2 rounded-xl shadow-sm flex items-center gap-1.5 transition-all shrink-0 cursor-pointer">
                   <i data-lucide="send" class="w-3 h-3"></i> Send
                 </button>
               </div>
@@ -503,17 +579,16 @@
       const container = document.getElementById("reply-composer-container");
 
       const activeYearVal = parseYearValue(d.studentYear);
-      // Seniority Check: Only allow replies if user is senior/peer mentor or faculty
       const isSenior = state.user.role === "faculty" || state.userYearValue >= activeYearVal;
 
       if (!isSenior) {
         container.innerHTML = `
-          <div class="text-center py-4">
-            <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-2 border border-slate-200 text-slate-400">
-              <i data-lucide="lock" class="w-5 h-5"></i>
+          <div class="text-center py-6">
+            <div class="w-10 h-10 bg-[#F7F9FF] rounded-2xl flex items-center justify-center mx-auto mb-3 border border-[#E9EDFF] text-[#737B94]">
+              <i data-lucide="lock" class="w-5 h-5 text-[#4B46FF]"></i>
             </div>
-            <h4 class="text-sm font-bold text-slate-900">Answering Locked</h4>
-            <p class="text-xs text-slate-500 mt-1">To ensure answer quality, only students in ${d.studentYear} or above can submit solutions to this channel.</p>
+            <h4 class="text-sm font-extrabold text-[#0B1230]">Answering Locked</h4>
+            <p class="text-xs text-[#737B94] mt-1.5 font-medium max-w-sm mx-auto">To ensure answer quality, only students in ${d.studentYear} or above can submit solutions to this channel.</p>
           </div>
         `;
         lucide.createIcons();
@@ -521,17 +596,17 @@
       }
 
       container.innerHTML = `
-        <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-1.5 uppercase tracking-wider">
-          <i data-lucide="edit-3" class="w-4 h-4 text-indigo-500"></i> Submit Your Solution
+        <h3 class="text-xs font-extrabold text-[#0B1230] mb-3 flex items-center gap-2 uppercase tracking-wider">
+          <i data-lucide="edit-3" class="w-4 h-4 text-[#4B46FF]"></i> Submit Your Solution
         </h3>
         <form onsubmit="handlePostReply(event)" class="space-y-4">
-          <textarea id="reply-text" rows="4" required class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 ring-indigo-100 transition-all resize-none placeholder-slate-400 leading-relaxed" placeholder="Type a step-by-step clear explanation..."></textarea>
+          <textarea id="reply-text" rows="4" required class="w-full text-xs bg-[#F7F9FF] border border-[#E9EDFF] rounded-xl p-3.5 focus:bg-white focus:outline-none focus:border-[#4B46FF] focus:ring-2 ring-[#4B46FF]/10 transition-all resize-none placeholder-[#737B94] leading-relaxed font-medium" placeholder="Type a step-by-step clear explanation..."></textarea>
           
           <div class="flex justify-between items-center pt-2">
-            <span class="text-xs text-amber-700 font-extrabold bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm">
+            <span class="text-xs text-[#0B1230] font-extrabold bg-[#FFC857]/15 border border-[#FFC857]/30 px-3.5 py-2 rounded-xl flex items-center gap-1.5">
               <span>🎁</span> Earn ${d.points || 25} pts for helping
             </span>
-            <button type="submit" id="reply-submit-btn" class="bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white px-5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md shadow-indigo-100 transition-all">
+            <button type="submit" id="reply-submit-btn" class="btn-electric bg-[#4B46FF] hover:bg-[#3934E6] text-white px-5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer">
               <i data-lucide="send" class="w-3.5 h-3.5"></i>
               <span>Post Solution</span>
             </button>
@@ -543,49 +618,46 @@
 
     function renderSidebarInfo() {
       const d = state.activeDoubt;
-      
-      // Render Concept details
+
       const infoContainer = document.getElementById("concept-info-container");
       infoContainer.innerHTML = `
         <div>
-          <span class="text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Active Concept</span>
-          <span class="text-slate-900 font-extrabold text-sm block">${d.concept || 'General Concept'}</span>
+          <span class="text-[#737B94] font-extrabold uppercase tracking-wider block mb-1 text-[10px]">Active Concept</span>
+          <span class="text-[#0B1230] font-extrabold text-sm block">${d.concept || 'General Concept'}</span>
         </div>
         ${d.difficulty ? `
           <div>
-            <span class="text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Complexity Level</span>
-            <span class="badge-clean-neutral px-2 py-0.5 rounded text-[10px] font-bold inline-block">${d.difficulty}</span>
+            <span class="text-[#737B94] font-extrabold uppercase tracking-wider block mb-1 text-[10px]">Complexity Level</span>
+            <span class="bg-[#F7F9FF] border border-[#E9EDFF] text-[#737B94] px-2.5 py-1 rounded-lg text-[10px] font-bold inline-block">${d.difficulty}</span>
           </div>
         ` : ''}
         ${d.intent ? `
           <div>
-            <span class="text-slate-400 font-bold uppercase tracking-wider block mb-0.5">Identified Query Intent</span>
-            <span class="badge-clean-purple px-2 py-0.5 rounded text-[10px] font-bold inline-block">Intent: ${d.intent}</span>
+            <span class="text-[#737B94] font-extrabold uppercase tracking-wider block mb-1 text-[10px]">Identified Query Intent</span>
+            <span class="bg-[#4B46FF]/10 text-[#4B46FF] px-2.5 py-1 rounded-lg text-[10px] font-extrabold inline-block">Intent: ${d.intent}</span>
           </div>
         ` : ''}
       `;
 
-      // Render Dynamic DB Slide References
       const resContainer = document.getElementById("resources-container");
-      
-      // Try to find matching resources in DB metadata
+
       const resources = DB.getResourcesByConcept(d.concept || "");
       if (resources.length === 0) {
         resContainer.innerHTML = `
-          <div class="text-[11px] text-slate-400 italic">No slide materials linked to this concept.</div>
+          <div class="text-[11px] text-[#737B94] italic font-medium">No slide materials linked to this concept.</div>
         `;
         return;
       }
 
       resContainer.innerHTML = resources.slice(0, 3).map(r => `
-        <a href="${r.url}" target="_blank" class="block p-3 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 hover:border-emerald-200 transition-all text-xs group">
+        <a href="${r.url}" target="_blank" class="block p-3.5 rounded-xl border border-[#E9EDFF] bg-[#F7F9FF] hover:bg-white hover:border-[#35C98A]/40 transition-all text-xs group">
           <div class="flex items-center gap-2 mb-1.5">
-            <span class="badge-clean-emerald text-[9px] font-bold px-1.5 py-0.5 rounded">${r.resource_type || 'Slides'}</span>
-            <span class="text-[10px] text-slate-400 font-semibold ml-auto">Unit 1</span>
+            <span class="bg-[#35C98A]/10 text-[#35C98A] border border-[#35C98A]/20 text-[9px] font-extrabold px-2 py-0.5 rounded-md">${r.resource_type || 'Slides'}</span>
+            <span class="text-[10px] text-[#737B94] font-semibold ml-auto">Unit 1</span>
           </div>
-          <p class="font-bold text-slate-800 leading-snug group-hover:text-emerald-700 transition-colors">${r.title}</p>
-          <div class="flex items-center gap-1 text-[10px] text-slate-400 mt-1 font-semibold">
-            <i data-lucide="external-link" class="w-3 h-3"></i>
+          <p class="font-bold text-[#0B1230] leading-snug group-hover:text-[#35C98A] transition-colors">${r.title}</p>
+          <div class="flex items-center gap-1 text-[10px] text-[#737B94] mt-1.5 font-bold">
+            <i data-lucide="external-link" class="w-3 h-3 text-[#35C98A]"></i>
             <span>Open Slides</span>
           </div>
         </a>
@@ -599,16 +671,40 @@
       return escaped.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
     }
 
-    window.handleUpvote = (e) => {
+    window.handleUpvote = async (e) => {
       e.stopPropagation();
-      const doubts = DB.getDoubts();
-      const doubtIndex = doubts.findIndex(x => String(x.id) === String(state.currentDoubtId));
-      if (doubtIndex === -1) return;
 
-      doubts[doubtIndex].upvotes = (doubts[doubtIndex].upvotes || 0) + 1;
-      DB.saveDoubts(doubts);
-      loadDoubtData();
-      showToast("Upvoted doubt!", "success");
+      const doubtId = state.currentDoubtId;
+      const upvotedDoubts = JSON.parse(localStorage.getItem('upvoted_doubts') || '[]');
+      if (upvotedDoubts.includes(String(doubtId))) {
+        showToast("You already attempted", "warning");
+        return;
+      }
+
+      if (e.currentTarget.dataset.upvoting === "1") return;
+      e.currentTarget.dataset.upvoting = "1";
+
+      try {
+        const res = await fetch(`http://localhost:8000/api/doubts/${doubtId}/upvote`, { method: 'POST' });
+        if (res.ok) {
+          const data = await res.json();
+          upvotedDoubts.push(String(doubtId));
+          localStorage.setItem('upvoted_doubts', JSON.stringify(upvotedDoubts));
+
+          const doubts = DB.getDoubts();
+          const doubtIndex = doubts.findIndex(x => String(x.id) === String(doubtId));
+          if (doubtIndex !== -1) {
+            doubts[doubtIndex].upvotes = data.upvotes;
+            DB.saveDoubts(doubts);
+          }
+          loadDoubtData();
+          showToast("Upvoted doubt!", "success");
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        e.currentTarget.dataset.upvoting = "0";
+      }
     };
 
     window.handleShareLink = (e) => {
@@ -639,38 +735,55 @@
         };
 
         const bounty = state.activeDoubt.points || 25;
-        await DB.resolveDoubt(state.currentDoubtId, ansData);
-        await DB.updateUserPoints(bounty);
-
-        showToast(`Answer posted successfully! Earned ${bounty} pts.`, "success");
         
-        // Refresh local data & UI
-        await DB.syncDoubts();
+        const doubts = DB.getDoubts();
+        const d = doubts.find(dx => String(dx.id) === String(state.currentDoubtId));
+        if (d) {
+          if (!d.answers) d.answers = [];
+          d.answers.push({
+            id: "temp-" + Date.now(),
+            ...ansData,
+            helpfulnessUpvotes: 0,
+            replies: [],
+            createdAt: new Date().toISOString()
+          });
+          d.status = 'Resolved';
+          DB.saveDoubts(doubts);
+        }
+        
+        DB.updateUserPoints(bounty);
+        showToast(`Answer posted successfully! Earned ${bounty} pts.`, "success");
         loadDoubtData();
+
+        DB.resolveDoubt(state.currentDoubtId, ansData).then(() => {
+          DB.syncDoubts().then(() => {
+             if (state.currentDoubtId) loadDoubtData();
+          });
+        }).catch(err => {
+          console.error("Error posting answer:", err);
+        });
       } catch (err) {
         showToast("Error posting answer.", "error");
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = '<i data-lucide="send" class="w-3.5 h-3.5"></i> <span>Post Solution</span>';
-        lucide.createIcons();
+        if (window.lucide) lucide.createIcons();
       }
     }
 
     window.toggleAnswerMenu = (e, answerId) => {
       e.stopPropagation();
       const menu = document.getElementById(`menu-${answerId}`);
-      
-      // Close all other open dropdowns first
+
       document.querySelectorAll('[id^="menu-"]').forEach(m => {
         if (m.id !== `menu-${answerId}`) m.classList.add("hidden");
       });
-      
+
       if (menu) {
         menu.classList.toggle("hidden");
       }
     };
 
-    // Close menus when clicking outside
     document.addEventListener("click", () => {
       document.querySelectorAll('[id^="menu-"]').forEach(m => m.classList.add("hidden"));
     });
@@ -692,14 +805,13 @@
       const menu = document.getElementById(`menu-${answerId}`);
       if (menu) menu.classList.add("hidden");
 
-      // Replace backticks to prevent JS interpolation issues
       const escapedContentForReset = originalContent.replace(/`/g, '\\`').replace(/\$/g, '\\$');
-      
+
       container.innerHTML = `
-        <textarea id="edit-textarea-${answerId}" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 ring-indigo-100 transition-all resize-none mb-2" rows="3">${originalContent}</textarea>
+        <textarea id="edit-textarea-${answerId}" class="w-full text-xs bg-[#F7F9FF] border border-[#E9EDFF] rounded-xl p-3 focus:bg-white focus:outline-none focus:border-[#4B46FF] focus:ring-2 ring-[#4B46FF]/10 transition-all resize-none mb-2 font-medium" rows="3">${originalContent}</textarea>
         <div class="flex gap-2 justify-end">
-          <button onclick="cancelEditAnswer('${answerId}', \`${escapedContentForReset}\`)" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
-          <button onclick="saveEditAnswer('${answerId}')" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm">Save</button>
+          <button onclick="cancelEditAnswer('${answerId}', \`${escapedContentForReset}\`)" class="px-3.5 py-1.5 rounded-xl border border-[#E9EDFF] text-xs font-bold text-[#737B94] hover:bg-[#F7F9FF]">Cancel</button>
+          <button onclick="saveEditAnswer('${answerId}')" class="btn-electric bg-[#4B46FF] hover:bg-[#3934E6] text-white text-xs font-bold px-4 py-1.5 rounded-xl shadow-sm cursor-pointer">Save</button>
         </div>
       `;
       lucide.createIcons();
@@ -722,7 +834,6 @@
         return;
       }
 
-      // OPTIMISTIC UPDATE: Save to local doubts immediately & render
       const doubts = DB.getDoubts();
       let found = false;
       doubts.forEach(d => {
@@ -740,7 +851,6 @@
         showToast("Answer updated successfully.", "success");
       }
 
-      // Sync with database in the background (no awaiting!)
       DB.updateAnswer(answerId, newContent).then(success => {
         if (!success) {
           console.error("Failed to sync answer update to DB.");
@@ -753,18 +863,16 @@
     let pendingDeleteAnswerId = null;
 
     window.handleDeleteAnswer = (answerId) => {
-      console.log("handleDeleteAnswer called with ID:", answerId);
       if (!answerId || answerId === "undefined" || answerId === "null") {
         showToast("Cannot delete: Invalid Answer ID (" + answerId + ")", "error");
         return;
       }
       pendingDeleteAnswerId = answerId;
 
-      // Reset confirm card content back to answer deletion settings
       const modalText = document.querySelector("#confirm-modal p");
       const modalTitle = document.querySelector("#confirm-modal h4");
       const confirmBtn = document.getElementById("confirm-delete-btn-action");
-      
+
       if (modalTitle) modalTitle.textContent = "Are you absolutely sure?";
       if (modalText) modalText.textContent = "This action will delete your solution and revert any points awarded for this answer. This cannot be undone.";
       if (confirmBtn) {
@@ -792,10 +900,8 @@
     window.executeDeleteAnswer = async () => {
       if (!pendingDeleteAnswerId) return;
       const answerId = pendingDeleteAnswerId;
-      console.log("executeDeleteAnswer starting for:", answerId);
       closeConfirmModal();
-      
-      // OPTIMISTIC UPDATE: Remove from local doubts immediately & render
+
       const doubts = DB.getDoubts();
       let found = false;
       doubts.forEach(d => {
@@ -813,10 +919,8 @@
         showToast("Solution deleted successfully.", "success");
       }
 
-      // Sync with database in the background (no awaiting!)
       DB.deleteAnswer(answerId).then(success => {
         if (success) {
-          // Re-fetch current user profile to update points balance in UI in the background
           const email = (state.user && state.user.email) ? state.user.email : "alex.morgan@studybuddy.edu";
           fetch(`http://localhost:8000/api/user/${email}`)
             .then(res => {
@@ -841,14 +945,12 @@
       });
     };
 
-    // Doubt options & handlers
     window.toggleDoubtMenu = (e) => {
       e.stopPropagation();
       const menu = document.getElementById("doubt-menu");
-      
-      // Close other menus first
+
       document.querySelectorAll('[id^="menu-"]').forEach(m => m.classList.add("hidden"));
-      
+
       if (menu) {
         menu.classList.toggle("hidden");
       }
@@ -866,13 +968,13 @@
       const currentQuery = state.activeDoubt.rawQuery;
 
       titleContainer.innerHTML = `
-        <input type="text" id="edit-doubt-title" class="w-full text-lg font-bold bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 ring-indigo-100 transition-all mb-2" value="${currentTitle.replace(/"/g, '&quot;')}">
+        <input type="text" id="edit-doubt-title" class="w-full text-lg font-extrabold bg-[#F7F9FF] border border-[#E9EDFF] rounded-xl px-3.5 py-2 focus:bg-white focus:outline-none focus:border-[#4B46FF] focus:ring-2 ring-[#4B46FF]/10 transition-all mb-2" value="${currentTitle.replace(/"/g, '&quot;')}">
       `;
       queryContainer.innerHTML = `
-        <textarea id="edit-doubt-query" class="w-full text-sm bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 ring-indigo-100 transition-all resize-none mb-2" rows="3">${currentQuery}</textarea>
+        <textarea id="edit-doubt-query" class="w-full text-xs bg-[#F7F9FF] border border-[#E9EDFF] rounded-xl p-3.5 focus:bg-white focus:outline-none focus:border-[#4B46FF] focus:ring-2 ring-[#4B46FF]/10 transition-all resize-none mb-2 font-medium" rows="3">${currentQuery}</textarea>
         <div class="flex gap-2 justify-end">
-          <button onclick="cancelEditDoubt()" class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
-          <button onclick="saveEditDoubt()" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm">Save</button>
+          <button onclick="cancelEditDoubt()" class="px-3.5 py-1.5 rounded-xl border border-[#E9EDFF] text-xs font-bold text-[#737B94] hover:bg-[#F7F9FF]">Cancel</button>
+          <button onclick="saveEditDoubt()" class="btn-electric bg-[#4B46FF] hover:bg-[#3934E6] text-white text-xs font-bold px-4 py-1.5 rounded-xl shadow-sm cursor-pointer">Save</button>
         </div>
       `;
     };
@@ -894,7 +996,6 @@
         return;
       }
 
-      // OPTIMISTIC UPDATE: Save to local doubts immediately & render
       const doubts = DB.getDoubts();
       const doubt = doubts.find(d => String(d.id) === String(state.currentDoubtId));
       if (doubt) {
@@ -905,7 +1006,6 @@
         showToast("Question updated successfully.", "success");
       }
 
-      // Sync with database in the background (no awaiting!)
       DB.updateDoubt(state.currentDoubtId, title, rawQuery).then(success => {
         if (!success) {
           console.error("Failed to sync question update to DB.");
@@ -925,11 +1025,11 @@
 
     window.handleDeleteDoubt = () => {
       pendingDeleteDoubtId = state.currentDoubtId;
-      
+
       const modalTitle = document.querySelector("#confirm-modal h4");
       const modalText = document.querySelector("#confirm-modal p");
       const confirmBtn = document.getElementById("confirm-delete-btn-action");
-      
+
       if (modalTitle) modalTitle.textContent = "Delete this question?";
       if (modalText) modalText.textContent = "This will delete the question, refund the 15 bounty points, and remove all answers. This action cannot be undone.";
       if (confirmBtn) {
@@ -951,7 +1051,6 @@
       const doubtId = pendingDeleteDoubtId;
       closeConfirmModal();
 
-      // OPTIMISTIC UPDATE: Remove from local doubts immediately
       const doubts = DB.getDoubts();
       const idx = doubts.findIndex(d => String(d.id) === String(doubtId));
       if (idx !== -1) {
@@ -961,13 +1060,11 @@
       showToast("Question deleted. Refunding bounty...", "success");
 
       try {
-        // Await the backend deletion so that the DB write commits before redirection!
         await DB.deleteDoubt(doubtId);
       } catch (err) {
         console.error("Failed to delete doubt:", err);
       }
 
-      // Redirect now that the database write is committed
       window.location.href = "student-dashboard.html";
     };
 
@@ -989,7 +1086,6 @@
         return;
       }
 
-      // OPTIMISTIC UPDATE: Add reply locally and render
       const doubts = DB.getDoubts();
       let found = false;
       doubts.forEach(d => {
@@ -1016,7 +1112,6 @@
 
       input.value = "";
 
-      // Sync with database in background
       DB.addReply(answerId, state.user.name, state.user.avatar, content).then(success => {
         if (!success) {
           console.error("Failed to sync reply to DB.");
@@ -1026,14 +1121,36 @@
       });
     };
 
+    window.facultyVerifyPeerAnswerFromQuestion = (doubtId, answerIdx) => {
+      const doubts = DB.getDoubts();
+      const doubt = doubts.find(d => String(d.id) === String(doubtId));
+      if (doubt && doubt.answers && doubt.answers[answerIdx]) {
+         doubt.answers[answerIdx].isFacultyVerified = true;
+         DB.saveDoubts(doubts);
+      }
+      loadDoubtData();
+      showToast("Peer solution verified! Faculty approval tag awarded (+15 pts).", "success");
+
+      DB.setAnswerFacultyVerified(doubtId, answerIdx, true).then(() => {
+        DB.updateUserPoints(15);
+      }).catch(err => console.error("Verify error:", err));
+    };
+
     window.executeLikeAnswer = async (answerId) => {
-      // OPTIMISTIC UPDATE: Increment upvotes locally & render
+      const likedAnswers = JSON.parse(localStorage.getItem('liked_answers') || '[]');
+      if (likedAnswers.includes(String(answerId))) {
+        showToast("You already attempted", "warning");
+        return;
+      }
+      
       const doubts = DB.getDoubts();
       let found = false;
       doubts.forEach(d => {
         if (d.answers) {
           const ans = d.answers.find(a => String(a.id) === String(answerId));
           if (ans) {
+            likedAnswers.push(String(answerId));
+            localStorage.setItem('liked_answers', JSON.stringify(likedAnswers));
             ans.helpfulnessUpvotes = (ans.helpfulnessUpvotes || 0) + 1;
             found = true;
           }
@@ -1045,7 +1162,6 @@
         showToast("Solution marked as helpful!", "success");
       }
 
-      // Sync with database in background
       DB.likeAnswer(answerId).then(res => {
         if (!res || !res.success) {
           console.error("Failed to sync like to DB.");
@@ -1056,13 +1172,29 @@
     };
 
     window.executeRateAnswer = async (answerId, rating) => {
-      // OPTIMISTIC UPDATE: Set rating directly (user rates once, replaces previous)
+      let ratedAnswersObj = {};
+      try {
+        const parsed = JSON.parse(localStorage.getItem('rated_answers') || '{}');
+        if (Array.isArray(parsed)) {
+          parsed.forEach(id => ratedAnswersObj[String(id)] = true);
+        } else if (parsed && typeof parsed === 'object') {
+          ratedAnswersObj = parsed;
+        }
+      } catch(e) {}
+
+      if (ratedAnswersObj[String(answerId)]) {
+        showToast("You already attempted", "warning");
+        return;
+      }
+      
       const doubts = DB.getDoubts();
       let found = false;
       doubts.forEach(d => {
         if (d.answers) {
           const ans = d.answers.find(a => String(a.id) === String(answerId));
           if (ans) {
+            ratedAnswersObj[String(answerId)] = rating;
+            localStorage.setItem('rated_answers', JSON.stringify(ratedAnswersObj));
             ans.rating = rating;
             ans.ratingCount = Math.max(ans.ratingCount || 0, 1);
             found = true;
@@ -1075,11 +1207,9 @@
         showToast(`Rated ${rating} stars!`, "success");
       }
 
-      // Sync with database in background (backend upserts per-user and recalculates average)
       const userEmail = state.user?.email || '';
       DB.rateAnswer(answerId, rating, userEmail).then(res => {
         if (res && res.success) {
-          // Update with the true server-computed average
           const doubts2 = DB.getDoubts();
           doubts2.forEach(d => {
             if (d.answers) {

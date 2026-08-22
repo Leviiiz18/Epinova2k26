@@ -83,6 +83,7 @@
         difficulty VARCHAR(20) DEFAULT 'Beginner',
         intent VARCHAR(50) DEFAULT 'Conceptual', -- 'Conceptual', 'Debugging', 'Problem Solving', 'Exam Prep'
         detected_misconception TEXT,
+        upvotes INT DEFAULT 0,
         auto_sort_confidence JSONB, -- {"topic": 0.94, "concept": 0.97}
         status VARCHAR(30) DEFAULT 'Open', -- 'Open', 'In Review', 'Resolved'
         embedding vector(384), -- pgvector embedding for semantic search (all-MiniLM-L6-v2 = 384 dims)

@@ -4,46 +4,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Study Buddy — Student Community</title>
+  <title>What's that? — Student Community</title>
+
+  <!-- Tailwind CSS CDN & Config -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif']
+          },
+          colors: {
+            brand: {
+              DEFAULT: '#4B46FF',
+              hover: '#3934E6',
+              accent: '#6C8CFF',
+              navy: '#0B1230',
+              dark: '#070B1D',
+              ice: '#F7F9FF',
+              main: '#F5F7FC',
+              secondary: '#E9EDFF',
+              success: '#35C98A',
+              warning: '#FFC857',
+              error: '#FF5C70',
+              text: '#20263D',
+              muted: '#737B94'
+            }
+          },
+          borderRadius: {
+            '2xl': '18px',
+            '3xl': '24px'
+          }
+        }
+      }
+    }
+  </script>
+
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
-
     .no-scrollbar {
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-
     .channel-active {
-      background-color: #e0e7ff;
-      color: #4f46e5;
+      background-color: #E9EDFF;
+      color: #4B46FF;
       font-weight: 700;
-      border-color: #c7d2fe;
+      border-color: rgba(75, 70, 255, 0.25);
     }
   </style>
 </head>
 
-<body class="bg-white text-slate-900 h-screen flex overflow-hidden font-sans">
+<body class="bg-[#F5F7FC] text-[#20263D] h-screen flex overflow-hidden font-sans">
   <!-- Ask a Doubt Modal -->
   <div id="ask-doubt-modal" class="fixed inset-0 z-[100] hidden items-center justify-center">
     <!-- Backdrop -->
-    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onclick="closeAskDoubtModal()">
+    <div class="absolute inset-0 bg-[#0B1230]/50 backdrop-blur-sm transition-opacity" onclick="closeAskDoubtModal()">
     </div>
 
     <!-- Modal Content -->
-    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl relative z-10 mx-4 flex flex-col overflow-hidden">
+    <div class="card-modern bg-white w-full max-w-2xl shadow-2xl relative z-10 mx-4 flex flex-col overflow-hidden border-[#E9EDFF]">
 
       <!-- Modal Header -->
-      <div class="flex items-center justify-between p-5 border-b border-slate-100 bg-slate-50/80">
-        <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-          <i data-lucide="edit-3" class="w-5 h-5 text-indigo-600"></i> Ask a New Doubt
+      <div class="flex items-center justify-between p-6 border-b border-[#E9EDFF] bg-[#F7F9FF]">
+        <h3 class="text-lg font-extrabold text-[#0B1230] flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-[#4B46FF]/10 text-[#4B46FF] flex items-center justify-center">
+            <i data-lucide="edit-3" class="w-4 h-4"></i>
+          </div>
+          <span>Ask a New Doubt</span>
         </h3>
         <button onclick="closeAskDoubtModal()"
-          class="text-slate-400 hover:text-slate-600 transition-colors p-1 rounded-md hover:bg-slate-200">
+          class="text-[#737B94] hover:text-[#0B1230] transition-colors p-1.5 rounded-xl hover:bg-[#E9EDFF]">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -51,39 +87,36 @@
       <!-- Modal Body -->
       <form onsubmit="handleGlobalPostDoubt(event)" class="p-6">
         <input type="text" id="global-post-title" required placeholder="What is your doubt about?"
-          class="w-full text-xl font-extrabold text-slate-900 placeholder-slate-400 border-0 focus:ring-0 p-0 mb-4 bg-transparent outline-none">
+          class="w-full text-xl font-extrabold text-[#0B1230] placeholder-[#737B94] border-0 border-b border-[#E9EDFF] focus:border-[#4B46FF] pb-3 mb-4 bg-transparent outline-none transition-colors">
 
         <textarea id="global-post-desc" required rows="5" placeholder="Explain your doubt in detail..."
-          class="w-full text-sm text-slate-600 placeholder-slate-400 border-0 focus:ring-0 p-0 mb-4 bg-transparent resize-none outline-none leading-relaxed"></textarea>
+          class="w-full text-sm text-[#20263D] placeholder-[#737B94] border border-[#E9EDFF] rounded-xl p-3.5 mb-4 bg-[#F7F9FF] focus:bg-white focus:border-[#4B46FF] focus:ring-2 ring-[#4B46FF]/10 resize-none outline-none leading-relaxed transition-all"></textarea>
 
-        <div class="flex items-center gap-2 mb-4">
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Answer style:</span>
-          <div class="inline-flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200"
+        <div class="flex items-center gap-3 mb-5">
+          <span class="text-[11px] font-bold text-[#737B94] uppercase tracking-wider">Answer style:</span>
+          <div class="inline-flex items-center gap-1 bg-[#F7F9FF] p-1 rounded-xl border border-[#E9EDFF]"
             id="modal-exam-toggle" data-value="none">
             <button type="button" data-mode="none" onclick="setExamMode(this, 'modal-exam-toggle')"
-              class="exam-toggle-btn px-2.5 py-1 text-[11px] font-bold rounded-md bg-white text-slate-900 shadow-sm border border-slate-200/70">Normal</button>
+              class="exam-toggle-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-white text-[#0B1230] shadow-sm border border-[#E9EDFF]">Normal</button>
             <button type="button" data-mode="5m" onclick="setExamMode(this, 'modal-exam-toggle')"
-              class="exam-toggle-btn px-2.5 py-1 text-[11px] font-medium rounded-md text-slate-500 hover:text-slate-900">5
-              Mark</button>
+              class="exam-toggle-btn px-3 py-1.5 text-xs font-medium rounded-lg text-[#737B94] hover:text-[#0B1230]">5 Mark</button>
             <button type="button" data-mode="10m" onclick="setExamMode(this, 'modal-exam-toggle')"
-              class="exam-toggle-btn px-2.5 py-1 text-[11px] font-medium rounded-md text-slate-500 hover:text-slate-900">10
-              Mark</button>
+              class="exam-toggle-btn px-3 py-1.5 text-xs font-medium rounded-lg text-[#737B94] hover:text-[#0B1230]">10 Mark</button>
           </div>
         </div>
 
-        <div class="flex items-center justify-between pt-4 border-t border-slate-100 mt-2">
-          <div class="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
-            <i data-lucide="info" class="w-4 h-4 text-slate-400"></i> Posts cost 15 pts
+        <div class="flex items-center justify-between pt-4 border-t border-[#E9EDFF]">
+          <div class="text-xs text-[#737B94] flex items-center gap-1.5 font-medium">
+            <i data-lucide="info" class="w-4 h-4 text-[#4B46FF]"></i> Posts cost 15 pts
           </div>
           <div class="flex items-center gap-3">
             <button type="button" onclick="closeAskDoubtModal()"
-              class="text-slate-500 hover:text-slate-700 font-bold text-sm px-4 py-2 transition-colors">
+              class="text-[#737B94] hover:text-[#0B1230] font-bold text-sm px-4 py-2.5 transition-colors">
               Cancel
             </button>
-            <!-- Only Auto Sort button here -->
             <button type="submit"
-              class="bg-violet-600 hover:bg-violet-700 active:bg-violet-800 text-white text-sm font-bold px-6 py-2.5 rounded-xl transition-all shadow-md shadow-violet-200 flex items-center gap-2">
-              <i data-lucide="sparkles" class="w-4 h-4 text-violet-200"></i> Auto-Sort & Post
+              class="btn-electric text-white text-sm font-bold px-6 py-2.5 rounded-xl shadow-md flex items-center gap-2">
+              <i data-lucide="sparkles" class="w-4 h-4"></i> Auto-Sort & Post
             </button>
           </div>
         </div>
@@ -91,17 +124,12 @@
     </div>
   </div>
 
-  <!-- Left Sidebar (Discord Style) -->
-  <aside class="w-64 bg-slate-50 border-r border-slate-200 flex-shrink-0 hidden md:flex flex-col h-full z-10">
+  <!-- Left Sidebar -->
+  <aside class="w-64 bg-white border-r border-[#E9EDFF] flex-shrink-0 hidden md:flex flex-col h-full z-10">
     <!-- Brand Logo -->
-    <div class="h-16 flex items-center px-4 border-b border-slate-200">
-      <a href="index.html" class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-sm">
-          <i data-lucide="graduation-cap" class="w-4 h-4"></i>
-        </div>
-        <div>
-          <span class="text-base font-extrabold text-slate-900">Study Buddy</span>
-        </div>
+    <div class="h-20 flex items-center px-4 border-b border-[#E9EDFF] bg-white">
+      <a href="index.html" class="flex items-center w-full py-1">
+        <img src="assets/logo.png" alt="Logo" class="h-16 w-auto max-w-full object-contain">
       </a>
     </div>
 
@@ -110,114 +138,136 @@
       <!-- Injected by JS -->
     </div>
 
-    <!-- User Profile Footer in Sidebar -->
-    <div class="p-3 border-t border-slate-200 bg-white">
-      <div class="flex items-center gap-2">
-        <img src="" id="sidebar-avatar" class="w-9 h-9 rounded-full object-cover border border-slate-200">
-        <div class="flex-1 min-w-0">
-          <div class="text-sm font-bold text-slate-900 truncate" id="sidebar-name"></div>
-          <div class="text-[10px] text-slate-500 font-medium truncate" id="sidebar-year"></div>
+    <!-- Knowledge Graph Premium Feature -->    
+    <div class="px-3 pb-3">
+      <a href="knowledge_graph.html"
+        class="group flex items-center gap-3 w-full px-4 py-3.5 rounded-2xl bg-gradient-to-br from-[#4B46FF] to-[#7C78FF] text-white shadow-lg hover:shadow-xl hover:from-[#3934E6] hover:to-[#6A66FF] transition-all relative overflow-hidden">
+        <!-- Glow orb -->
+        <span class="absolute -top-4 -right-4 w-16 h-16 bg-white/10 rounded-full blur-lg group-hover:scale-125 transition-transform"></span>
+        <div class="shrink-0 w-8 h-8 bg-white/15 rounded-xl flex items-center justify-center">
+          <i data-lucide="git-branch" class="w-4 h-4 text-white"></i>
         </div>
-        <button onclick="logout()"
-          class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors"
-          title="Log out">
-          <i data-lucide="log-out" class="w-4 h-4"></i>
-        </button>
-      </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs font-extrabold text-white leading-tight">Knowledge Graph</div>
+          <div class="text-[10px] text-white/70 font-medium mt-0.5">Explore concept map ✦ Premium</div>
+        </div>
+        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-white/60 shrink-0 group-hover:translate-x-0.5 transition-transform"></i>
+      </a>
     </div>
+
+    <!-- User Profile Footer in Sidebar — click to open profile -->
+    <a href="profile.html"
+      class="group p-4 border-t border-[#E9EDFF] bg-[#F7F9FF] hover:bg-[#EEF0FF] transition-all flex items-center gap-3 cursor-pointer">
+      <img src="" id="sidebar-avatar" class="w-10 h-10 rounded-full object-cover border-2 border-[#E9EDFF] group-hover:border-[#4B46FF]/40 shadow-sm transition-all shrink-0">
+      <div class="flex-1 min-w-0">
+        <div class="text-sm font-bold text-[#0B1230] truncate" id="sidebar-name"></div>
+        <div class="text-[11px] text-[#737B94] font-semibold truncate flex items-center gap-1" id="sidebar-year">
+          <span></span>
+        </div>
+      </div>
+      <i data-lucide="chevron-right" class="w-4 h-4 text-[#737B94] group-hover:text-[#4B46FF] group-hover:translate-x-0.5 transition-all shrink-0"></i>
+    </a>
   </aside>
 
   <!-- Main Content Area -->
-  <div class="flex-1 flex flex-col h-full overflow-hidden bg-white">
+  <div class="flex-1 flex flex-col h-full overflow-hidden bg-[#F5F7FC]">
     <!-- Header -->
     <header
-      class="h-16 flex items-center justify-between px-4 sm:px-6 border-b border-slate-200 bg-white z-10 shrink-0">
+      class="h-18 flex items-center justify-between px-6 border-b border-[#E9EDFF] bg-white z-10 shrink-0">
       <div class="flex items-center gap-3">
-        <button class="md:hidden p-2 -ml-2 text-slate-500 hover:bg-slate-100 rounded-md" onclick="toggleMobileMenu()">
+        <button class="md:hidden p-2 -ml-2 text-[#737B94] hover:bg-[#F7F9FF] rounded-xl" onclick="toggleMobileMenu()">
           <i data-lucide="menu" class="w-5 h-5"></i>
         </button>
-        <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-          <i data-lucide="hash" class="w-5 h-5 text-slate-400"></i>
+        <h2 class="text-lg font-extrabold text-[#0B1230] flex items-center gap-2">
+          <i data-lucide="hash" class="w-5 h-5 text-[#4B46FF]"></i>
           <span id="current-channel-title">General</span>
         </h2>
         <span
-          class="badge-clean-neutral text-[10px] font-semibold px-2 py-0.5 rounded hidden sm:block bg-slate-100 border border-slate-200 text-slate-600"
+          class="text-[11px] font-bold px-2.5 py-1 rounded-lg hidden sm:block bg-[#F7F9FF] border border-[#E9EDFF] text-[#4B46FF]"
           id="current-year-title">3rd Year</span>
       </div>
 
       <div class="flex items-center gap-3">
-        <!-- Knowledge Graph Nav -->
-        <a href="knowledge_graph.html" title="Explore Concept Knowledge Graph"
-          class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium text-indigo-700 hover:text-indigo-900 border border-indigo-200 bg-indigo-50/70 hover:bg-indigo-100 transition-colors">
-          <i data-lucide="git-branch" class="w-3.5 h-3.5 text-indigo-600"></i>
-          <span>Knowledge Graph</span>
-        </a>
+        
+        <!-- Notifications Bell -->
+        <div class="relative">
+          <button id="notification-btn" onclick="toggleNotifications(event)" class="p-2 text-[#737B94] hover:text-[#0B1230] hover:bg-[#F7F9FF] rounded-xl transition-colors relative border border-transparent hover:border-[#E9EDFF]">
+            <i data-lucide="bell" class="w-5 h-5"></i>
+            <span id="notification-badge" class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[#FF5C70] rounded-full hidden"></span>
+          </button>
+          <div id="notification-dropdown" class="origin-top-right absolute right-0 mt-2 w-80 rounded-2xl shadow-xl bg-white ring-1 ring-black ring-opacity-5 divide-y divide-[#E9EDFF] hidden z-50 border border-[#E9EDFF]">
+            <div class="p-4 bg-[#F7F9FF]">
+              <h3 class="text-xs font-bold text-[#0B1230] uppercase tracking-wider">Notifications</h3>
+            </div>
+            <div id="notification-list" class="max-h-64 overflow-y-auto">
+               <div class="p-4 text-center text-xs text-[#737B94]">Loading...</div>
+            </div>
+          </div>
+        </div>
+
         <div id="user-points-wallet"
-          class="flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-bold px-3 py-1.5 rounded-full cursor-pointer hover:bg-amber-100 transition-colors select-none"
+          class="flex items-center gap-1.5 bg-[#FFC857]/15 border border-[#FFC857]/40 text-[#0B1230] text-xs font-extrabold px-3.5 py-2 rounded-xl cursor-pointer hover:bg-[#FFC857]/25 transition-all shadow-sm select-none"
           onclick="showPointsInfo()">
           <span>🪙</span>
           <span id="header-points-balance">100</span>
-          <span class="text-[9px] text-amber-500 font-semibold uppercase tracking-wide">pts</span>
+          <span class="text-[10px] text-[#737B94] font-bold uppercase tracking-wider">pts</span>
         </div>
       </div>
     </header>
 
     <!-- Content Split -->
-    <div class="flex flex-1 overflow-hidden relative bg-slate-50/50">
-      <!-- Center Feed (Reddit Style) -->
+    <div class="flex flex-1 overflow-hidden relative bg-[#F5F7FC]">
+      <!-- Center Feed -->
       <main class="flex-1 flex flex-col h-full relative">
         <!-- Scrollable Feed -->
         <div class="flex-1 overflow-y-auto p-4 sm:p-6 no-scrollbar" id="feed-scroll-container">
           <div class="max-w-3xl mx-auto space-y-6">
 
             <!-- Compose Box (Dashboard Only) -->
-            <div id="compose-box-container" class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm mb-6">
-              <div class="flex items-center gap-3 mb-4">
+            <div id="compose-box-container" class="card-modern bg-white p-6 shadow-sm mb-6 border-[#E9EDFF]">
+              <div class="flex items-center gap-3.5 mb-4">
                 <div
-                  class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
-                  <i data-lucide="sparkles" class="w-4 h-4"></i>
+                  class="w-10 h-10 rounded-2xl bg-[#4B46FF]/10 text-[#4B46FF] flex items-center justify-center shrink-0">
+                  <i data-lucide="sparkles" class="w-5 h-5"></i>
                 </div>
                 <div>
-                  <h3 class="text-sm font-extrabold text-slate-900">Ask a Doubt</h3>
-                  <p class="text-[11px] text-slate-500 font-medium">Type your question. Our AI will automatically sort
-                    it to the correct subject channel!</p>
+                  <h3 class="text-base font-extrabold text-[#0B1230]">Ask a Doubt</h3>
+                  <p class="text-xs text-[#737B94] font-medium">Type your question. Our AI will automatically sort it to the correct subject channel!</p>
                 </div>
               </div>
               <form onsubmit="handleGlobalPostDoubt(event)">
                 <input type="text" id="global-post-title"
-                  class="w-full text-sm font-bold text-slate-900 placeholder:text-slate-400 border-0 border-b border-slate-200 bg-transparent px-2 py-3 focus:ring-0 focus:border-indigo-500 transition-colors mb-4"
+                  class="w-full text-sm font-bold text-[#0B1230] placeholder-[#737B94] border-0 border-b border-[#E9EDFF] bg-transparent px-1 py-3 focus:ring-0 focus:border-[#4B46FF] transition-colors mb-4 outline-none"
                   placeholder="What's your question? e.g., Confused about Sobel vs. Laplacian...">
                 <textarea id="global-post-desc" rows="3"
-                  class="w-full text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-xl p-3 focus:bg-white focus:border-indigo-500 focus:ring-2 ring-indigo-100 transition-all resize-none placeholder:text-slate-400"
+                  class="w-full text-sm text-[#20263D] bg-[#F7F9FF] border border-[#E9EDFF] rounded-xl p-3.5 focus:bg-white focus:border-[#4B46FF] focus:ring-2 ring-[#4B46FF]/10 transition-all resize-none placeholder-[#737B94] outline-none"
                   placeholder="Provide more details, code snippets, or context..."></textarea>
 
                 <!-- Exam-style answer toggle: None / 5 Mark / 10 Mark -->
-                <div class="flex items-center gap-2 mt-3">
-                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Answer style:</span>
-                  <div class="inline-flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200"
+                <div class="flex items-center gap-3 mt-4">
+                  <span class="text-[11px] font-bold text-[#737B94] uppercase tracking-wider">Answer style:</span>
+                  <div class="inline-flex items-center gap-1 bg-[#F7F9FF] p-1 rounded-xl border border-[#E9EDFF]"
                     id="global-exam-toggle" data-value="none">
                     <button type="button" data-mode="none" onclick="setExamMode(this, 'global-exam-toggle')"
-                      class="exam-toggle-btn px-2.5 py-1 text-[11px] font-bold rounded-md bg-white text-slate-900 shadow-sm border border-slate-200/70">Normal</button>
+                      class="exam-toggle-btn px-3 py-1 text-xs font-bold rounded-lg bg-white text-[#0B1230] shadow-sm border border-[#E9EDFF]">Normal</button>
                     <button type="button" data-mode="5m" onclick="setExamMode(this, 'global-exam-toggle')"
-                      class="exam-toggle-btn px-2.5 py-1 text-[11px] font-medium rounded-md text-slate-500 hover:text-slate-900">5
-                      Mark</button>
+                      class="exam-toggle-btn px-3 py-1 text-xs font-medium rounded-lg text-[#737B94] hover:text-[#0B1230]">5 Mark</button>
                     <button type="button" data-mode="10m" onclick="setExamMode(this, 'global-exam-toggle')"
-                      class="exam-toggle-btn px-2.5 py-1 text-[11px] font-medium rounded-md text-slate-500 hover:text-slate-900">10
-                      Mark</button>
+                      class="exam-toggle-btn px-3 py-1 text-xs font-medium rounded-lg text-[#737B94] hover:text-[#0B1230]">10 Mark</button>
                   </div>
                 </div>
 
-                <div class="flex items-center justify-between mt-4">
+                <div class="flex items-center justify-between mt-5 pt-3 border-t border-[#E9EDFF]">
                   <div class="flex items-center gap-3">
                     <span
-                      class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-md border border-slate-200 flex items-center gap-1"><i
-                        data-lucide="cpu" class="w-3 h-3 text-indigo-500"></i> AI Auto-Sort Enabled</span>
+                      class="text-[11px] font-bold text-[#4B46FF] bg-[#F7F9FF] px-2.5 py-1 rounded-lg border border-[#E9EDFF] flex items-center gap-1.5"><i
+                        data-lucide="cpu" class="w-3.5 h-3.5"></i> AI Auto-Sort Enabled</span>
                     <span
-                      class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-md border border-amber-200 hidden sm:flex items-center gap-1">🪙
+                      class="text-[11px] font-bold text-[#0B1230] bg-[#FFC857]/15 px-2.5 py-1 rounded-lg border border-[#FFC857]/30 hidden sm:flex items-center gap-1">🪙
                       Costs 15 pts</span>
                   </div>
                   <button type="submit"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-5 py-2 rounded-lg shadow-sm transition-colors flex items-center gap-1.5">
+                    class="btn-electric bg-[#4B46FF] hover:bg-[#3934E6] text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md flex items-center gap-1.5 cursor-pointer transition-all">
                     <i data-lucide="send" class="w-3.5 h-3.5"></i> Post Doubt
                   </button>
                 </div>
@@ -226,27 +276,25 @@
 
             <!-- Permission Warning (If can't post) -->
             <div id="no-post-warning"
-              class="bg-white border border-slate-200 rounded-xl p-5 text-center hidden shadow-sm mb-6">
+              class="card-modern bg-white p-6 text-center hidden shadow-sm mb-6 border-[#E9EDFF]">
               <div
-                class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-2 text-slate-400">
+                class="w-10 h-10 bg-[#F7F9FF] rounded-2xl flex items-center justify-center mx-auto mb-3 text-[#737B94] border border-[#E9EDFF]">
                 <i data-lucide="lock" class="w-5 h-5"></i>
               </div>
-              <p class="text-sm text-slate-600 font-bold" id="no-post-warning-text">You can only answer doubts in your
-                own academic year's channels.</p>
+              <p class="text-sm text-[#20263D] font-bold" id="no-post-warning-text">You can only answer doubts in your own academic year's channels.</p>
             </div>
 
             <!-- Filter/Sort Bar -->
-            <div class="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-slate-200">
-              <div class="flex items-center gap-1 bg-slate-200/50 p-1 rounded-lg border border-slate-200">
-                <button
-                  class="px-3 py-1.5 text-[11px] font-bold rounded-md bg-white text-slate-900 shadow-sm border border-slate-200/50">Most
-                  Recent</button>
-                <button class="px-3 py-1.5 text-[11px] font-medium rounded-md text-slate-500 hover:text-slate-900">Most
-                  Upvoted</button>
-                <button
-                  class="px-3 py-1.5 text-[11px] font-medium rounded-md text-slate-500 hover:text-slate-900">Unsolved</button>
-                <button
-                  class="px-3 py-1.5 text-[11px] font-medium rounded-md text-slate-500 hover:text-slate-900">Solved</button>
+            <div class="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-[#E9EDFF]">
+              <div class="flex items-center gap-1 bg-white p-1 rounded-xl border border-[#E9EDFF]" id="feed-filter-bar">
+                <button onclick="setFilter('recent', this)"
+                  class="feed-filter-btn px-3.5 py-1.5 text-xs font-bold rounded-lg bg-[#E9EDFF] text-[#4B46FF] transition-all">Most Recent</button>
+                <button onclick="setFilter('upvoted', this)"
+                  class="feed-filter-btn px-3.5 py-1.5 text-xs font-medium rounded-lg text-[#737B94] hover:text-[#0B1230] transition-all">Most Upvoted</button>
+                <button onclick="setFilter('unsolved', this)"
+                  class="feed-filter-btn px-3.5 py-1.5 text-xs font-medium rounded-lg text-[#737B94] hover:text-[#0B1230] transition-all">Unsolved</button>
+                <button onclick="setFilter('solved', this)"
+                  class="feed-filter-btn px-3.5 py-1.5 text-xs font-medium rounded-lg text-[#737B94] hover:text-[#0B1230] transition-all">Solved</button>
               </div>
             </div>
 
@@ -260,24 +308,24 @@
       </main>
 
       <!-- Right Sidebar (Leaderboard & Faculty) -->
-      <aside class="w-72 bg-white border-l border-slate-200 hidden lg:flex flex-col h-full shrink-0">
-        <div class="flex-1 overflow-y-auto p-5 space-y-8 no-scrollbar">
+      <aside class="w-72 bg-white border-l border-[#E9EDFF] hidden lg:flex flex-col h-full shrink-0">
+        <div class="flex-1 overflow-y-auto p-6 space-y-8 no-scrollbar">
           <!-- Top Helpers -->
           <div>
-            <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
-              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                <i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i> Top Helpers
+            <div class="flex items-center justify-between mb-4 border-b border-[#E9EDFF] pb-3">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-[#737B94] flex items-center gap-2">
+                <i data-lucide="trophy" class="w-4 h-4 text-[#FFC857]"></i> Top Helpers
               </h3>
-              <span class="text-[9px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">This Week</span>
+              <span class="text-[10px] font-extrabold text-[#0B1230] bg-[#FFC857]/20 px-2 py-0.5 rounded-lg border border-[#FFC857]/40">This Week</span>
             </div>
-            <div class="space-y-2" id="leaderboard-container"></div>
+            <div class="space-y-2.5" id="leaderboard-container"></div>
           </div>
 
           <!-- Online Faculty -->
           <div>
-            <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
-              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                <i data-lucide="users" class="w-4 h-4 text-emerald-500"></i> Online Faculty
+            <div class="flex items-center justify-between mb-4 border-b border-[#E9EDFF] pb-3">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-[#737B94] flex items-center gap-2">
+                <i data-lucide="users" class="w-4 h-4 text-[#35C98A]"></i> Online Faculty
               </h3>
             </div>
             <div id="online-faculty-container" class="space-y-4">
@@ -291,15 +339,15 @@
 
   <!-- Mobile Menu Overlay -->
   <div id="mobile-menu"
-    class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden md:hidden transition-opacity duration-300 opacity-0">
+    class="fixed inset-0 bg-[#0B1230]/60 backdrop-blur-sm z-50 hidden md:hidden transition-opacity duration-300 opacity-0">
     <div
-      class="w-64 bg-slate-50 h-full flex flex-col transform -translate-x-full transition-transform duration-300 shadow-2xl"
+      class="w-72 bg-white h-full flex flex-col transform -translate-x-full transition-transform duration-300 shadow-2xl"
       id="mobile-menu-panel">
       <!-- Same as Left Sidebar content -->
-      <div class="h-16 flex items-center justify-between px-4 border-b border-slate-200 bg-white">
-        <span class="text-base font-extrabold text-slate-900">Channels</span>
+      <div class="h-18 flex items-center justify-between px-5 border-b border-[#E9EDFF] bg-white">
+        <span class="text-base font-extrabold text-[#0B1230]">Channels</span>
         <button onclick="toggleMobileMenu()"
-          class="text-slate-400 hover:text-slate-700 bg-slate-100 p-1.5 rounded-md"><i data-lucide="x"
+          class="text-[#737B94] hover:text-[#0B1230] bg-[#F7F9FF] p-2 rounded-xl border border-[#E9EDFF]"><i data-lucide="x"
             class="w-4 h-4"></i></button>
       </div>
       <div class="flex-1 overflow-y-auto py-4 space-y-5 no-scrollbar" id="mobile-channels-container"></div>
@@ -330,8 +378,21 @@
       user: null,
       userYearValue: 1, // 1 to 4
       activeYearValue: 1,
-      currentDoubtId: null
+      currentDoubtId: null,
+      currentFilter: 'recent'
     };
+
+    function setFilter(filterType, btnEl) {
+      state.currentFilter = filterType;
+      const filterBtns = document.querySelectorAll('.feed-filter-btn');
+      filterBtns.forEach(btn => {
+        btn.className = "feed-filter-btn px-3.5 py-1.5 text-xs font-medium rounded-lg text-[#737B94] hover:text-[#0B1230] bg-transparent transition-all";
+      });
+      if (btnEl) {
+        btnEl.className = "feed-filter-btn px-3.5 py-1.5 text-xs font-bold rounded-lg bg-[#E9EDFF] text-[#4B46FF] transition-all";
+      }
+      renderFeed();
+    }
 
     function parseYearValue(yearStr) {
       if (!yearStr || yearStr === "Global") return 1;
@@ -354,10 +415,8 @@
         // Setup base year value
         state.userYearValue = parseYearValue(state.user.year || state.user.yearName);
         state.activeYearValue = state.userYearValue;
-        // activeYear and activeSubject are already set to Global / General
       } catch (e) {
         console.error("Error during init:", e);
-        // Fallback for demo purposes if DB crashes
         state.user = { name: "Guest", year: "1st Year", points: 100, role: "student" };
         state.userYearValue = 1;
         state.activeYearValue = 1;
@@ -366,7 +425,11 @@
 
       // Setup UI from user data
       document.getElementById("sidebar-name").textContent = state.user.name;
-      document.getElementById("sidebar-year").textContent = state.user.year || state.user.yearName || "Unknown Year";
+      const sidebarYearEl = document.getElementById("sidebar-year");
+      if (sidebarYearEl) {
+        const span = sidebarYearEl.querySelector("span") || sidebarYearEl;
+        span.textContent = state.user.year || state.user.yearName || "Unknown Year";
+      }
 
       const avatarEl = document.getElementById("sidebar-avatar");
       if (state.user.avatar) {
@@ -377,9 +440,6 @@
 
       document.getElementById("header-points-balance").textContent = state.user.points || 100;
 
-      // Render the shell + any cached doubts immediately, then refresh from
-      // the backend in the background — avoids a blank/frozen-feeling feed
-      // while the network round trip to Neon completes.
       renderSidebar();
       renderFeed();
       lucide.createIcons();
@@ -391,9 +451,7 @@
       renderOnlineFaculty();
       lucide.createIcons();
 
-      // Auto-trigger switch to user's default channel
       switchChannel(state.activeYear, state.activeSubject);
-      
       checkUrlForDoubt();
     });
 
@@ -405,14 +463,14 @@
       const hash = window.location.hash;
       const params = new URLSearchParams(window.location.search);
       let doubtId = params.get("doubt") || params.get("question") || params.get("questionId") || params.get("id");
-      
+
       if (!doubtId && hash && hash.includes("/question/")) {
         const parts = hash.split("/question/");
         if (parts.length > 1) {
           doubtId = parts[1];
         }
       }
-      
+
       if (doubtId) {
         window.location.href = `question.html?id=${doubtId}`;
       }
@@ -426,12 +484,12 @@
         const isDashActive = state.activeSubject === "Dashboard";
         html += `
           <div class="mb-5">
-            <div class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1.5 px-4 flex items-center gap-1.5">
+            <div class="text-[10px] font-extrabold uppercase tracking-widest text-[#737B94] mb-2 px-4 flex items-center gap-1.5">
               <i data-lucide="layout-dashboard" class="w-3.5 h-3.5"></i> HOME
             </div>
-            <div class="space-y-0.5 px-2">
-              <button onclick="switchChannel('Global', 'Dashboard')" class="w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${isDashActive ? 'channel-active border border-indigo-200/50 shadow-sm' : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-900 border border-transparent'}">
-                <i data-lucide="home" class="w-3.5 h-3.5 ${isDashActive ? 'text-indigo-600' : 'text-slate-400'}"></i>
+            <div class="space-y-1 px-2">
+              <button onclick="switchChannel('Global', 'Dashboard')" class="w-full text-left px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2.5 ${isDashActive ? 'channel-active border shadow-sm' : 'text-[#737B94] hover:bg-[#F7F9FF] hover:text-[#0B1230] border border-transparent'}">
+                <i data-lucide="home" class="w-4 h-4 ${isDashActive ? 'text-[#4B46FF]' : 'text-[#737B94]'}"></i>
                 <span class="truncate">Main Dashboard</span>
               </button>
             </div>
@@ -442,19 +500,19 @@
         const isGenActive = state.activeSubject === "General";
         html += `
           <div class="mb-5">
-            <div class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1.5 px-4 flex items-center gap-1.5">
+            <div class="text-[10px] font-extrabold uppercase tracking-widest text-[#737B94] mb-2 px-4 flex items-center gap-1.5">
               <i data-lucide="globe" class="w-3.5 h-3.5"></i> GLOBAL CHANNELS
             </div>
-            <div class="space-y-0.5 px-2">
-              <button onclick="switchChannel('Global', 'General')" class="w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${isGenActive ? 'channel-active border border-indigo-200/50 shadow-sm' : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-900 border border-transparent'}">
-                <i data-lucide="message-square" class="w-3.5 h-3.5 ${isGenActive ? 'text-indigo-600' : 'text-slate-400'}"></i>
+            <div class="space-y-1 px-2">
+              <button onclick="switchChannel('Global', 'General')" class="w-full text-left px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2.5 ${isGenActive ? 'channel-active border shadow-sm' : 'text-[#737B94] hover:bg-[#F7F9FF] hover:text-[#0B1230] border border-transparent'}">
+                <i data-lucide="message-square" class="w-4 h-4 ${isGenActive ? 'text-[#4B46FF]' : 'text-[#737B94]'}"></i>
                 <span class="truncate">General Discussion</span>
               </button>
             </div>
           </div>
         `;
 
-        // 2. YEAR SPECIFIC CHANNELS
+        // 3. YEAR SPECIFIC CHANNELS
         let targetYearRaw = state.user.year || state.user.yearName || "1st Year";
         let targetYearVal = parseYearValue(targetYearRaw);
         let targetYear = YEARS[targetYearVal - 1] || "1st Year";
@@ -464,39 +522,39 @@
         yearsToRender.forEach((yr) => {
           html += `
             <div class="mb-5">
-              <div class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1.5 px-4 flex items-center gap-1.5">
+              <div class="text-[10px] font-extrabold uppercase tracking-widest text-[#737B94] mb-2 px-4 flex items-center gap-1.5">
                 <i data-lucide="folder-open" class="w-3.5 h-3.5"></i> ${yr.toUpperCase()} SUBJECTS
               </div>
-              <div class="space-y-0.5 px-2">
+              <div class="space-y-1 px-2">
           `;
           (YEAR_SUBJECTS[yr] || []).forEach(sub => {
             const isActive = state.activeYear === yr && state.activeSubject === sub;
             const activeClass = isActive
-              ? "channel-active border border-indigo-200/50 shadow-sm"
-              : "text-slate-600 hover:bg-slate-200/50 hover:text-slate-900 border border-transparent";
+              ? "channel-active border shadow-sm"
+              : "text-[#737B94] hover:bg-[#F7F9FF] hover:text-[#0B1230] border border-transparent";
 
             html += `
-              <button onclick="switchChannel('${yr}', '${sub}')" class="w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-2 ${activeClass}">
-                <i data-lucide="${isActive ? 'folder-open' : 'folder'}" class="w-3.5 h-3.5 ${isActive ? 'text-indigo-600' : 'text-slate-400'}"></i>
+              <button onclick="switchChannel('${yr}', '${sub}')" class="w-full text-left px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2.5 ${activeClass}">
+                <i data-lucide="${isActive ? 'folder-open' : 'folder'}" class="w-4 h-4 ${isActive ? 'text-[#4B46FF]' : 'text-[#737B94]'}"></i>
                 <span class="truncate">${sub}</span>
               </button>
             `;
 
-            // Render sub-channels (Units) if the channel is active
+            // Render sub-channels (Units) if active
             if (isActive) {
               const taxonomyMatch = (typeof STUDY_BUDDY_DATA !== 'undefined' ? STUDY_BUDDY_DATA.taxonomy.find(t => t.subjectName === sub) : null);
               if (taxonomyMatch && taxonomyMatch.topics) {
-                html += `<div class="pl-6 pr-2 pt-1 pb-2 space-y-0.5 border-l-2 border-indigo-100 ml-3 mb-1">`;
+                html += `<div class="pl-6 pr-2 pt-1 pb-2 space-y-1 border-l-2 border-[#E9EDFF] ml-4 mb-1">`;
                 taxonomyMatch.topics.forEach((topic, idx) => {
                   const unitName = `Unit ${idx + 1}: ${topic.topicName}`;
                   const isUnitActive = state.activeSubject === unitName;
                   const unitClass = isUnitActive
-                    ? "bg-slate-200 text-slate-900 font-bold"
-                    : "text-slate-500 hover:text-slate-800 hover:bg-slate-200/50";
+                    ? "bg-[#E9EDFF] text-[#4B46FF] font-bold"
+                    : "text-[#737B94] hover:text-[#0B1230] hover:bg-[#F7F9FF]";
 
                   html += `
-                    <button onclick="switchChannel('${yr}', '${unitName}')" class="w-full text-left px-2 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-1.5 ${unitClass}">
-                      <i data-lucide="hash" class="w-3 h-3 ${isUnitActive ? 'text-indigo-500' : 'text-slate-400'}"></i>
+                    <button onclick="switchChannel('${yr}', '${unitName}')" class="w-full text-left px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1.5 ${unitClass}">
+                      <i data-lucide="hash" class="w-3 h-3 ${isUnitActive ? 'text-[#4B46FF]' : 'text-[#737B94]'}"></i>
                       <span class="truncate">${unitName}</span>
                     </button>
                   `;
@@ -523,7 +581,6 @@
       document.getElementById("current-channel-title").textContent = subject;
       document.getElementById("current-year-title").textContent = year;
 
-      // Manage Composer Box Visibility (Only on Dashboard)
       const composeBox = document.getElementById("compose-box-container");
       const warningBox = document.getElementById("no-post-warning");
       const warningText = document.getElementById("no-post-warning-text");
@@ -536,9 +593,9 @@
         if (warningBox) warningBox.classList.remove("hidden");
 
         if (state.activeYearValue < state.userYearValue) {
-          if (warningText) warningText.innerHTML = `You are viewing a junior year channel.<br><span class="text-xs text-slate-500 font-normal mt-1 block">You can view and answer doubts here, but please use the Main Dashboard to ask your own doubts.</span>`;
+          if (warningText) warningText.innerHTML = `You are viewing a junior year channel.<br><span class="text-xs text-[#737B94] font-normal mt-1 block">You can view and answer doubts here, but please use the Main Dashboard to ask your own doubts.</span>`;
         } else {
-          if (warningText) warningText.innerHTML = `Channels are read-only views for specific subjects.<br><span class="text-xs text-slate-500 font-normal mt-1 block">Please navigate to the <strong class="text-indigo-600">Main Dashboard</strong> to ask a new doubt. The AI will sort it here automatically.</span>`;
+          if (warningText) warningText.innerHTML = `Channels are read-only views for specific subjects.<br><span class="text-xs text-[#737B94] font-normal mt-1 block">Please navigate to the <strong class="text-[#4B46FF]">Main Dashboard</strong> to ask a new doubt. The AI will sort it here automatically.</span>`;
         }
       }
 
@@ -546,7 +603,6 @@
       renderFeed();
       lucide.createIcons();
 
-      // Close mobile menu if open
       const mobileMenu = document.getElementById("mobile-menu");
       if (!mobileMenu.classList.contains("hidden")) toggleMobileMenu();
     }
@@ -555,11 +611,7 @@
       const container = document.getElementById("doubts-feed-container");
       const doubts = DB.getDoubts();
 
-      // We filter doubts by matching the subject.
-      // In a robust system, doubts should also be tagged with the 'year' they were posted in.
-      // We'll approximate by checking the student's year for now, since they can only post in their own year.
-      const filtered = doubts.filter(d => {
-        // If Dashboard, show global and user's current year doubts
+      let filtered = doubts.filter(d => {
         if (state.activeSubject === "Dashboard") {
           const doubtYearVal = parseYearValue(d.studentYear);
           return (doubtYearVal === state.userYearValue || d.subject === "General" || !d.subject);
@@ -573,7 +625,6 @@
           if (state.activeSubject === "General" && !SUBJECTS.includes(d.subject)) {
             matchesSubject = true;
           } else if (!state.activeSubject.startsWith("Unit ") && typeof STUDY_BUDDY_DATA !== 'undefined') {
-            // Check if doubt belongs to a unit of the active subject
             const taxonomyMatch = STUDY_BUDDY_DATA.taxonomy.find(t => t.subjectName === state.activeSubject);
             if (taxonomyMatch && taxonomyMatch.topics) {
               const unitTopics = taxonomyMatch.topics.map((t, idx) => `Unit ${idx + 1}: ${t.topicName}`);
@@ -584,29 +635,43 @@
           }
         }
 
-        // Fallback: If doubt has no studentYear or is legacy, just show it based on subject to populate the feed.
         if (!d.studentYear) return matchesSubject;
 
         return matchesYear && matchesSubject;
       });
 
+      // Apply Tab Filter (Most Recent, Most Upvoted, Unsolved, Solved)
+      const currentFilter = state.currentFilter || 'recent';
+      if (currentFilter === 'upvoted') {
+        filtered.sort((a, b) => (b.upvotes || 0) - (a.upvotes || 0));
+      } else if (currentFilter === 'unsolved') {
+        filtered = filtered.filter(d => d.status !== 'Resolved');
+      } else if (currentFilter === 'solved') {
+        filtered = filtered.filter(d => d.status === 'Resolved');
+      } else {
+        // Most Recent (newest first)
+        filtered.sort((a, b) => {
+          const timeA = new Date(a.timestamp || 0).getTime() || 0;
+          const timeB = new Date(b.timestamp || 0).getTime() || 0;
+          if (timeB !== timeA) return timeB - timeA;
+          return String(b.id).localeCompare(String(a.id));
+        });
+      }
+
       if (filtered.length === 0) {
         container.innerHTML = `
-          <div class="text-center py-16 bg-white rounded-xl border border-slate-200 border-dashed shadow-sm">
-            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 text-slate-300">
+          <div class="card-modern text-center py-16 bg-white border-[#E9EDFF] border-dashed shadow-sm">
+            <div class="w-16 h-16 bg-[#F7F9FF] rounded-2xl flex items-center justify-center mx-auto mb-4 border border-[#E9EDFF] text-[#737B94]">
               <i data-lucide="inbox" class="w-8 h-8"></i>
             </div>
-            <h3 class="text-base font-extrabold text-slate-900">No doubts here yet</h3>
-            <p class="text-sm text-slate-500 mt-1 max-w-sm mx-auto">Be the first to start a discussion in ${state.activeYear} - ${state.activeSubject}!</p>
+            <h3 class="text-base font-extrabold text-[#0B1230]">No doubts here yet</h3>
+            <p class="text-sm text-[#737B94] mt-1 max-w-sm mx-auto font-medium">Be the first to start a discussion in ${state.activeYear} - ${state.activeSubject}!</p>
           </div>
         `;
         lucide.createIcons();
         return;
       }
 
-      // Stabilize upvote counts once (was previously re-randomized on every
-      // render if unset, which is what made the count appear to "jump" /
-      // glitch, especially right after posting an answer triggered a re-render).
       let upvotesChanged = false;
       filtered.forEach(d => {
         if (d.upvotes === undefined) {
@@ -616,56 +681,58 @@
       });
       if (upvotesChanged) DB.saveDoubts(DB.getDoubts());
 
+      const upvotedDoubts = JSON.parse(localStorage.getItem('upvoted_doubts') || '[]');
+
       container.innerHTML = filtered.map(d => {
         const isSolved = d.status === "Resolved";
         const answerCount = d.answers ? d.answers.length : 0;
 
         let yearBadge = "";
         const authorYearVal = parseYearValue(d.studentYear);
-        if (authorYearVal) yearBadge = `<span class="bg-slate-100 border border-slate-200 text-slate-600 px-1.5 py-0.5 rounded text-[9px] font-bold shadow-sm">${d.studentYear}</span>`;
+        if (authorYearVal) yearBadge = `<span class="bg-[#F7F9FF] border border-[#E9EDFF] text-[#4B46FF] px-2 py-0.5 rounded-md text-[10px] font-bold shadow-sm">${d.studentYear}</span>`;
 
         let examBadge = "";
-        if (d.examMode === "5m") examBadge = `<span class="bg-violet-100 border border-violet-200 text-violet-700 px-1.5 py-0.5 rounded text-[9px] font-bold shadow-sm">5 Mark Answer</span>`;
-        else if (d.examMode === "10m") examBadge = `<span class="bg-violet-100 border border-violet-200 text-violet-700 px-1.5 py-0.5 rounded text-[9px] font-bold shadow-sm">10 Mark Answer</span>`;
+        if (d.examMode === "5m") examBadge = `<span class="bg-[#4B46FF]/10 border border-[#4B46FF]/20 text-[#4B46FF] px-2 py-0.5 rounded-md text-[10px] font-bold shadow-sm">5 Mark Answer</span>`;
+        else if (d.examMode === "10m") examBadge = `<span class="bg-[#4B46FF]/10 border border-[#4B46FF]/20 text-[#4B46FF] px-2 py-0.5 rounded-md text-[10px] font-bold shadow-sm">10 Mark Answer</span>`;
 
-        const pendingBadge = d._pending ? `<span class="bg-slate-100 border border-slate-200 text-slate-500 px-1.5 py-0.5 rounded text-[9px] font-bold shadow-sm flex items-center gap-1"><i data-lucide="loader-2" class="w-2.5 h-2.5 animate-spin"></i> Auto-sorting…</span>` : "";
+        const pendingBadge = d._pending ? `<span class="bg-[#F7F9FF] border border-[#E9EDFF] text-[#737B94] px-2 py-0.5 rounded-md text-[10px] font-bold shadow-sm flex items-center gap-1"><i data-lucide="loader-2" class="w-2.5 h-2.5 animate-spin text-[#4B46FF]"></i> Auto-sorting…</span>` : "";
 
         return `
-          <div class="bg-white border border-slate-200 rounded-xl p-5 hover:border-indigo-300 hover:shadow-md transition-all shadow-sm cursor-pointer group relative ${d._pending ? 'opacity-70' : ''}" onclick="openThread('${d.id}')">
-            <!-- decorative accent line -->
-            ${isSolved ? '<div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 rounded-l-xl"></div>' : ''}
+          <div class="card-modern bg-white p-5 hover:border-[#4B46FF]/40 hover:shadow-lg transition-all shadow-sm cursor-pointer group relative border-[#E9EDFF] ${d._pending ? 'opacity-70' : ''}" onclick="openThread('${d.id}')">
+            ${isSolved ? '<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#35C98A] rounded-l-2xl"></div>' : ''}
             
             <div class="flex items-start gap-4">
               <!-- Upvote column -->
-              <div class="flex flex-col items-center gap-1 bg-slate-50/80 px-2.5 py-2 rounded-xl border border-slate-200 hover:border-indigo-100 transition-colors shrink-0" onclick="handleUpvote(event, '${d.id}')">
-                <i data-lucide="chevron-up" class="w-5 h-5 text-slate-400 hover:text-indigo-500 transition-colors"></i>
-                <span id="feed-upvotes-${d.id}" class="text-sm font-extrabold text-slate-700">${d.upvotes}</span>
-                <i data-lucide="chevron-down" class="w-5 h-5 text-slate-300"></i>
+              <div class="flex flex-col items-center gap-1 px-3 py-2.5 rounded-2xl border transition-all shrink-0 ${upvotedDoubts.includes(String(d.id)) ? 'bg-[#E9EDFF] border-[#4B46FF]/30 cursor-default' : 'bg-[#F7F9FF] border-[#E9EDFF] hover:border-[#4B46FF]/30 cursor-pointer'}" 
+                   onclick="handleUpvote(event, '${d.id}')"
+                   title="${upvotedDoubts.includes(String(d.id)) ? 'You too have the same issue' : 'I have this issue too'}">
+                <i data-lucide="hand" class="w-5 h-5 ${upvotedDoubts.includes(String(d.id)) ? 'fill-[#4B46FF] text-[#4B46FF]' : 'text-[#737B94] group-hover:text-[#4B46FF] transition-colors'}"></i>
+                <span id="feed-upvotes-${d.id}" class="text-sm font-extrabold text-[#0B1230]">${d.upvotes}</span>
               </div>
               
               <div class="flex-1 min-w-0">
                 <div class="flex flex-wrap items-center gap-2 mb-2">
-                  <img src="${d.studentAvatar || 'https://via.placeholder.com/150'}" class="w-5 h-5 rounded-full border border-slate-200">
-                  <span class="text-xs font-bold text-slate-900">${d.studentName}</span>
+                  <img src="${d.studentAvatar || 'https://via.placeholder.com/150'}" class="w-6 h-6 rounded-full border border-[#E9EDFF] object-cover">
+                  <span class="text-xs font-bold text-[#0B1230]">${d.studentName}</span>
                   ${yearBadge}
                   ${examBadge}
                   ${pendingBadge}
-                  <span class="text-[10px] text-slate-400 ml-auto whitespace-nowrap">${d.timestamp || '2 hrs ago'}</span>
+                  <span class="text-[11px] text-[#737B94] font-medium ml-auto whitespace-nowrap">${d.timestamp || '2 hrs ago'}</span>
                 </div>
                 
-                <h4 class="text-base font-extrabold text-slate-900 mb-1.5 leading-snug group-hover:text-indigo-700 transition-colors">${d.title}</h4>
-                <p class="text-sm text-slate-600 line-clamp-2 leading-relaxed mb-4">${d.rawQuery}</p>
+                <h4 class="text-base font-extrabold text-[#0B1230] mb-1.5 leading-snug group-hover:text-[#4B46FF] transition-colors">${d.title}</h4>
+                <p class="text-sm text-[#737B94] line-clamp-2 leading-relaxed mb-4 font-normal">${d.rawQuery}</p>
                 
-                <div class="flex flex-wrap items-center gap-3 text-[11px] font-bold">
-                  <div class="flex items-center gap-1.5 text-slate-600 bg-slate-100/80 border border-slate-200 px-2.5 py-1 rounded-md shadow-sm">
-                    <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
+                <div class="flex flex-wrap items-center gap-3 text-xs font-bold">
+                  <div class="flex items-center gap-1.5 text-[#0B1230] bg-[#F7F9FF] border border-[#E9EDFF] px-3 py-1.5 rounded-xl shadow-sm">
+                    <i data-lucide="message-square" class="w-3.5 h-3.5 text-[#4B46FF]"></i>
                     <span>${answerCount} ${answerCount === 1 ? 'Answer' : 'Answers'}</span>
                   </div>
                   ${isSolved
-            ? `<div class="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-md shadow-sm"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Solved</div>`
+            ? `<div class="flex items-center gap-1.5 text-[#35C98A] bg-[#35C98A]/10 border border-[#35C98A]/20 px-3 py-1.5 rounded-xl shadow-sm"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Solved</div>`
             : ''
           }
-                  <div class="flex items-center gap-1.5 text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 shadow-sm ml-auto sm:ml-0">
+                  <div class="flex items-center gap-1.5 text-[#0B1230] bg-[#FFC857]/15 px-3 py-1.5 rounded-xl border border-[#FFC857]/30 shadow-sm ml-auto sm:ml-0">
                     <span>🎁 ${d.points || 25} pts bounty</span>
                   </div>
                 </div>
@@ -717,8 +784,6 @@
       }
     }
 
-    // Minimal markdown -> HTML for the AI's exam-style answers (just **bold**
-    // and line breaks — avoids pulling in a full markdown lib for this).
     function renderLiteMarkdown(text) {
       if (!text) return "";
       const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -736,12 +801,12 @@
       group.querySelectorAll(".exam-toggle-btn").forEach(b => {
         const active = b === btn;
         b.classList.toggle("bg-white", active);
-        b.classList.toggle("text-slate-900", active);
+        b.classList.toggle("text-[#0B1230]", active);
         b.classList.toggle("font-bold", active);
         b.classList.toggle("shadow-sm", active);
         b.classList.toggle("border", active);
-        b.classList.toggle("border-slate-200/70", active);
-        b.classList.toggle("text-slate-500", !active);
+        b.classList.toggle("border-[#E9EDFF]", active);
+        b.classList.toggle("text-[#737B94]", !active);
         b.classList.toggle("font-medium", !active);
       });
     }
@@ -780,19 +845,18 @@
       list = list.sort((a, b) => b.pts - a.pts);
 
       document.getElementById("leaderboard-container").innerHTML = list.map((l, i) => `
-        <div class="flex items-center justify-between p-2.5 rounded-xl transition-all ${l.name === state.user.name ? 'bg-indigo-50 border border-indigo-100 shadow-sm' : 'bg-slate-50 border border-slate-100'}">
+        <div class="flex items-center justify-between p-3 rounded-2xl transition-all ${l.name === state.user.name ? 'bg-[#E9EDFF] border border-[#4B46FF]/30 shadow-sm' : 'bg-[#F7F9FF] border border-[#E9EDFF]'}">
           <div class="flex items-center gap-3">
-            <span class="text-[10px] font-extrabold ${i === 0 ? 'text-amber-500' : 'text-slate-400'} w-3 text-center">${i + 1}</span>
-            <img src="${l.avatar}" class="w-7 h-7 rounded-full object-cover border border-slate-200">
-            <span class="text-xs font-bold text-slate-800">${l.name} ${l.name === state.user.name ? '<span class="text-[9px] text-indigo-500 font-bold ml-1">(You)</span>' : ''}</span>
+            <span class="text-xs font-extrabold ${i === 0 ? 'text-[#FFC857]' : 'text-[#737B94]'} w-4 text-center">${i + 1}</span>
+            <img src="${l.avatar}" class="w-8 h-8 rounded-full object-cover border border-[#E9EDFF]">
+            <span class="text-xs font-bold text-[#0B1230]">${l.name} ${l.name === state.user.name ? '<span class="text-[10px] text-[#4B46FF] font-bold ml-1">(You)</span>' : ''}</span>
           </div>
-          <span class="text-xs font-extrabold text-indigo-600">${l.pts}</span>
+          <span class="text-xs font-extrabold text-[#4B46FF]">${l.pts}</span>
         </div>
       `).join("");
     }
 
     function renderOnlineFaculty() {
-      // Mocking faculty from the resources metadata in data.js
       const uniqueFaculty = {};
       STUDY_BUDDY_DATA.resources.forEach(r => {
         if (!uniqueFaculty[r.facultyId]) {
@@ -808,14 +872,14 @@
       const container = document.getElementById("online-faculty-container");
       if (container) {
         container.innerHTML = faculty.map(f => `
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-3.5">
             <div class="relative shrink-0">
-              <img src="${f.avatar}" class="w-9 h-9 rounded-full object-cover border border-slate-200">
-              <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></div>
+              <img src="${f.avatar}" class="w-10 h-10 rounded-full object-cover border border-[#E9EDFF]">
+              <div class="absolute bottom-0 right-0 w-3 h-3 bg-[#35C98A] border-2 border-white rounded-full"></div>
             </div>
             <div>
-              <div class="text-xs font-bold text-slate-900">${f.name}</div>
-              <div class="text-[10px] text-slate-500 font-medium">${f.dept}</div>
+              <div class="text-xs font-bold text-[#0B1230]">${f.name}</div>
+              <div class="text-[11px] text-[#737B94] font-semibold">${f.dept}</div>
             </div>
           </div>
         `).join('');
@@ -828,9 +892,9 @@
         balanceEl.textContent = newPoints;
         const wallet = document.getElementById("user-points-wallet");
         wallet.classList.remove("scale-100");
-        wallet.classList.add("scale-110", "bg-amber-100", "border-amber-400");
+        wallet.classList.add("scale-110", "bg-[#FFC857]/30");
         setTimeout(() => {
-          wallet.classList.remove("scale-110", "bg-amber-100", "border-amber-400");
+          wallet.classList.remove("scale-110", "bg-[#FFC857]/30");
           wallet.classList.add("scale-100");
         }, 300);
       }
@@ -839,36 +903,70 @@
     function showPointsInfo() {
       showToast(`You have ${state.user.points} pts! Answer doubts to earn more.`, "info");
     }
+
     window.handleUpvote = (e, doubtId, isModal = false) => {
       e.stopPropagation();
 
-      // Guard against double-fires (rapid clicks) which used to double-count
-      // the upvote before the pointer-events lock kicked in.
+      const upvotedDoubts = JSON.parse(localStorage.getItem('upvoted_doubts') || '[]');
+      if (upvotedDoubts.includes(String(doubtId))) {
+        showToast("You already attempted", "warning");
+        return;
+      }
+
       if (e.currentTarget.dataset.upvoting === "1") return;
       e.currentTarget.dataset.upvoting = "1";
 
+      upvotedDoubts.push(String(doubtId));
+      localStorage.setItem('upvoted_doubts', JSON.stringify(upvotedDoubts));
+
       const doubts = DB.getDoubts();
       const doubtIndex = doubts.findIndex(d => d.id === doubtId);
-      if (doubtIndex === -1) return;
-
-      const currentUpvotes = doubts[doubtIndex].upvotes || (2 + (String(doubtId).split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 24));
-      doubts[doubtIndex].upvotes = currentUpvotes + 1;
-      DB.saveDoubts(doubts);
+      let newUpvotes = 1;
+      if (doubtIndex !== -1) {
+        doubts[doubtIndex].upvotes = (doubts[doubtIndex].upvotes || 0) + 1;
+        newUpvotes = doubts[doubtIndex].upvotes;
+        DB.saveDoubts(doubts);
+      }
 
       if (isModal) {
         const modalBtn = document.getElementById(`modal-upvotes-${doubtId}`);
-        if (modalBtn) modalBtn.textContent = `Upvote (${doubts[doubtIndex].upvotes})`;
+        if (modalBtn) modalBtn.textContent = `I have this issue too (${newUpvotes})`;
       } else {
         const feedCount = document.getElementById(`feed-upvotes-${doubtId}`);
-        if (feedCount) feedCount.textContent = doubts[doubtIndex].upvotes;
+        if (feedCount) feedCount.textContent = newUpvotes;
       }
 
-      const upvoteIcon = e.currentTarget.querySelector('.lucide-chevron-up');
+      const upvoteIcon = e.currentTarget.querySelector('.lucide-hand');
       if (upvoteIcon) {
-        upvoteIcon.classList.remove('text-slate-400');
-        upvoteIcon.classList.add('text-indigo-500');
+        upvoteIcon.classList.add('fill-[#4B46FF]', 'text-[#4B46FF]');
+        e.currentTarget.title = "You too have the same issue";
       }
       showToast("Upvoted successfully!", "success");
+
+      fetch(`http://localhost:8000/api/doubts/${doubtId}/upvote`, { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+            if (data.upvotes) {
+                const updatedDoubts = DB.getDoubts();
+                const idx = updatedDoubts.findIndex(d => d.id === doubtId);
+                if (idx !== -1) {
+                    updatedDoubts[idx].upvotes = data.upvotes;
+                    DB.saveDoubts(updatedDoubts);
+                    
+                    if (isModal) {
+                        const btn = document.getElementById(`modal-upvotes-${doubtId}`);
+                        if (btn) btn.textContent = `I have this issue too (${data.upvotes})`;
+                    } else {
+                        const count = document.getElementById(`feed-upvotes-${doubtId}`);
+                        if (count) count.textContent = data.upvotes;
+                    }
+                }
+            }
+        })
+        .catch(err => console.error(err))
+        .finally(() => {
+          e.currentTarget.dataset.upvoting = "0";
+        });
     };
 
     window.handleShare = (e, doubtId) => {
@@ -881,24 +979,12 @@
 
     window.handleAutoSortPost = async (e) => {
       e.preventDefault();
-
-      const title = document.getElementById("post-title")?.value.trim();
-      const desc = document.getElementById("post-desc")?.value.trim();
-
-      // Auto-sort is now handled directly by handleGlobalPostDoubt
     };
 
-    // Normalizes text for duplicate comparison: lowercase, trimmed, and with
-    // repeated whitespace collapsed, so "Confused about DFS!" and
-    // "confused   about dfs" are treated as the same question.
     function normalizeForDuplicateCheck(str) {
       return (str || "").toLowerCase().trim().replace(/\s+/g, " ").replace(/[?.!]+$/g, "");
     }
 
-    // Looks for a doubt this same student already posted with essentially
-    // the same question text (matches the backend's unique constraint on
-    // student_id + raw_query, but checked instantly on the client instead
-    // of round-tripping to the server and hitting a DB error).
     function findDuplicateDoubt(rawQuery) {
       const normalizedQuery = normalizeForDuplicateCheck(rawQuery);
       const doubts = DB.getDoubts();
@@ -914,7 +1000,6 @@
       const form = e.target;
       const btn = form.querySelector('button[type="submit"]');
 
-      // Guard: ignore this submit entirely if a previous submit is still in flight.
       if (btn && btn.disabled) return;
 
       const titleInput = form.querySelector('input[type="text"]');
@@ -935,8 +1020,6 @@
         return;
       }
 
-      // Same question already posted by you? Don't create a duplicate —
-      // just take them straight to the existing thread instead.
       const duplicate = findDuplicateDoubt(desc);
       if (duplicate) {
         showToast("You've already asked this — opening your existing question.", "info");
@@ -952,13 +1035,10 @@
       }
 
       const originalText = btn.innerHTML;
-      btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-violet-200"></i> Sorting...';
+      btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-[#E9EDFF]"></i> Sorting...';
       btn.disabled = true;
       lucide.createIcons();
 
-      // Optimistic UI: clear the form + show the post immediately so it feels
-      // instant, instead of staring at a spinner while the AI classifies +
-      // (optionally) generates the exam-style answer in the background.
       if (titleInput) titleInput.value = "";
       if (descInput) descInput.value = "";
       const tempId = "temp-" + Date.now();
@@ -988,7 +1068,6 @@
 
         const res = await DB.addDoubt(newDoubt);
 
-        // Drop the optimistic placeholder now that the real (auto-sorted) doubt is in
         const refreshed = DB.getDoubts().filter(d => d.id !== tempId);
         DB.saveDoubts(refreshed);
 

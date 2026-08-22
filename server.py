@@ -174,7 +174,7 @@ if LANGCHAIN_AVAILABLE and DB_URL:
 def get_db_connection():
     if not DB_URL:
         raise Exception("DATABASE_URL environment variable is not set!")
-    return psycopg.connect(DB_URL)
+    return psycopg.connect(DB_URL, connect_timeout=5)
 
 def run_query(query, params=None, commit=False, fetch_one=False, fetch_all=False):
     try:
@@ -649,6 +649,14 @@ def read_index():
 def read_knowledge_graph():
     return FileResponse(os.path.join(BASE_DIR, "knowledge_graph.html"))
 
+@app.get("/question.html")
+def read_question():
+    return FileResponse(os.path.join(BASE_DIR, "question.html"))
+
+@app.get("/profile.html")
+def read_profile():
+    return FileResponse(os.path.join(BASE_DIR, "profile.html"))
+
 class KgRagRequest(BaseModel):
     concept: str
     question: str = ""
@@ -814,7 +822,7 @@ def get_doubts(subject: str = "All"):
     # which is what made the feed/queue feel slow to load as data grew.
     query = """
         SELECT d.id, d.title, d.raw_query as "rawQuery", d.difficulty, d.intent,
-               d.detected_misconception as "misconception", d.status, d.created_at, d.points,
+               d.detected_misconception as "misconception", d.status, d.created_at, d.points, COALESCE(d.upvotes, 0) as upvotes,
                u.full_name as "studentName", u.academic_year as "studentYear", u.avatar_url as "studentAvatar",
                s.name as "subject", t.name as "topic", c.name as "concept",
                COALESCE(ans.answers, '[]'::json) as "answers"
@@ -1127,11 +1135,15 @@ def add_answer(doubt_id: str, request: AnswerRequest):
         conn = get_db_connection()
         with conn.cursor() as cur:
             # 1. Resolve author
-            cur.execute("SELECT id FROM users WHERE email = %s;", [request.authorEmail])
+            cur.execute("SELECT id, role FROM users WHERE email = %s;", [request.authorEmail])
             user_row = cur.fetchone()
             if not user_row:
                 raise HTTPException(status_code=404, detail="User not found")
             author_id = user_row[0]
+            role = user_row[1]
+            
+            is_faculty = (role == 'teacher')
+            v_state = 'FACULTY_VERIFIED' if is_faculty else 'Reviewing'
 
             # 2. Get doubt bounty
             cur.execute("SELECT points FROM doubts WHERE id = %s;", [doubt_id])
@@ -1142,15 +1154,24 @@ def add_answer(doubt_id: str, request: AnswerRequest):
             cur.execute("""
                 INSERT INTO answers (doubt_id, author_id, content, explanation_style,
                                      is_ai_verified, is_faculty_verified, verification_state)
-                VALUES (%s, %s, %s, 'Technical', FALSE, FALSE, 'Reviewing')
+                VALUES (%s, %s, %s, 'Technical', FALSE, %s, %s)
                 RETURNING id;
-            """, [doubt_id, author_id, content])
+            """, [doubt_id, author_id, content, is_faculty, v_state])
             inserted = cur.fetchone()
             answer_id = str(inserted[0]) if inserted else ""
 
             # 4. Update doubt status + user points in the same transaction
             cur.execute("UPDATE doubts SET status = 'Resolved' WHERE id = %s;", [doubt_id])
             cur.execute("UPDATE users SET points = points + %s WHERE id = %s;", [bounty, author_id])
+
+            # 5. Notify doubt author
+            cur.execute("SELECT student_id, title FROM doubts WHERE id = %s;", [doubt_id])
+            doubt_info = cur.fetchone()
+            if doubt_info and doubt_info[0] != author_id:
+                cur.execute("""
+                    INSERT INTO notifications (user_id, title, message)
+                    VALUES (%s, %s, %s)
+                """, [doubt_info[0], "New Answer", f"Someone answered your story: {doubt_info[1][:50]}..."])
 
             conn.commit()
         conn.close()
@@ -1393,6 +1414,13 @@ def update_user_points(email: str, request: PointsRequest):
     
     return {"success": True, "points": new_points}
 
+@app.post("/api/doubts/{doubt_id}/upvote")
+@app.post("/doubts/{doubt_id}/upvote")
+def upvote_doubt(doubt_id: str):
+    run_query("UPDATE doubts SET upvotes = COALESCE(upvotes, 0) + 1 WHERE id = %s;", [doubt_id], commit=True)
+    row = run_query("SELECT upvotes FROM doubts WHERE id = %s;", [doubt_id], fetch_one=True)
+    return {"success": True, "upvotes": row['upvotes'] if row else 0}
+
 @app.post("/api/answers/{answer_id}/like")
 @app.post("/answers/{answer_id}/like")
 def like_answer(answer_id: str):
@@ -1446,8 +1474,64 @@ def add_reply(answer_id: str, request: ReplyRequest):
         INSERT INTO answer_replies (answer_id, author_name, author_avatar, content)
         VALUES (%s, %s, %s, %s);
     """, [answer_id, request.authorName, request.authorAvatar, request.content], commit=True)
+    
+    # Notify answer author
+    author_row = run_query("SELECT author_id FROM answers WHERE id = %s;", [answer_id], fetch_one=True)
+    if author_row:
+        author_id = author_row['author_id']
+        run_query("""
+            INSERT INTO notifications (user_id, title, message)
+            VALUES (%s, %s, %s)
+        """, [author_id, "New Reply", f"{request.authorName} commented on your answer."], commit=True)
+        
     return {"success": True, "message": "Reply added successfully."}
 
+@app.get("/api/notifications")
+@app.get("/notifications")
+def get_notifications(email: str):
+    user_row = run_query("SELECT id FROM users WHERE email = %s;", [email], fetch_one=True)
+    if not user_row:
+        return {"notifications": []}
+    
+    user_id = user_row['id']
+    notifs = run_query("""
+        SELECT id, title, message, is_read, created_at
+        FROM notifications
+        WHERE user_id = %s
+        ORDER BY created_at DESC
+        LIMIT 20;
+    """, [user_id], fetch_all=True)
+    
+    for n in notifs:
+        n['id'] = str(n['id'])
+        if n['created_at']:
+            n['created_at'] = n['created_at'].isoformat()
+            
+    return {"notifications": notifs}
+
+@app.post("/api/notifications/{notif_id}/read")
+@app.post("/notifications/{notif_id}/read")
+def mark_notification_read(notif_id: str):
+    run_query("UPDATE notifications SET is_read = TRUE WHERE id = %s;", [notif_id], commit=True)
+    return {"success": True}
+
+@app.get("/api/concepts")
+@app.get("/concepts")
+def get_concepts():
+    try:
+        concepts = run_query("""
+            SELECT c.id, c.name, c.sub_concept, c.difficulty_level, c.canonical_summary, c.common_misconception,
+                   t.name as topic_name, s.name as subject_name
+            FROM concepts c
+            LEFT JOIN topics t ON c.topic_id = t.id
+            LEFT JOIN subjects s ON t.subject_id = s.id
+            ORDER BY c.name ASC;
+        """, fetch_all=True)
+        for c in concepts:
+            c['id'] = str(c['id'])
+        return {"success": True, "concepts": concepts}
+    except Exception as e:
+        return {"success": False, "error": str(e), "concepts": []}
 
 if __name__ == '__main__':
     import uvicorn

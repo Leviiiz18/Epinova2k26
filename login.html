@@ -3,116 +3,158 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In — Study Buddy</title>
+  <title>Sign In — What's that?</title>
+  
+  <!-- Tailwind CSS CDN & Config -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif']
+          },
+          colors: {
+            brand: {
+              DEFAULT: '#4B46FF',
+              hover: '#3934E6',
+              accent: '#6C8CFF',
+              navy: '#0B1230',
+              dark: '#070B1D',
+              ice: '#F7F9FF',
+              main: '#F5F7FC',
+              secondary: '#E9EDFF',
+              success: '#35C98A',
+              warning: '#FFC857',
+              error: '#FF5C70',
+              text: '#20263D',
+              muted: '#737B94'
+            }
+          },
+          borderRadius: {
+            '2xl': '18px',
+            '3xl': '24px'
+          }
+        }
+      }
+    }
+  </script>
+
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="css/style.css">
   <style>
     .field-input {
       width: 100%;
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 13px;
-      color: #0f172a;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      background: #FFFFFF;
+      border: 1px solid #E9EDFF;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #0B1230;
+      transition: all 0.15s ease;
       outline: none;
     }
     .field-input:focus {
-      border-color: #0f172a;
-      box-shadow: 0 0 0 3px rgba(15,23,42,0.08);
+      border-color: #4B46FF;
+      box-shadow: 0 0 0 4px rgba(75, 70, 255, 0.12);
     }
-    .field-input::placeholder { color: #94a3b8; }
+    .field-input::placeholder { color: #737B94; font-weight: 400; }
     .field-label {
       display: block;
       font-size: 11px;
       font-weight: 700;
-      color: #475569;
+      color: #737B94;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 5px;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
     }
     .demo-btn {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
+      gap: 12px;
+      padding: 10px 14px;
+      background: #FFFFFF;
+      border: 1px solid #E9EDFF;
+      border-radius: 14px;
       width: 100%;
       text-align: left;
-      transition: background 0.15s, border-color 0.15s;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
       cursor: pointer;
     }
-    .demo-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .demo-btn:hover {
+      background: #F7F9FF;
+      border-color: rgba(75, 70, 255, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(75, 70, 255, 0.08);
+    }
     .submit-btn {
       width: 100%;
-      background: #0f172a;
-      color: #fff;
+      background: #4B46FF;
+      color: #FFFFFF;
       border: none;
-      border-radius: 10px;
-      padding: 12px 20px;
-      font-size: 13px;
+      border-radius: 14px;
+      padding: 13px 20px;
+      font-size: 14px;
       font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
-      letter-spacing: 0.01em;
+      box-shadow: 0 4px 14px rgba(75, 70, 255, 0.3);
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .submit-btn:hover { background: #1e293b; }
-    .submit-btn:active { transform: scale(0.99); }
+    .submit-btn:hover {
+      background: #3934E6;
+      box-shadow: 0 8px 22px rgba(75, 70, 255, 0.4);
+      transform: translateY(-1px);
+    }
+    .submit-btn:active { transform: scale(0.98); }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+<body class="bg-[#F5F7FC] text-[#20263D] min-h-screen flex flex-col font-sans">
 
   <!-- Header -->
-  <header class="w-full px-6 py-4 flex items-center justify-between border-b border-slate-200 bg-white">
-    <a href="index.html" class="flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-lg bg-slate-900 flex items-center justify-center text-white">
-        <i data-lucide="graduation-cap" class="w-4 h-4"></i>
-      </div>
-      <span class="text-sm font-bold text-slate-900 tracking-tight">Study Buddy</span>
+  <header class="w-full px-6 py-4 flex items-center justify-between border-b border-[#E9EDFF] bg-white/90 backdrop-blur-md sticky top-0 z-40">
+    <a href="index.html" class="flex items-center">
+      <img src="assets/logo.png" alt="Logo" class="h-16 sm:h-18 w-auto object-contain hover:scale-105 transition-transform">
     </a>
-    <a href="index.html" class="text-xs font-medium text-slate-500 hover:text-slate-900 flex items-center gap-1.5 transition-colors">
-      <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
-      <span>Back to Overview</span>
+    <a href="index.html" title="Back to Overview" class="text-xs font-bold text-[#737B94] hover:text-[#4B46FF] flex items-center justify-center transition-colors bg-[#F7F9FF] hover:bg-[#E9EDFF] p-2.5 rounded-xl border border-[#E9EDFF]">
+      <i data-lucide="arrow-left" class="w-4 h-4 text-[#4B46FF]"></i>
     </a>
   </header>
 
   <!-- Main -->
-  <main class="flex-1 flex items-center justify-center p-4 sm:p-6">
-    <div class="w-full max-w-[420px]">
+  <main class="flex-1 flex items-center justify-center p-4 sm:p-8 relative overflow-hidden">
+    <!-- Subtle Background Glows -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#4B46FF]/5 rounded-full blur-3xl pointer-events-none"></div>
 
-      <!-- Title -->
+    <div class="w-full max-w-[460px] relative z-10">
+
+      <!-- Title & Mascot Logo -->
       <div class="text-center mb-8">
-        <div class="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white mx-auto mb-4">
-          <i data-lucide="graduation-cap" class="w-5 h-5"></i>
-        </div>
-        <h1 class="text-2xl font-bold text-slate-950 tracking-tight">Welcome back</h1>
-        <p class="text-slate-500 text-sm mt-1.5">Sign in to your Study Buddy account</p>
+        <img src="assets/logo.png" alt="Logo" class="h-36 sm:h-44 w-auto object-contain mx-auto mb-3 hover:scale-105 transition-transform duration-300">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-[#0B1230] tracking-tight">Welcome back</h1>
+        <p class="text-[#737B94] text-sm mt-1 font-medium">Sign in to your account</p>
       </div>
 
       <!-- Quick Demo Access -->
       <div class="mb-6">
-        <p class="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3 text-center">Quick Demo Access</p>
-        <div class="grid grid-cols-2 gap-2.5">
+        <p class="text-[11px] font-bold uppercase tracking-widest text-[#737B94] mb-3 text-center">Quick Demo Access</p>
+        <div class="grid grid-cols-2 gap-3">
           <button type="button" onclick="loginAsDemo('student')" class="demo-btn">
-            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150" class="w-8 h-8 rounded-full object-cover border border-slate-200 flex-shrink-0" alt="Alex">
-            <div>
-              <div class="text-xs font-bold text-slate-900">Alex Morgan</div>
-              <div class="text-[11px] text-slate-500">3rd Year Student</div>
+            <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150" class="w-9 h-9 rounded-full object-cover border border-[#E9EDFF] flex-shrink-0" alt="Alex">
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-[#0B1230] truncate">Alex Morgan</div>
+              <div class="text-[11px] text-[#737B94] font-medium truncate">3rd Year Student</div>
             </div>
           </button>
           <button type="button" onclick="loginAsDemo('faculty','fac-ai-01')" class="demo-btn">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250" class="w-8 h-8 rounded-full object-cover border border-slate-200 flex-shrink-0" alt="Dr Sarah">
-            <div>
-              <div class="text-xs font-bold text-slate-900">Dr. Sarah Jenkins</div>
-              <div class="text-[11px] text-slate-500">AI &amp; ML Faculty</div>
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250" class="w-9 h-9 rounded-full object-cover border border-[#E9EDFF] flex-shrink-0" alt="Dr Sarah">
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-[#0B1230] truncate">Dr. Sarah Jenkins</div>
+              <div class="text-[11px] text-[#737B94] font-medium truncate">AI &amp; ML Faculty</div>
             </div>
           </button>
         </div>
@@ -120,14 +162,14 @@
 
       <!-- Divider -->
       <div class="flex items-center gap-3 mb-6">
-        <div class="flex-1 h-px bg-slate-200"></div>
-        <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">or sign in manually</span>
-        <div class="flex-1 h-px bg-slate-200"></div>
+        <div class="flex-1 h-px bg-[#E9EDFF]"></div>
+        <span class="text-[11px] font-bold text-[#737B94] uppercase tracking-wider">or sign in manually</span>
+        <div class="flex-1 h-px bg-[#E9EDFF]"></div>
       </div>
 
       <!-- Form Card -->
-      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-        <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="p-6 space-y-4">
+      <div class="card-modern bg-white p-7 shadow-lg border-[#E9EDFF]">
+        <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
 
           <!-- Signup-only fields (hidden by default) -->
           <div id="field-name" class="hidden">
@@ -165,15 +207,15 @@
 
           <!-- Password -->
           <div>
-            <div class="flex items-center justify-between mb-[5px]">
+            <div class="flex items-center justify-between mb-1.5">
               <label class="field-label" style="margin-bottom:0">Password</label>
-              <a href="#" onclick="showToast('Password reset link sent to demo email!', 'info'); return false;" class="text-[11px] text-slate-400 hover:text-slate-700 transition-colors">Forgot password?</a>
+              <a href="#" onclick="showToast('Password reset link sent to demo email!', 'info'); return false;" class="text-[11px] font-medium text-[#737B94] hover:text-[#4B46FF] transition-colors">Forgot password?</a>
             </div>
             <input type="password" id="input-password" autocomplete="current-password" required value="password123" placeholder="••••••••" class="field-input">
           </div>
 
           <!-- Submit -->
-          <div class="pt-1">
+          <div class="pt-2">
             <button type="submit" id="submit-auth-btn" class="submit-btn">
               <span id="btn-text">Sign In</span>
               <i data-lucide="arrow-right" class="w-4 h-4"></i>
@@ -183,9 +225,9 @@
         </form>
 
         <!-- Sign up toggle -->
-        <div class="px-6 pb-5 text-center">
-          <span class="text-xs text-slate-500" id="auth-switch-text">Don't have an account?</span>
-          <button type="button" onclick="toggleAuthMode()" id="auth-switch-btn" class="text-xs font-semibold text-slate-700 hover:text-slate-950 hover:underline ml-1.5 transition-colors">Sign up now</button>
+        <div class="mt-6 pt-4 border-t border-[#E9EDFF] text-center">
+          <span class="text-xs text-[#737B94] font-medium" id="auth-switch-text">Don't have an account?</span>
+          <button type="button" onclick="toggleAuthMode()" id="auth-switch-btn" class="text-xs font-bold text-[#4B46FF] hover:text-[#3934E6] hover:underline ml-1.5 transition-colors">Sign up now</button>
         </div>
       </div>
 
@@ -193,8 +235,10 @@
   </main>
 
   <!-- Footer -->
-  <footer class="py-4 text-center text-xs text-slate-400 border-t border-slate-200 bg-white mt-auto">
-    <span>Study Buddy Platform &bull; Academic Doubt Resolution Engine</span>
+  <footer class="border-t border-[#E9EDFF] bg-white py-4 px-4 text-center text-xs text-[#737B94]">
+    <div class="max-w-7xl mx-auto flex items-center justify-center">
+      <img src="assets/logo.png" alt="Logo" class="h-12 w-auto object-contain">
+    </div>
   </footer>
 
   <script src="js/data.js?v=2.1"></script>
@@ -246,7 +290,7 @@
         fieldYear.classList.add("hidden");
         fieldDomain.classList.add("hidden");
         authTitle.textContent = "Welcome back";
-        authSub.textContent = "Sign in to your Study Buddy account";
+        authSub.textContent = "Sign in to your What's that? account";
         btnText.textContent = "Sign In";
         switchText.textContent = "Don't have an account?";
         switchBtn.textContent = "Sign up now";

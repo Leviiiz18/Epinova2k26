@@ -435,10 +435,11 @@ const DB = {
     }
     
     try {
-      const email = answerData.authorName.includes("Alex") ? "alex.morgan@studybuddy.edu" :
+      const email = answerData.authorEmail || (
+                    answerData.authorName.includes("Alex") ? "alex.morgan@studybuddy.edu" :
                     answerData.authorName.includes("Rahul") ? "rahul.sharma@studybuddy.edu" :
                     answerData.authorName.includes("Elena") ? "elena.vance@studybuddy.edu" :
-                    answerData.authorName.includes("Priya") ? "priya.patel@studybuddy.edu" : "jordan.hayes@studybuddy.edu";
+                    answerData.authorName.includes("Priya") ? "priya.patel@studybuddy.edu" : "jordan.hayes@studybuddy.edu");
                     
       const response = await fetch(`http://localhost:8000/api/doubts/${doubtId}/answers`, {
         method: "POST",
